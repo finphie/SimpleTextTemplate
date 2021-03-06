@@ -11,13 +11,13 @@
         None,
 
         /// <summary>
-        /// HTMLブロック。
+        /// そのまま出力するブロック
         /// </summary>
-        Html,
+        Raw,
 
         /// <summary>
-        /// 変数ブロック。
+        /// 識別子
         /// </summary>
-        Object
+        Identifier
     }
 }

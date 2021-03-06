@@ -4,14 +4,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using SimpleTextTemplate.Extensions;
 using SimpleTextTemplate.Helpers;
-using static SimpleTextTemplate.HtmlParserException;
+using static SimpleTextTemplate.SimpleTextTemplateException;
 
 namespace SimpleTextTemplate
 {
     /// <summary>
-    /// UTF-8でエンコードされたHTMLを読み込みます。
+    /// UTF-8でエンコードされたテンプレートを読み込みます。
     /// </summary>
-    public ref struct HtmlReader
+    public ref struct SimpleTextTemplateReader
     {
         /// <summary>
         /// '{{'
@@ -28,21 +28,21 @@ namespace SimpleTextTemplate
         int _position;
 
         /// <summary>
-        /// <see cref="HtmlReader"/>構造体の新しいインスタンスを初期化します。
+        /// <see cref="SimpleTextTemplateReader"/>構造体の新しいインスタンスを初期化します。
         /// </summary>
-        /// <param name="input">処理対象にするUTF-8のHTML文字列</param>
-        public HtmlReader(ReadOnlySpan<byte> input)
+        /// <param name="input">処理対象にするUTF-8のテンプレート文字列</param>
+        public SimpleTextTemplateReader(ReadOnlySpan<byte> input)
         {
             _buffer = input;
             _position = 0;
         }
 
         /// <summary>
-        /// HTML文字列を読み込みます。
+        /// テンプレート文字列を読み込みます。
         /// </summary>
-        /// <param name="range">HTMLまたはオブジェクトの位置</param>
+        /// <param name="range">テンプレートまたはオブジェクトの位置</param>
         /// <returns>ブロックのタイプ</returns>
-        /// <exception cref="HtmlParserException">HTMLの解析に失敗した場合に、対象の例外をスローします。</exception>
+        /// <exception cref="SimpleTextTemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
         public BlockType Read(out Range range)
         {
             if (_position >= _buffer.Length)
@@ -53,17 +53,17 @@ namespace SimpleTextTemplate
 
             if (TryReadHtml(out range))
             {
-                return BlockType.Html;
+                return BlockType.Raw;
             }
 
-            ReadObject(out range);
-            return BlockType.Object;
+            ReadIdentifier(out range);
+            return BlockType.Identifier;
         }
 
         /// <summary>
-        /// HTML文字列を読み込みます。
+        /// テンプレート文字列を読み込みます。
         /// </summary>
-        /// <param name="range">HTMLの位置</param>
+        /// <param name="range">テンプレートの位置</param>
         /// <returns>
         /// 現在位置の文字列が'{{'の場合は<see langword="true"/>、
         /// それ以外の場合は<see langword="false"/>。
@@ -106,11 +106,11 @@ namespace SimpleTextTemplate
         }
 
         /// <summary>
-        /// オブジェクトを読み込みます。
+        /// 識別子を読み込みます。
         /// </summary>
         /// <param name="range">オブジェクトの位置</param>
-        /// <exception cref="HtmlParserException">HTMLの解析に失敗した場合に、対象の例外をスローします。</exception>
-        public void ReadObject(out Range range)
+        /// <exception cref="SimpleTextTemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
+        public void ReadIdentifier(out Range range)
         {
             if (_position >= _buffer.Length)
             {

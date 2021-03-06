@@ -3,23 +3,23 @@
 namespace SimpleTextTemplate
 {
     /// <summary>
-    /// HTML解析中に発生したエラーを表します。
+    /// テンプレート解析中に発生したエラーを表します。
     /// </summary>
-    public sealed class HtmlParserException : Exception
+    public sealed class SimpleTextTemplateException : Exception
     {
         /// <summary>
-        /// <see cref="HtmlParserException"/>クラスの新しいインスタンスを初期化します。
+        /// <see cref="SimpleTextTemplateException"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
-        public HtmlParserException()
+        public SimpleTextTemplateException()
         {
         }
 
         /// <summary>
-        /// <see cref="HtmlParserException"/>クラスの新しいインスタンスを初期化します。
+        /// <see cref="SimpleTextTemplateException"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="error">エラーを説明するメッセージ</param>
         /// <param name="position">エラーが発生した位置</param>
-        public HtmlParserException(ParserError error, int position)
+        public SimpleTextTemplateException(ParserError error, int position)
             : base($"Error: {error} at position: {position}")
         {
             Error = error;
@@ -27,20 +27,20 @@ namespace SimpleTextTemplate
         }
 
         /// <summary>
-        /// <see cref="HtmlParserException"/>クラスの新しいインスタンスを初期化します。
+        /// <see cref="SimpleTextTemplateException"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="message">エラーを説明するメッセージ</param>
-        public HtmlParserException(string message)
+        public SimpleTextTemplateException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// <see cref="HtmlParserException"/>クラスの新しいインスタンスを初期化します。
+        /// <see cref="SimpleTextTemplateException"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="message">エラーを説明するメッセージ</param>
         /// <param name="innerException">内部例外</param>
-        public HtmlParserException(string message, Exception innerException)
+        public SimpleTextTemplateException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
@@ -75,7 +75,7 @@ namespace SimpleTextTemplate
         public ParserError Error { get; }
 
         /// <summary>
-        /// HTML文字列のバイト位置を取得します。
+        /// テンプレート文字列のバイト位置を取得します。
         /// </summary>
         /// <value>
         /// バイト位置

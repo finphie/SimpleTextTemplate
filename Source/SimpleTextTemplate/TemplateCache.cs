@@ -3,11 +3,12 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace SimpleTextTemplate
 {
     /// <summary>
-    /// HTMLを解析するときに使用するキャッシュクラスです。
+    /// テンプレートを解析するときに使用するキャッシュクラスです。
     /// </summary>
     sealed class TemplateCache
     {
@@ -57,11 +58,11 @@ namespace SimpleTextTemplate
 
                 switch (block.Type)
                 {
-                    case BlockType.Html:
+                    case BlockType.Raw:
                         bufferWriter.Write(value);
                         break;
-                    case BlockType.Object:
-                        context.TryGetValue(value, out var x);
+                    case BlockType.Identifier:
+                        context.TryGetValue(Encoding.UTF8.GetString(value), out var x);
                         bufferWriter.Write(x);
                         break;
                     case BlockType.None:
@@ -73,7 +74,7 @@ namespace SimpleTextTemplate
 
         void Parse()
         {
-            var reader = new HtmlReader(Buffer);
+            var reader = new SimpleTextTemplateReader(Buffer);
 
             while ((reader.Read(out var value) is var type) && type != BlockType.None)
             {
