@@ -2,8 +2,8 @@
 using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using System.Text;
+using SimpleTextTemplate.Extensions;
 
 namespace SimpleTextTemplate
 {
@@ -13,7 +13,7 @@ namespace SimpleTextTemplate
     sealed class TemplateCache
     {
         readonly byte[] _buffer;
-        readonly List<ValueTuple<BlockType, Range>> _blocks;
+        readonly List<ValueTuple<BlockType, TextRange>> _blocks;
 
         /// <summary>
         /// <see cref="TemplateCache"/>クラスの新しいインスタンスを初期化します。
@@ -41,7 +41,7 @@ namespace SimpleTextTemplate
         /// <value>
         /// ブロック単位のバッファ
         /// </value>
-        internal ReadOnlySpan<(BlockType Type, Range Range)> Blocks => CollectionsMarshal.AsSpan(_blocks);
+        internal ReadOnlySpan<(BlockType Type, TextRange Range)> Blocks => _blocks.AsSpan();
 
         /// <summary>
         /// 文字列コンテンツをレンダリングして、<see cref="IBufferWriter{Byte}"/>に書き込みます。
@@ -54,7 +54,7 @@ namespace SimpleTextTemplate
 
             foreach (ref readonly var block in Blocks)
             {
-                var value = buffer[block.Range];
+                var value = buffer.Slice(block.Range.Start, block.Range.Length);
 
                 switch (block.Type)
                 {
@@ -62,7 +62,8 @@ namespace SimpleTextTemplate
                         bufferWriter.Write(value);
                         break;
                     case BlockType.Identifier:
-                        context.TryGetValue(Encoding.UTF8.GetString(value), out var x);
+                        // TODO: パフォーマンス
+                        context.TryGetValue(Encoding.UTF8.GetString(value.ToArray()), out var x);
                         bufferWriter.Write(x);
                         break;
                     case BlockType.None:

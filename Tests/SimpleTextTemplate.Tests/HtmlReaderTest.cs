@@ -75,15 +75,15 @@ namespace SimpleTextTemplate.Tests
             var utf8Html = GetBytes(html);
             var reader = new SimpleTextTemplateReader(utf8Html);
             var count = 0;
-            Range range;
+            TextRange range;
 
             while (reader.Read(out range) is var type && type != BlockType.None)
             {
-                var actual = utf8Html[range];
+                var actual = utf8Html.AsSpan(range.Start, range.Length).ToArray();
                 actual.Should().Equal(GetBytes(expectedItems.Value[count++].Value));
             }
 
-            utf8Html[range].Should().BeEmpty();
+            utf8Html.AsSpan(range.Start, range.Length).ToArray().Should().BeEmpty();
 
             if (!string.IsNullOrEmpty(html))
             {
@@ -105,7 +105,7 @@ namespace SimpleTextTemplate.Tests
             var reader = new SimpleTextTemplateReader(utf8Html);
             var success = reader.TryReadHtml(out var range);
 
-            var actual = utf8Html[range];
+            var actual = utf8Html.AsSpan(range.Start, range.Length).ToArray();
             success.Should().BeTrue();
             actual.Should().Equal(GetBytes(expected));
         }
@@ -119,7 +119,7 @@ namespace SimpleTextTemplate.Tests
             var reader = new SimpleTextTemplateReader(utf8Html);
             var success = reader.TryReadHtml(out var range);
 
-            var actual = utf8Html[range];
+            var actual = utf8Html.AsSpan(range.Start, range.Length).ToArray();
             success.Should().BeFalse();
             actual.Should().BeEmpty();
         }
@@ -137,7 +137,7 @@ namespace SimpleTextTemplate.Tests
             var reader = new SimpleTextTemplateReader(utf8Html);
             reader.ReadIdentifier(out var range);
 
-            var actual = utf8Html[range];
+            var actual = utf8Html.AsSpan(range.Start, range.Length).ToArray();
             actual.Should().Equal(GetBytes(expected));
         }
 
@@ -164,7 +164,7 @@ namespace SimpleTextTemplate.Tests
             FluentActions.Invoking(Execute).Should().Throw<SimpleTextTemplateException>()
                 .Where(x => x.Error == error && x.Position == position);
 
-            Range Execute()
+            TextRange Execute()
             {
                 var utf8Html = GetBytes(html);
                 var reader = new SimpleTextTemplateReader(utf8Html);

@@ -43,7 +43,7 @@ namespace SimpleTextTemplate
         /// <param name="range">テンプレートまたはオブジェクトの位置</param>
         /// <returns>ブロックのタイプ</returns>
         /// <exception cref="SimpleTextTemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
-        public BlockType Read(out Range range)
+        public BlockType Read(out TextRange range)
         {
             if (_position >= _buffer.Length)
             {
@@ -69,7 +69,7 @@ namespace SimpleTextTemplate
         /// それ以外の場合は<see langword="false"/>。
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryReadHtml(out Range range)
+        public bool TryReadHtml(out TextRange range)
         {
             if (_position >= _buffer.Length)
             {
@@ -97,11 +97,11 @@ namespace SimpleTextTemplate
                     return false;
                 }
 
-                range = startPosition.._position;
+                range = new TextRange(startPosition, _position);
                 return true;
             }
 
-            range = startPosition..++_position;
+            range = new TextRange(startPosition, ++_position);
             return true;
         }
 
@@ -110,7 +110,7 @@ namespace SimpleTextTemplate
         /// </summary>
         /// <param name="range">オブジェクトの位置</param>
         /// <exception cref="SimpleTextTemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
-        public void ReadIdentifier(out Range range)
+        public void ReadIdentifier(out TextRange range)
         {
             if (_position >= _buffer.Length)
             {
@@ -185,7 +185,7 @@ namespace SimpleTextTemplate
                         ThrowHelper.ThrowHtmlParserException(ParserError.ExpectedEndObject, _position);
                     }
 
-                    range = startPosition..endPosition;
+                    range = new TextRange(startPosition, endPosition);
                     return;
                 }
 
