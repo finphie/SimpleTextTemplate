@@ -3,7 +3,7 @@
 namespace SimpleTextTemplate.Extensions
 {
     /// <summary>
-    /// <see cref="byte"/>を処理するためのヘルパークラスです。
+    /// <see cref="byte"/>関連のヘルパークラスです。
     /// </summary>
     static class ByteExtensions
     {
