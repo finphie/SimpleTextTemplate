@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - '**/*.md'
+      - .markdownlint.yml
+      - .github/workflows/linter-markdown.yml
+
+jobs:
+  main:
+    name: 'Lint: Markdown'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout ${{ github.event.repository.name }} repository
+        uses: actions/checkout@v2
+
+      - name: Install markdownlint-cli
+        run: sudo npm install -g markdownlint-cli
+
+      - name: Lint markdown
+        run: markdownlint '**/*.md'
