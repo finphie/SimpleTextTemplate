@@ -4,6 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleTextTemplate
 {
+    /// <summary>
+    /// コンテキスト
+    /// </summary>
     interface IContext
     {
         void Add(string key, byte[] value);

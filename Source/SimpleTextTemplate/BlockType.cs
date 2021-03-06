@@ -3,7 +3,7 @@
     /// <summary>
     /// ブロックのタイプを表します。
     /// </summary>
-    enum BlockType
+    public enum BlockType
     {
         /// <summary>
         /// 空のブロック。

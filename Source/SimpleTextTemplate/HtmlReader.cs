@@ -6,14 +6,12 @@ using SimpleTextTemplate.Extensions;
 using SimpleTextTemplate.Helpers;
 using static SimpleTextTemplate.HtmlParserException;
 
-[assembly: InternalsVisibleTo("Stazor.Tests.Engines.Simple")]
-
 namespace SimpleTextTemplate
 {
     /// <summary>
     /// UTF-8でエンコードされたHTMLを読み込みます。
     /// </summary>
-    ref struct HtmlReader
+    public ref struct HtmlReader
     {
         /// <summary>
         /// '{{'
