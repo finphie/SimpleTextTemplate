@@ -5,15 +5,8 @@ namespace SimpleTextTemplate
     /// <summary>
     /// コンテキスト
     /// </summary>
-    interface IContext
+    public interface IContext
     {
-        /// <summary>
-        /// 指定された識別子にUTF-8文字列を関連付けます。
-        /// </summary>
-        /// <param name="key">識別子名</param>
-        /// <param name="value">UTF-8文字列</param>
-        void Add(string key, byte[] value);
-
         /// <summary>
         /// 指定された識別子に関連付けられているUTF-8文字列を取得します。
         /// </summary>
