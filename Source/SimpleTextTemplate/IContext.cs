@@ -1,6 +1,4 @@
-﻿#if NET5_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleTextTemplate
 {
@@ -25,11 +23,6 @@ namespace SimpleTextTemplate
         /// 指定された識別子に関連付けられた文字列を取得できた場合は<see langword="true"/>、
         /// それ以外の場合は<see langword="false"/>。
         /// </returns>
-        bool TryGetValue(
-            string key,
-#if NET5_0_OR_GREATER
-            [NotNullWhen(true)]
-#endif
-            out byte[]? value);
+        bool TryGetValue(string key, [NotNullWhen(true)] out byte[]? value);
     }
 }
