@@ -6,7 +6,7 @@ using static SimpleTextTemplate.SimpleTextTemplateException;
 
 namespace SimpleTextTemplate.Tests
 {
-    public sealed class HtmlReaderTest
+    public sealed class SimpleTextTemplateReaderTest
     {
         public static TheoryData<string, MemberSerializer<Block[]>> TestData => new()
         {
@@ -70,22 +70,22 @@ namespace SimpleTextTemplate.Tests
 
         [Theory]
         [MemberData(nameof(TestData))]
-        public void ReadTest(string html, MemberSerializer<Block[]> expectedItems)
+        public void ReadTest(string input, MemberSerializer<Block[]> expectedItems)
         {
-            var utf8Html = GetBytes(html);
-            var reader = new SimpleTextTemplateReader(utf8Html);
+            var utf8Bytes = GetBytes(input);
+            var reader = new SimpleTextTemplateReader(utf8Bytes);
             var count = 0;
             TextRange range;
 
             while (reader.Read(out range) is var type && type != BlockType.None)
             {
-                var actual = utf8Html.AsSpan(range.Start, range.Length).ToArray();
+                var actual = utf8Bytes.AsSpan(range.Start, range.Length).ToArray();
                 actual.Should().Equal(GetBytes(expectedItems.Value[count++].Value));
             }
 
-            utf8Html.AsSpan(range.Start, range.Length).ToArray().Should().BeEmpty();
+            utf8Bytes.AsSpan(range.Start, range.Length).ToArray().Should().BeEmpty();
 
-            if (!string.IsNullOrEmpty(html))
+            if (!string.IsNullOrEmpty(input))
             {
                 count.Should().Be(expectedItems.Value.Length);
             }
@@ -99,13 +99,13 @@ namespace SimpleTextTemplate.Tests
         [InlineData("{ A }", "{ A }")]
         [InlineData("z{{ A }}z", "z")]
         [InlineData("z{{", "z")]
-        public void TryReadHtmlTest(string html, string expected)
+        public void TryReadTemplateTest(string input, string expected)
         {
-            var utf8Html = GetBytes(html);
-            var reader = new SimpleTextTemplateReader(utf8Html);
-            var success = reader.TryReadHtml(out var range);
+            var utf8Bytes = GetBytes(input);
+            var reader = new SimpleTextTemplateReader(utf8Bytes);
+            var success = reader.TryReadTemplate(out var range);
 
-            var actual = utf8Html.AsSpan(range.Start, range.Length).ToArray();
+            var actual = utf8Bytes.AsSpan(range.Start, range.Length).ToArray();
             success.Should().BeTrue();
             actual.Should().Equal(GetBytes(expected));
         }
@@ -113,13 +113,13 @@ namespace SimpleTextTemplate.Tests
         [Theory]
         [InlineData("")]
         [InlineData("{{")]
-        public void TryReadHtmlTest_Error(string html)
+        public void TryReadTemplateTest_Error(string input)
         {
-            var utf8Html = GetBytes(html);
-            var reader = new SimpleTextTemplateReader(utf8Html);
-            var success = reader.TryReadHtml(out var range);
+            var utf8Bytes = GetBytes(input);
+            var reader = new SimpleTextTemplateReader(utf8Bytes);
+            var success = reader.TryReadTemplate(out var range);
 
-            var actual = utf8Html.AsSpan(range.Start, range.Length).ToArray();
+            var actual = utf8Bytes.AsSpan(range.Start, range.Length).ToArray();
             success.Should().BeFalse();
             actual.Should().BeEmpty();
         }
@@ -131,43 +131,43 @@ namespace SimpleTextTemplate.Tests
         [InlineData("{{   A   }}", "A")]
         [InlineData("{{ ABC }}", "ABC")]
         [InlineData("{{ A B }}", "A B")]
-        public void ReadObjectTest(string html, string expected)
+        public void ReadIdentifierTest(string input, string expected)
         {
-            var utf8Html = GetBytes(html);
-            var reader = new SimpleTextTemplateReader(utf8Html);
+            var utf8Bytes = GetBytes(input);
+            var reader = new SimpleTextTemplateReader(utf8Bytes);
             reader.ReadIdentifier(out var range);
 
-            var actual = utf8Html.AsSpan(range.Start, range.Length).ToArray();
+            var actual = utf8Bytes.AsSpan(range.Start, range.Length).ToArray();
             actual.Should().Equal(GetBytes(expected));
         }
 
         [Theory]
-        [InlineData("{{}}", ParserError.InvalidObjectFormat, 2)]
-        [InlineData("", ParserError.ExpectedStartObject, 0)]
-        [InlineData("{", ParserError.ExpectedStartObject, 0)]
-        [InlineData("a", ParserError.ExpectedStartObject, 0)]
-        [InlineData("ab", ParserError.ExpectedStartObject, 0)]
-        [InlineData("abc", ParserError.ExpectedStartObject, 0)]
-        [InlineData("z{{A}}z", ParserError.ExpectedStartObject, 0)]
-        [InlineData("{A}", ParserError.ExpectedStartObject, 1)]
-        [InlineData("{ A }", ParserError.ExpectedStartObject, 1)]
-        [InlineData("{{{", ParserError.ExpectedStartObject, 2)]
-        [InlineData("{{{A}}", ParserError.ExpectedStartObject, 2)]
-        [InlineData("{{{ A}}", ParserError.ExpectedStartObject, 2)]
-        [InlineData("{{", ParserError.ExpectedEndObject, 1)]
-        [InlineData("{{ ", ParserError.ExpectedEndObject, 2)]
-        [InlineData("{{ A", ParserError.ExpectedEndObject, 3)]
-        [InlineData("{{A}}}", ParserError.ExpectedEndObject, 5)]
-        [InlineData("{{A }}}", ParserError.ExpectedEndObject, 6)]
-        public void ReadObjectTest_Error(string html, ParserError error, int position)
+        [InlineData("{{}}", ParserError.InvalidIdentifierFormat, 2)]
+        [InlineData("", ParserError.ExpectedStartToken, 0)]
+        [InlineData("{", ParserError.ExpectedStartToken, 0)]
+        [InlineData("a", ParserError.ExpectedStartToken, 0)]
+        [InlineData("ab", ParserError.ExpectedStartToken, 0)]
+        [InlineData("abc", ParserError.ExpectedStartToken, 0)]
+        [InlineData("z{{A}}z", ParserError.ExpectedStartToken, 0)]
+        [InlineData("{A}", ParserError.ExpectedStartToken, 1)]
+        [InlineData("{ A }", ParserError.ExpectedStartToken, 1)]
+        [InlineData("{{{", ParserError.ExpectedStartToken, 2)]
+        [InlineData("{{{A}}", ParserError.ExpectedStartToken, 2)]
+        [InlineData("{{{ A}}", ParserError.ExpectedStartToken, 2)]
+        [InlineData("{{", ParserError.ExpectedEndToken, 1)]
+        [InlineData("{{ ", ParserError.ExpectedEndToken, 2)]
+        [InlineData("{{ A", ParserError.ExpectedEndToken, 3)]
+        [InlineData("{{A}}}", ParserError.ExpectedEndToken, 5)]
+        [InlineData("{{A }}}", ParserError.ExpectedEndToken, 6)]
+        public void ReadIdentifierTest_Error(string input, ParserError error, int position)
         {
             FluentActions.Invoking(Execute).Should().Throw<SimpleTextTemplateException>()
                 .Where(x => x.Error == error && x.Position == position);
 
             TextRange Execute()
             {
-                var utf8Html = GetBytes(html);
-                var reader = new SimpleTextTemplateReader(utf8Html);
+                var utf8Bytes = GetBytes(input);
+                var reader = new SimpleTextTemplateReader(utf8Bytes);
                 reader.ReadIdentifier(out var range);
 
                 return range;

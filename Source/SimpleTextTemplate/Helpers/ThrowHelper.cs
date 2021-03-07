@@ -22,7 +22,7 @@ namespace SimpleTextTemplate.Helpers
         [DoesNotReturn]
 #endif
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static void ThrowHtmlParserException(ParserError error, int position)
+        public static void ThrowTemplateParserException(ParserError error, int position)
             => throw new SimpleTextTemplateException(error, position);
     }
 }

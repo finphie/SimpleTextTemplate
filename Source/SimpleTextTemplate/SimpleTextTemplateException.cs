@@ -51,19 +51,19 @@ namespace SimpleTextTemplate
         public enum ParserError
         {
             /// <summary>
-            /// 無効なオブジェクトフォーマット
+            /// 無効な識別子フォーマット
             /// </summary>
-            InvalidObjectFormat,
+            InvalidIdentifierFormat,
 
             /// <summary>
             /// '{{'から始まらない場合
             /// </summary>
-            ExpectedStartObject,
+            ExpectedStartToken,
 
             /// <summary>
             /// '}}'で終わらない場合
             /// </summary>
-            ExpectedEndObject
+            ExpectedEndToken
         }
 
         /// <summary>

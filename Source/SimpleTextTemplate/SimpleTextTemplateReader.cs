@@ -16,12 +16,12 @@ namespace SimpleTextTemplate
         /// <summary>
         /// '{{'
         /// </summary>
-        const ushort StartObject = 0x7b7b;
+        const ushort StartIdentifier = 0x7b7b;
 
         /// <summary>
         /// '}}'
         /// </summary>
-        const ushort EndObject = 0x7d7d;
+        const ushort EndIdentifier = 0x7d7d;
 
         readonly ReadOnlySpan<byte> _buffer;
 
@@ -51,7 +51,7 @@ namespace SimpleTextTemplate
                 return BlockType.None;
             }
 
-            if (TryReadHtml(out range))
+            if (TryReadTemplate(out range))
             {
                 return BlockType.Raw;
             }
@@ -69,7 +69,7 @@ namespace SimpleTextTemplate
         /// それ以外の場合は<see langword="false"/>。
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryReadHtml(out TextRange range)
+        public bool TryReadTemplate(out TextRange range)
         {
             if (_position >= _buffer.Length)
             {
@@ -83,7 +83,7 @@ namespace SimpleTextTemplate
             while (_position + 1 < _buffer.Length)
             {
                 // '{{'で始まらない場合
-                if (!IsStartObjectInternal(ref bufferStart))
+                if (!IsStartIdentifierBlockInternal(ref bufferStart))
                 {
                     _position++;
                     continue;
@@ -114,13 +114,13 @@ namespace SimpleTextTemplate
         {
             if (_position >= _buffer.Length)
             {
-                ThrowHelper.ThrowHtmlParserException(ParserError.ExpectedStartObject, _position);
+                ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
             }
 
             ref var bufferStart = ref MemoryMarshal.GetReference(_buffer);
 
             // '{{'で始まらない場合
-            if (!IsStartObjectInternal(ref bufferStart))
+            if (!IsStartIdentifierBlockInternal(ref bufferStart))
             {
                 // 2文字の内、最初の1文字が'{'の場合
                 if (_position + 1 < _buffer.Length && Unsafe.Add(ref bufferStart, _position) == (byte)'{')
@@ -128,20 +128,20 @@ namespace SimpleTextTemplate
                     _position++;
                 }
 
-                ThrowHelper.ThrowHtmlParserException(ParserError.ExpectedStartObject, _position);
+                ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
             }
 
             _position += sizeof(ushort);
 
             if (_position >= _buffer.Length)
             {
-                ThrowHelper.ThrowHtmlParserException(ParserError.ExpectedEndObject, --_position);
+                ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, --_position);
             }
 
             // '{'が3つ以上連続している場合
             if (Unsafe.Add(ref bufferStart, _position) == (byte)'{')
             {
-                ThrowHelper.ThrowHtmlParserException(ParserError.ExpectedStartObject, _position);
+                ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
             }
 
             // '{'に連続するスペースを削除
@@ -150,7 +150,7 @@ namespace SimpleTextTemplate
             // スペースを削除後、bufferの末尾に到達した場合
             if (_position >= _buffer.Length)
             {
-                ThrowHelper.ThrowHtmlParserException(ParserError.ExpectedEndObject, --_position);
+                ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, --_position);
             }
 
             var startPosition = _position;
@@ -158,14 +158,14 @@ namespace SimpleTextTemplate
             while (_position + 1 < _buffer.Length)
             {
                 // '}}'で終わる場合
-                if (IsEndObjectInternal(ref bufferStart))
+                if (IsEndIdentifierBlockInternal(ref bufferStart))
                 {
                     var endPosition = _position;
 
                     // '{{'と'}}'の間に1文字もない場合
                     if (startPosition == endPosition)
                     {
-                        ThrowHelper.ThrowHtmlParserException(ParserError.InvalidObjectFormat, _position);
+                        ThrowHelper.ThrowTemplateParserException(ParserError.InvalidIdentifierFormat, _position);
                     }
 
                     // 末尾のスペースを削除
@@ -182,7 +182,7 @@ namespace SimpleTextTemplate
                     // '}'が3つ以上連続している場合
                     if (_position < _buffer.Length && Unsafe.Add(ref bufferStart, _position) == (byte)'}')
                     {
-                        ThrowHelper.ThrowHtmlParserException(ParserError.ExpectedEndObject, _position);
+                        ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, _position);
                     }
 
                     range = new TextRange(startPosition, endPosition);
@@ -192,7 +192,7 @@ namespace SimpleTextTemplate
                 _position++;
             }
 
-            ThrowHelper.ThrowHtmlParserException(ParserError.ExpectedEndObject, _position);
+            ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, _position);
             range = default;
         }
 
@@ -204,8 +204,8 @@ namespace SimpleTextTemplate
         /// それ以外の場合は<see langword="false"/>。
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsStartObject()
-            => IsStartObjectInternal(ref MemoryMarshal.GetReference(_buffer));
+        public bool IsStartIdentifierBlock()
+            => IsStartIdentifierBlockInternal(ref MemoryMarshal.GetReference(_buffer));
 
         /// <summary>
         /// 現在位置の文字列が'}}'であるかどうかを示す値を返します。
@@ -215,8 +215,8 @@ namespace SimpleTextTemplate
         /// それ以外の場合は<see langword="false"/>。
         /// </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsEndObject()
-            => IsEndObjectInternal(ref MemoryMarshal.GetReference(_buffer));
+        public bool IsEndIdentifierBlock()
+            => IsEndIdentifierBlockInternal(ref MemoryMarshal.GetReference(_buffer));
 
         /// <summary>
         /// 空白文字列をスキップします。
@@ -226,17 +226,17 @@ namespace SimpleTextTemplate
             => SkipWhiteSpaceInternal(ref MemoryMarshal.GetReference(_buffer));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool IsStartObjectInternal(ref byte bufferStart)
+        bool IsStartIdentifierBlockInternal(ref byte bufferStart)
         {
             Debug.Assert(_buffer[0] == bufferStart, "Invalid position");
-            return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, _position)) == StartObject;
+            return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, _position)) == StartIdentifier;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool IsEndObjectInternal(ref byte bufferStart)
+        bool IsEndIdentifierBlockInternal(ref byte bufferStart)
         {
             Debug.Assert(_buffer[0] == bufferStart, "Invalid position");
-            return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, _position)) == EndObject;
+            return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, _position)) == EndIdentifier;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
