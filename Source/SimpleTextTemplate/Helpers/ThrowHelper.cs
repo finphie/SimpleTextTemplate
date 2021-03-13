@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using static SimpleTextTemplate.SimpleTextTemplateException;
+using static SimpleTextTemplate.TemplateException;
 
 namespace SimpleTextTemplate.Helpers
 {
@@ -29,14 +29,14 @@ namespace SimpleTextTemplate.Helpers
             => throw new ArgumentException($"引数'{paramName}'は、nullまたは空白のみの文字列にはできません。", paramName);
 
         /// <summary>
-        /// 新しい<see cref="SimpleTextTemplateException"/>例外をスローします。
+        /// 新しい<see cref="TemplateException"/>例外をスローします。
         /// </summary>
         /// <param name="error">解析エラー</param>
         /// <param name="position">バイト位置</param>
-        /// <exception cref="SimpleTextTemplateException">常にこの例外をスローします。</exception>
+        /// <exception cref="TemplateException">常にこの例外をスローします。</exception>
         [DebuggerHidden]
         [DoesNotReturn]
         public static void ThrowTemplateParserException(ParserError error, int position)
-            => throw new SimpleTextTemplateException(error, position);
+            => throw new TemplateException(error, position);
     }
 }
