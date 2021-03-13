@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using SimpleTextTemplate.Abstractions;
 using SimpleTextTemplate.Contexts;
 
 namespace SimpleTextTemplate

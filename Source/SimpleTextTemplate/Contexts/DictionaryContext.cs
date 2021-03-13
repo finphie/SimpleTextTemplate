@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using SimpleTextTemplate.Abstractions;
 using SimpleTextTemplate.Helpers;
 
 namespace SimpleTextTemplate.Contexts

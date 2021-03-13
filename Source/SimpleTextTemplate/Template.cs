@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using SimpleTextTemplate.Abstractions;
 using SimpleTextTemplate.Extensions;
 using SimpleTextTemplate.Helpers;
 using static SimpleTextTemplate.TemplateException;

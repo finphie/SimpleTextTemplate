@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace SimpleTextTemplate
+namespace SimpleTextTemplate.Abstractions
 {
     /// <summary>
     /// コンテキスト
