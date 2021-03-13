@@ -2,7 +2,7 @@
 using System.Text;
 using FluentAssertions;
 using Xunit;
-using static SimpleTextTemplate.SimpleTextTemplateException;
+using static SimpleTextTemplate.TemplateException;
 
 namespace SimpleTextTemplate.Tests
 {
@@ -73,7 +73,7 @@ namespace SimpleTextTemplate.Tests
         public void ReadTest(string input, MemberSerializer<Block[]> expectedItems)
         {
             var utf8Bytes = GetBytes(input);
-            var reader = new SimpleTextTemplateReader(utf8Bytes);
+            var reader = new TemplateReader(utf8Bytes);
             var count = 0;
             TextRange range;
 
@@ -102,7 +102,7 @@ namespace SimpleTextTemplate.Tests
         public void TryReadTemplateTest(string input, string expected)
         {
             var utf8Bytes = GetBytes(input);
-            var reader = new SimpleTextTemplateReader(utf8Bytes);
+            var reader = new TemplateReader(utf8Bytes);
             var success = reader.TryReadTemplate(out var range);
 
             var actual = utf8Bytes.AsSpan(range.Start, range.Length).ToArray();
@@ -116,7 +116,7 @@ namespace SimpleTextTemplate.Tests
         public void TryReadTemplateTest_Error(string input)
         {
             var utf8Bytes = GetBytes(input);
-            var reader = new SimpleTextTemplateReader(utf8Bytes);
+            var reader = new TemplateReader(utf8Bytes);
             var success = reader.TryReadTemplate(out var range);
 
             var actual = utf8Bytes.AsSpan(range.Start, range.Length).ToArray();
@@ -134,7 +134,7 @@ namespace SimpleTextTemplate.Tests
         public void ReadIdentifierTest(string input, string expected)
         {
             var utf8Bytes = GetBytes(input);
-            var reader = new SimpleTextTemplateReader(utf8Bytes);
+            var reader = new TemplateReader(utf8Bytes);
             reader.ReadIdentifier(out var range);
 
             var actual = utf8Bytes.AsSpan(range.Start, range.Length).ToArray();
@@ -161,13 +161,13 @@ namespace SimpleTextTemplate.Tests
         [InlineData("{{A }}}", ParserError.ExpectedEndToken, 6)]
         public void ReadIdentifierTest_Error(string input, ParserError error, int position)
         {
-            FluentActions.Invoking(Execute).Should().Throw<SimpleTextTemplateException>()
+            FluentActions.Invoking(Execute).Should().Throw<TemplateException>()
                 .Where(x => x.Error == error && x.Position == position);
 
             TextRange Execute()
             {
                 var utf8Bytes = GetBytes(input);
-                var reader = new SimpleTextTemplateReader(utf8Bytes);
+                var reader = new TemplateReader(utf8Bytes);
                 reader.ReadIdentifier(out var range);
 
                 return range;

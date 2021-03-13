@@ -4,14 +4,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using SimpleTextTemplate.Extensions;
 using SimpleTextTemplate.Helpers;
-using static SimpleTextTemplate.SimpleTextTemplateException;
+using static SimpleTextTemplate.TemplateException;
 
 namespace SimpleTextTemplate
 {
     /// <summary>
     /// UTF-8でエンコードされたテンプレートを読み込みます。
     /// </summary>
-    public ref struct SimpleTextTemplateReader
+    public ref struct TemplateReader
     {
         /// <summary>
         /// '{{'
@@ -28,10 +28,10 @@ namespace SimpleTextTemplate
         int _position;
 
         /// <summary>
-        /// <see cref="SimpleTextTemplateReader"/>構造体の新しいインスタンスを初期化します。
+        /// <see cref="TemplateReader"/>構造体の新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="input">処理対象にするUTF-8のテンプレート文字列</param>
-        public SimpleTextTemplateReader(ReadOnlySpan<byte> input)
+        public TemplateReader(ReadOnlySpan<byte> input)
         {
             _buffer = input;
             _position = 0;
@@ -42,7 +42,7 @@ namespace SimpleTextTemplate
         /// </summary>
         /// <param name="range">テンプレートまたはオブジェクトの位置</param>
         /// <returns>ブロックのタイプ</returns>
-        /// <exception cref="SimpleTextTemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
+        /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
         public BlockType Read(out TextRange range)
         {
             if (_position >= _buffer.Length)
@@ -109,7 +109,7 @@ namespace SimpleTextTemplate
         /// 識別子を読み込みます。
         /// </summary>
         /// <param name="range">オブジェクトの位置</param>
-        /// <exception cref="SimpleTextTemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
+        /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
         public void ReadIdentifier(out TextRange range)
         {
             if (_position >= _buffer.Length)

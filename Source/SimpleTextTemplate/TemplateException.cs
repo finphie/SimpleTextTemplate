@@ -5,21 +5,21 @@ namespace SimpleTextTemplate
     /// <summary>
     /// テンプレート解析中に発生したエラーを表します。
     /// </summary>
-    public sealed class SimpleTextTemplateException : Exception
+    public sealed class TemplateException : Exception
     {
         /// <summary>
-        /// <see cref="SimpleTextTemplateException"/>クラスの新しいインスタンスを初期化します。
+        /// <see cref="TemplateException"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
-        public SimpleTextTemplateException()
+        public TemplateException()
         {
         }
 
         /// <summary>
-        /// <see cref="SimpleTextTemplateException"/>クラスの新しいインスタンスを初期化します。
+        /// <see cref="TemplateException"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="error">エラーを説明するメッセージ</param>
         /// <param name="position">エラーが発生した位置</param>
-        public SimpleTextTemplateException(ParserError error, int position)
+        public TemplateException(ParserError error, int position)
             : base($"Error: {error} at position: {position}")
         {
             Error = error;
@@ -27,20 +27,20 @@ namespace SimpleTextTemplate
         }
 
         /// <summary>
-        /// <see cref="SimpleTextTemplateException"/>クラスの新しいインスタンスを初期化します。
+        /// <see cref="TemplateException"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="message">エラーを説明するメッセージ</param>
-        public SimpleTextTemplateException(string message)
+        public TemplateException(string message)
             : base(message)
         {
         }
 
         /// <summary>
-        /// <see cref="SimpleTextTemplateException"/>クラスの新しいインスタンスを初期化します。
+        /// <see cref="TemplateException"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="message">エラーを説明するメッセージ</param>
         /// <param name="innerException">内部例外</param>
-        public SimpleTextTemplateException(string message, Exception innerException)
+        public TemplateException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
@@ -50,6 +50,11 @@ namespace SimpleTextTemplate
         /// </summary>
         public enum ParserError
         {
+            /// <summary>
+            /// 無効なフォーマット
+            /// </summary>
+            InvalidFormat,
+
             /// <summary>
             /// 無効な識別子フォーマット
             /// </summary>
