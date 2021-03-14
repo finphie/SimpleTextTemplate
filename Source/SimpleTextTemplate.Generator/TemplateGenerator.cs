@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -11,6 +12,17 @@ namespace SimpleTextTemplate.Generator
     [Generator]
     sealed class TemplateGenerator : ISourceGenerator
     {
+        const string AbstractionsNamespace = "SimpleTextTemplate.Abstractions";
+        const string STT1000RuleMessage = $"{AbstractionsNamespace}が参照されていません。";
+
+        static readonly DiagnosticDescriptor STT1000Rule = new(
+            "STT1000",
+            STT1000RuleMessage,
+            STT1000RuleMessage,
+            "Generator",
+            DiagnosticSeverity.Error,
+            true);
+
         /// <inheritdoc/>
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -25,6 +37,12 @@ namespace SimpleTextTemplate.Generator
         /// <inheritdoc/>
         public void Execute(GeneratorExecutionContext context)
         {
+            if (!context.Compilation.ReferencedAssemblyNames.Any(x => x.Name == AbstractionsNamespace))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(STT1000Rule, null));
+                return;
+            }
+
             if (!context.AnalyzerConfigOptions.GlobalOptions.TryGetValue("build_property.SimpleTextTemplatePath", out var path) || string.IsNullOrWhiteSpace(path))
             {
                 return;
