@@ -12,7 +12,7 @@ namespace SimpleTextTemplate
 <# if (type == BlockType.Raw) { #>
             bufferWriter.Write(new byte[] { <#= ToHexString(range) #> });
 <# } else if (type == BlockType.Identifier) { #>
-            if (context.TryGetValue("Markdown", out var value))
+            if (context.TryGetValue("<#= ToIdentifierString(range) #>", out var value))
             {
                 bufferWriter.Write(value);
             }
