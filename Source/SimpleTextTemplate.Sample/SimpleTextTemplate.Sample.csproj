@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <SimpleTextTemplatePath>$(MSBuildThisFileDirectory)Templates</SimpleTextTemplatePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="SimpleTextTemplatePath" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--
+    <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" />
+    -->
+    <ProjectReference Include="..\SimpleTextTemplate.Abstractions\SimpleTextTemplate.Abstractions.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

@@ -25,6 +25,14 @@ namespace SimpleTextTemplate
         }
 
         /// <summary>
+        /// ブロック単位のバッファを取得します。
+        /// </summary>
+        /// <value>
+        /// ブロック単位のバッファ
+        /// </value>
+        public IReadOnlyList<(BlockType Type, TextRange Range)> Blocks => _blocks.AsReadOnly();
+
+        /// <summary>
         /// テンプレート文字列を解析します。
         /// </summary>
         /// <param name="source">テンプレート文字列</param>

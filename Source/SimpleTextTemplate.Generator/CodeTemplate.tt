@@ -1,0 +1,23 @@
+﻿<#@ template language="C#" linePragmas="false" #>
+using System.Buffers;
+using SimpleTextTemplate.Abstractions;
+
+namespace SimpleTextTemplate
+{
+    static partial class TemplateEx
+    {
+        public static void Generate<#= FileName #>Template(IBufferWriter<byte> bufferWriter, IContext context)
+        {
+<# foreach (var (type, range) in GetBlocks()) { #>
+<# if (type == BlockType.Raw) { #>
+            bufferWriter.Write(new byte[] { <#= ToHexString(range) #> });
+<# } else if (type == BlockType.Identifier) { #>
+            if (context.TryGetValue("Markdown", out var value))
+            {
+                bufferWriter.Write(value);
+            }
+<# } #>
+<# } #>
+        }
+    }
+}

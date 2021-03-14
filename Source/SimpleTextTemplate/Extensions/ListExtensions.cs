@@ -20,7 +20,7 @@ namespace SimpleTextTemplate.Extensions
 #if NET5_0_OR_GREATER
             => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
 #else
-            => Unsafe.As<InternalList<T>>(list)._items.AsSpan(0, list.Count);
+            => Unsafe.As<InternalList<T>>(list)!._items.AsSpan(0, list.Count);
 
 #pragma warning disable
         class InternalList<T>
