@@ -62,7 +62,7 @@ jobs:
       - name: Clean
         if: matrix.os == 'windows-latest'
         run: |
-          dotnet clean
+          dotnet clean --configuration Release
           dotnet nuget locals all --clear
 
       - name: .NET Build
