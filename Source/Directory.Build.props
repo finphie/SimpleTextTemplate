@@ -1,8 +1,22 @@
 <Project>
+  <PropertyGroup>
+    <IsBenchmark>$(MSBuildProjectName.Contains('Benchmark'))</IsBenchmark>
+    <IsGenerator>$(MSBuildProjectName.EndsWith('Generator'))</IsGenerator>
+    <IsInternal>$(MSBuildProjectName.Contains('Internal'))</IsInternal>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsBenchmark)' == 'false' and '$(IsGenerator)' == 'false' and '$(IsInternal)' == 'false'">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)\Common\**\*.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)\Common\**\*.cs" Visible="false" />
     <Compile Include="$(MSBuildThisFileDirectory)\$(SolutionName).Shared\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsGenerator)' == 'true'">
+    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    <Compile Include="..\$(SolutionName)\**\*.cs" Exclude="**\bin\**;**\obj\**" Visible="false" />
   </ItemGroup>
 
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\'))" />
