@@ -19,8 +19,8 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup Condition="$(ProjectName.EndsWith('Tests')) and '$(OS)' != 'Windows_NT'">
-    <PackageVersion Include="Microsoft.VisualStudio.TestPlatform.ObjectModel" Version="*" />
+  <ItemGroup Condition="$(ProjectName.EndsWith('Tests')) and '$(OS)' == 'Unix'">
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="*" />
   </ItemGroup>
 
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\'))" />
