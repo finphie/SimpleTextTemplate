@@ -45,6 +45,7 @@ jobs:
     if: needs.check.outputs.test == 'True'
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-latest]
 
@@ -56,6 +57,12 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: ${{ env.dotnet-version }}
+
+      - name: Setup .NET 5
+        uses: actions/setup-dotnet@v1
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          dotnet-version: 5.0.x
 
       - name: .NET Build
         run: dotnet build --configuration Release
