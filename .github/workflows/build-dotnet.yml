@@ -64,7 +64,7 @@ jobs:
         run: |
           dotnet clean --configuration Release
           dotnet nuget locals all --clear
-          msbuild -t:restore
+          dotnet restore
 
       - name: .NET Build
         run: dotnet build --configuration Release
@@ -87,8 +87,8 @@ jobs:
         with:
           dotnet-version: ${{ env.dotnet-version }}
 
-      - name: .NET restore
-        run: dotnet restore
+      - name: .NET Build
+        run: dotnet build --configuration Release
 
       - name: Install dotnet format
         run: dotnet tool install -g dotnet-format --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
