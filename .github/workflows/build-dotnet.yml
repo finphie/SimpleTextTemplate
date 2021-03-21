@@ -57,15 +57,6 @@ jobs:
         with:
           dotnet-version: ${{ env.dotnet-version }}
 
-      # Windowsでエラーになる問題の回避
-      # https://github.com/actions/setup-dotnet/issues/155
-      - name: Clean
-        if: matrix.os == 'windows-latest'
-        run: |
-          dotnet clean --configuration Release
-          dotnet nuget locals all --clear
-          dotnet restore
-
       - name: .NET Build
         run: dotnet build --configuration Release
 
