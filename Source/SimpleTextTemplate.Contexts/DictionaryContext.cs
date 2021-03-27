@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SimpleTextTemplate.Abstractions;
-using SimpleTextTemplate.Helpers;
+using SimpleTextTemplate.Contexts.Helpers;
 
 namespace SimpleTextTemplate.Contexts
 {

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using SimpleTextTemplate.Abstractions;
-using SimpleTextTemplate.Contexts;
 
-namespace SimpleTextTemplate
+namespace SimpleTextTemplate.Contexts
 {
     /// <summary>
     /// コンテキスト作成クラスです。

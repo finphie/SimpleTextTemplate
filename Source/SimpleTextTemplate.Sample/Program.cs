@@ -3,6 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Text;
 using SimpleTextTemplate;
+using SimpleTextTemplate.Contexts;
 
 #pragma warning disable SA1516 // Elements should be separated by blank line
 
