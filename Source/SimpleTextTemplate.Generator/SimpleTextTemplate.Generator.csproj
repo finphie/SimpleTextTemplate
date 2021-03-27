@@ -24,9 +24,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\$(SolutionName)\**\*.cs" Exclude="**\bin\**;**\obj\**"  LinkBase="$(SolutionName)" Condition="'$(IsBuild)' == 'true'" />
-    <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" PrivateAssets="all" Condition="'$(IsBuild)' != 'true'" />
     <ProjectReference Include="..\SimpleTextTemplate.Abstractions\SimpleTextTemplate.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(IsBuild)' == 'true'">
+    <Compile Include="..\$(SolutionName)\**\*.cs" Exclude="**\bin\**;**\obj\**"  LinkBase="$(SolutionName)" />
+  </ItemGroup>
+
+   <ItemGroup Condition="'$(IsBuild)' != 'true'">
+    <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" PrivateAssets="all" Condition="'$(IsBuild)' != 'true'" />
   </ItemGroup>
 
   <ItemGroup>
