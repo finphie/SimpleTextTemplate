@@ -22,8 +22,10 @@
     <None Include="$(PKGSystem_Numerics_Vectors)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(PKGSystem_Runtime_CompilerServices_Unsafe)\lib\netstandard2.0\*.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
-  
+
   <ItemGroup>
+    <Compile Include="..\$(SolutionName)\**\*.cs" Exclude="**\bin\**;**\obj\**"  LinkBase="$(SolutionName)" Condition="'$(IsBuild)' == 'true'" />
+    <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" PrivateAssets="all" Condition="'$(IsBuild)' != 'true'" />
     <ProjectReference Include="..\SimpleTextTemplate.Abstractions\SimpleTextTemplate.Abstractions.csproj" />
   </ItemGroup>
 

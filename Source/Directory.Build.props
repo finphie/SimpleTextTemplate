@@ -3,6 +3,7 @@
     <IsBenchmark>$(MSBuildProjectName.Contains('Benchmark'))</IsBenchmark>
     <IsGenerator>$(MSBuildProjectName.EndsWith('Generator'))</IsGenerator>
     <IsInternal>$(MSBuildProjectName.Contains('Internal'))</IsInternal>
+    <IsBuild>$(BuildingInsideVisualStudio)</IsBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(IsBenchmark)' == 'false' and '$(IsGenerator)' == 'false' and '$(IsInternal)' == 'false'">
