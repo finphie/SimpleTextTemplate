@@ -30,7 +30,7 @@ namespace SimpleTextTemplate
         /// <value>
         /// ブロック単位のバッファ
         /// </value>
-        public IReadOnlyList<(BlockType Type, TextRange Range)> Blocks => _blocks.AsReadOnly();
+        internal ReadOnlySpan<(BlockType Type, TextRange Range)> Blocks => _blocks.AsSpan();
 
         /// <summary>
         /// テンプレート文字列を解析します。
@@ -53,7 +53,7 @@ namespace SimpleTextTemplate
         public void RenderTo(IBufferWriter<byte> bufferWriter, IContext context)
         {
             var source = _source.AsSpan();
-            var blocks = _blocks.AsSpan();
+            var blocks = Blocks;
 
             foreach (ref readonly var block in blocks)
             {

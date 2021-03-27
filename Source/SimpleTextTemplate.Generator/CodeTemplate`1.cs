@@ -40,7 +40,7 @@ namespace SimpleTextTemplate.Generator
         /// </value>
         internal string FileName => Path.GetFileNameWithoutExtension(FilePath);
 
-        IEnumerable<(BlockType Type, TextRange Range)> GetBlocks()
+        ReadOnlySpan<(BlockType Type, TextRange Range)> GetBlocks()
         {
             var source = Template.Parse(_source);
             return source.Blocks;
