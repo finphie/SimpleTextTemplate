@@ -28,11 +28,11 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(IsBuild)' == 'true'">
-    <Compile Include="..\$(SolutionName)\**\*.cs" Exclude="**\bin\**;**\obj\**"  LinkBase="$(SolutionName)" />
+    <Compile Include="..\$(SolutionName)\**\*.cs" Exclude="**\bin\**;**\obj\**" LinkBase="$(SolutionName)" Name="SimpleTextTemplate1" />
   </ItemGroup>
 
    <ItemGroup Condition="'$(IsBuild)' != 'true'">
-    <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" PrivateAssets="all" Condition="'$(IsBuild)' != 'true'" />
+    <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" PrivateAssets="all" Name="SimpleTextTemplate2" />
   </ItemGroup>
 
   <ItemGroup>
