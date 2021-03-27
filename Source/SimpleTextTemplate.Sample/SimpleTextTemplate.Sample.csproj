@@ -10,6 +10,10 @@
   <ItemGroup>
     <CompilerVisibleProperty Include="SimpleTextTemplatePath" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.0.0" />
+  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\SimpleTextTemplate.Contexts\SimpleTextTemplate.Contexts.csproj" />
