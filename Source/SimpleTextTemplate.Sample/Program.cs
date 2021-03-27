@@ -13,7 +13,7 @@ var symbols = new Dictionary<string, byte[]>
 };
 
 var bufferWriter = new ArrayBufferWriter<byte>();
-TemplateEx.GeneratePageTemplate(bufferWriter, Context.Create(symbols));
+ZTemplate.GeneratePageTemplate(bufferWriter, Context.Create(symbols));
 
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 

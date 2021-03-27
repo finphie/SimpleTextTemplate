@@ -53,7 +53,7 @@ namespace SimpleTextTemplate.Benchmarks
         public string ZSimpleTextTemplate()
         {
             using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-            TemplateEx.GeneratePageTemplate(bufferWriter, _context);
+            ZTemplate.GeneratePageTemplate(bufferWriter, _context);
             return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
         }
 
@@ -61,7 +61,7 @@ namespace SimpleTextTemplate.Benchmarks
         public byte[] ZSimpleTextTemplateUtf8()
         {
             using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-            TemplateEx.GeneratePageTemplate(bufferWriter, _context);
+            ZTemplate.GeneratePageTemplate(bufferWriter, _context);
             return bufferWriter.WrittenSpan.ToArray();
         }
 

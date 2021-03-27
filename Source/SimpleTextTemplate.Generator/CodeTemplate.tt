@@ -4,8 +4,16 @@ using SimpleTextTemplate.Abstractions;
 
 namespace SimpleTextTemplate
 {
-    static partial class TemplateEx
+    /// <summary>
+    /// テンプレートをレンダリングするクラスです。
+    /// </summary>
+    static partial class ZTemplate
     {
+        /// <summary>
+        /// テンプレートをレンダリングして、<see cref="IBufferWriter{Byte}"/>に書き込みます。
+        /// </summary>
+        /// <param name="bufferWriter">ターゲットの<see cref="IBufferWriter{Byte}"/></param>
+        /// <param name="context">コンテキスト</param>
         public static void Generate<#= FileName #>Template(IBufferWriter<byte> bufferWriter, IContext context)
         {
 <# foreach (var (type, range) in GetBlocks()) { #>

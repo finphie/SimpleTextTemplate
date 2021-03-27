@@ -22,9 +22,23 @@ namespace SimpleTextTemplate.Generator
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write("\nusing System.Buffers;\nusing SimpleTextTemplate.Abstractions;\n\nnamespace SimpleTe" +
-                    "xtTemplate\n{\n    static partial class TemplateEx\n    {\n        public static voi" +
-                    "d Generate");
+            this.Write(@"
+using System.Buffers;
+using SimpleTextTemplate.Abstractions;
+
+namespace SimpleTextTemplate
+{
+    /// <summary>
+    /// テンプレートをレンダリングするクラスです。
+    /// </summary>
+    static partial class ZTemplate
+    {
+        /// <summary>
+        /// テンプレートをレンダリングして、<see cref=""IBufferWriter{Byte}""/>に書き込みます。
+        /// </summary>
+        /// <param name=""bufferWriter"">ターゲットの<see cref=""IBufferWriter{Byte}""/></param>
+        /// <param name=""context"">コンテキスト</param>
+        public static void Generate");
             this.Write(this.ToStringHelper.ToStringWithCulture(FileName));
             this.Write("Template(IBufferWriter<byte> bufferWriter, IContext context)\n        {\n");
  foreach (var (type, range) in GetBlocks()) { 
