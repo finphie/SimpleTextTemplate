@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);SA0001</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
