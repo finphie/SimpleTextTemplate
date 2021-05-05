@@ -10,13 +10,14 @@ on:
       - '**/*.csproj'
       - '**/*.sln'
       - '**/Directory.Build.props'
+      - '**/Directory.Build.targets'
       - '**/.editorconfig'
       - .github/workflows/build-dotnet.yml
 
 env:
   DOTNET_NOLOGO: true
   DOTNET_CLI_TELEMETRY_OPTOUT: true
-  dotnet-version: 6.0.100-preview.2.21155.3
+  dotnet-version: 6.0.100-preview.3.21202.5
 
 jobs:
   check:
@@ -89,7 +90,7 @@ jobs:
         run: dotnet restore
 
       - name: Install dotnet format
-        run: dotnet tool install -g dotnet-format --version 5.1.* --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-tools/nuget/v3/index.json
+        run: dotnet tool install -g dotnet-format
 
       - name: Lint .NET code
         run: dotnet format --check --fix-whitespace --fix-style info --fix-analyzers info --verbosity diagnostic
