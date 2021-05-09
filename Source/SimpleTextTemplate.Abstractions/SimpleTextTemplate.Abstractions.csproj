@@ -5,6 +5,12 @@
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>シンプルなテキストテンプレートエンジンの抽象化。</Description>
+    <PackageTags>templating</PackageTags>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Utf8Utility" Version="0.3.0" />
   </ItemGroup>
