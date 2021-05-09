@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using SimpleTextTemplate.Abstractions;
+﻿using SimpleTextTemplate.Abstractions;
+using Utf8Utility;
 
 namespace SimpleTextTemplate.Contexts
 {
@@ -13,7 +13,7 @@ namespace SimpleTextTemplate.Contexts
         /// </summary>
         /// <param name="symbols">識別子とUTF-8文字列のペアリスト</param>
         /// <returns>コンテキスト</returns>
-        public static IContext Create(IReadOnlyDictionary<string, byte[]> symbols)
+        public static IContext Create(IReadOnlyUtf8StringDictionary<Utf8String> symbols)
             => new DictionaryContext(symbols);
     }
 }

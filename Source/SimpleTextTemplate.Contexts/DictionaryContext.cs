@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SimpleTextTemplate.Abstractions;
 using SimpleTextTemplate.Contexts.Helpers;
+using Utf8Utility;
 
 namespace SimpleTextTemplate.Contexts
 {
@@ -11,14 +12,14 @@ namespace SimpleTextTemplate.Contexts
     /// </summary>
     sealed class DictionaryContext : IContext
     {
-        readonly IReadOnlyDictionary<string, byte[]> _symbols;
+        readonly IReadOnlyUtf8StringDictionary<Utf8String> _symbols;
 
         /// <summary>
         /// <see cref="DictionaryContext"/>クラスの新しいインスタンスを初期化します。
         /// </summary>
         /// <param name="symbols">識別子とUTF-8文字列のペアリスト</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public DictionaryContext(IReadOnlyDictionary<string, byte[]> symbols)
+        public DictionaryContext(IReadOnlyUtf8StringDictionary<Utf8String> symbols)
         {
             if (symbols is null)
             {
@@ -30,14 +31,12 @@ namespace SimpleTextTemplate.Contexts
 
         /// <inheritdoc/>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryGetValue(string key, [NotNullWhen(true)] out byte[]? value)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-            {
-                ThrowHelper.ThrowArgumentNullOrWhitespaceException(nameof(key));
-            }
+        public bool TryGetValue(Utf8String key, [NotNullWhen(true)] out Utf8String value)
+            => _symbols.TryGetValue(key, out value);
 
-            return _symbols.TryGetValue(key, out value);
-        }
+        /// <inheritdoc/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool TryGetValue(ReadOnlySpan<byte> key, [NotNullWhen(true)] out Utf8String value)
+            => _symbols.TryGetValue(key, out value);
     }
 }

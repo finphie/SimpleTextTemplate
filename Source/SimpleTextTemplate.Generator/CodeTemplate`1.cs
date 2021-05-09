@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace SimpleTextTemplate.Generator
 {
@@ -43,16 +42,6 @@ namespace SimpleTextTemplate.Generator
         {
             var source = Template.Parse(_source);
             return source.Blocks;
-        }
-
-        unsafe string ToIdentifierString(TextRange range)
-        {
-            var identifier = _source.AsSpan(range.Start, range.Length);
-
-            fixed (byte* bytes = identifier)
-            {
-                return Encoding.UTF8.GetString(bytes, range.Length);
-            }
         }
 
         string ToHexString(TextRange range)
