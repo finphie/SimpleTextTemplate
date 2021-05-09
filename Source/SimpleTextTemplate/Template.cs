@@ -2,7 +2,6 @@
 using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 using SimpleTextTemplate.Abstractions;
 using SimpleTextTemplate.Extensions;
 using SimpleTextTemplate.Helpers;
@@ -65,9 +64,8 @@ namespace SimpleTextTemplate
                         bufferWriter.Write(value);
                         break;
                     case BlockType.Identifier:
-                        // TODO: パフォーマンス
-                        context.TryGetValue(Encoding.UTF8.GetString(value.ToArray()), out var x);
-                        bufferWriter.Write(x);
+                        context.TryGetValue(value, out var x);
+                        bufferWriter.Write(x.AsSpan());
                         break;
                     case BlockType.None:
                     default:

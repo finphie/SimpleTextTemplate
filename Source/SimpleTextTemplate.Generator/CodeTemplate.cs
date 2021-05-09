@@ -23,6 +23,7 @@ namespace SimpleTextTemplate.Generator
         public virtual string TransformText()
         {
             this.Write(@"
+using System;
 using System.Buffers;
 using SimpleTextTemplate.Abstractions;
 
@@ -48,10 +49,10 @@ namespace SimpleTextTemplate
             this.Write(this.ToStringHelper.ToStringWithCulture(ToHexString(range)));
             this.Write(" });\n");
  } else if (type == BlockType.Identifier) { 
-            this.Write("\n            if (context.TryGetValue(\"");
-            this.Write(this.ToStringHelper.ToStringWithCulture(ToIdentifierString(range)));
-            this.Write("\", out var value))\n            {\n                bufferWriter.Write(value);\n     " +
-                    "       }\n");
+            this.Write("\n            if (context.TryGetValue(new byte[] { ");
+            this.Write(this.ToStringHelper.ToStringWithCulture(ToHexString(range)));
+            this.Write(" }, out var value))\n            {\n                bufferWriter.Write(value.AsSpan" +
+                    "());\n            }\n");
  } 
             this.Write("\n");
  } 

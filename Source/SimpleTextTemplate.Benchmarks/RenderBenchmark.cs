@@ -6,6 +6,7 @@ using BenchmarkDotNet.Jobs;
 using Microsoft.Toolkit.HighPerformance.Buffers;
 using SimpleTextTemplate.Abstractions;
 using SimpleTextTemplate.Contexts;
+using Utf8Utility;
 using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks
@@ -28,10 +29,9 @@ namespace SimpleTextTemplate.Benchmarks
             var sourceString = Encoding.UTF8.GetString(source);
 
             _template = Template.Parse(source);
-            _context = Context.Create(new Dictionary<string, byte[]>
-            {
-                { "Identifier", Encoding.UTF8.GetBytes("Hello, World!") }
-            });
+            var utf8Dict = new Utf8StringDictionary<Utf8String>();
+            utf8Dict.Add((Utf8String)"Identifier", (Utf8String)"Hello, World!");
+            _context = Context.Create(utf8Dict);
 
             _scribanTemplate = ScribanTemplate.Parse(sourceString);
             _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(sourceString);
