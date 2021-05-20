@@ -11,7 +11,7 @@ using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks
 {
-    [SimpleJob(RuntimeMoniker.NetCoreApp50)]
+    [SimpleJob(RuntimeMoniker.Net50)]
     [MemoryDiagnoser]
     public class RenderBenchmark
     {
