@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Microsoft.Toolkit.HighPerformance.Buffers;
@@ -12,57 +14,65 @@ using ScribanTemplate = Scriban.Template;
 namespace SimpleTextTemplate.Benchmarks
 {
     [SimpleJob(RuntimeMoniker.Net50)]
+    [SimpleJob(RuntimeMoniker.Net60)]
     [MemoryDiagnoser]
     public class RenderBenchmark
     {
+        const string Identifier = "Identifier";
+        const string Message = "Hello, World!";
+        const string IdentifierBlock = "{{ " + Identifier + " }}";
+        const string Pattern = "{{ *" + Identifier + " *}}";
+
+        readonly ArrayPoolBufferWriter<byte> _bufferWriter = new();
+
+        string? _utf16Source;
+
         IContext? _context;
         Dictionary<string, string>? _model;
 
         Template _template;
         ScribanTemplate? _scribanTemplate;
         ScribanTemplate? _scribanLiquidTemplate;
+        Regex? _regex;
 
         [GlobalSetup]
         public void Setup()
         {
             var source = File.ReadAllBytes("Templates/Page.html");
-            var sourceString = Encoding.UTF8.GetString(source);
+            _utf16Source = Encoding.UTF8.GetString(source);
 
             _template = Template.Parse(source);
             var utf8Dict = new Utf8StringDictionary<Utf8String>();
-            utf8Dict.Add((Utf8String)"Identifier", (Utf8String)"Hello, World!");
+            utf8Dict.Add((Utf8String)Identifier, (Utf8String)Message);
             _context = Context.Create(utf8Dict);
 
-            _scribanTemplate = ScribanTemplate.Parse(sourceString);
-            _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(sourceString);
+            _scribanTemplate = ScribanTemplate.Parse(_utf16Source);
+            _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(_utf16Source);
             _model = new()
             {
-                { "Identifier", "Hello, World!" }
+                { Identifier, Message }
             };
+
+            _regex = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript);
         }
 
+        [GlobalCleanup]
+        public void Cleanup() => _bufferWriter.Dispose();
+
         [Benchmark]
-        public string SimpleTextTemplate()
+        public ReadOnlySpan<byte> SimpleTextTemplate()
         {
-            using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-            _template.RenderTo(bufferWriter, _context!);
-            return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
+            _bufferWriter.Clear();
+            _template.RenderTo(_bufferWriter, _context!);
+            return _bufferWriter.WrittenSpan;
         }
 
         [Benchmark(Baseline = true)]
-        public string ZSimpleTextTemplate()
+        public ReadOnlySpan<byte> ZSimpleTextTemplate()
         {
-            using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-            ZTemplate.GeneratePageTemplate(bufferWriter, _context);
-            return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
-        }
-
-        [Benchmark]
-        public byte[] ZSimpleTextTemplateUtf8()
-        {
-            using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-            ZTemplate.GeneratePageTemplate(bufferWriter, _context);
-            return bufferWriter.WrittenSpan.ToArray();
+            _bufferWriter.Clear();
+            ZTemplate.GeneratePageTemplate(_bufferWriter, _context);
+            return _bufferWriter.WrittenSpan;
         }
 
         [Benchmark]
@@ -70,5 +80,11 @@ namespace SimpleTextTemplate.Benchmarks
 
         [Benchmark]
         public string ScribanLiquid() => _scribanLiquidTemplate!.Render(_model);
+
+        [Benchmark]
+        public string Regex() => _regex!.Replace(_utf16Source!, Message);
+
+        [Benchmark]
+        public string StringReplace() => _utf16Source!.Replace(IdentifierBlock, Message);
     }
 }
