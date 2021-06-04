@@ -11,7 +11,10 @@ namespace SimpleTextTemplate
     /// <summary>
     /// UTF-8でエンコードされたテンプレートを読み込みます。
     /// </summary>
-    public ref struct TemplateReader
+#if !IsGenerator
+    public
+#endif
+    ref struct TemplateReader
     {
         /// <summary>
         /// '{{'

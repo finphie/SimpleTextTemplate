@@ -1,17 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net5.0;net48</TargetFrameworks>
+    <TargetFrameworks>net6.0;net5.0</TargetFrameworks>
   </PropertyGroup>
-
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <PackageReference Include="System.Text.Json" Version="5.0.2" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source\SimpleTextTemplate\SimpleTextTemplate.csproj" />
   </ItemGroup>
-
 
 </Project>

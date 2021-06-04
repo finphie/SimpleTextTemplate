@@ -3,7 +3,10 @@
     /// <summary>
     /// 範囲を表す構造体です。
     /// </summary>
-    public readonly struct TextRange
+#if !IsGenerator
+    public
+#endif
+    readonly struct TextRange
     {
         /// <summary>
         /// <see cref="TextRange"/>構造体の新しいインスタンスを初期化します。
