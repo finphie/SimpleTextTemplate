@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.0" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.0.2" />
-    <PackageReference Include="Scriban" Version="3.9.0" />
+    <PackageReference Include="Scriban" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
