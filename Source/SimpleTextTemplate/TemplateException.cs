@@ -5,7 +5,10 @@ namespace SimpleTextTemplate
     /// <summary>
     /// テンプレート解析中に発生したエラーを表します。
     /// </summary>
-    public sealed class TemplateException : Exception
+#if !IsGenerator
+    public
+#endif
+    sealed class TemplateException : Exception
     {
         /// <summary>
         /// <see cref="TemplateException"/>クラスの新しいインスタンスを初期化します。

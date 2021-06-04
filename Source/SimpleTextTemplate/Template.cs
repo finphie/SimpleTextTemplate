@@ -12,7 +12,10 @@ namespace SimpleTextTemplate
     /// <summary>
     /// テンプレートを解析・レンダリングする構造体です。
     /// </summary>
-    public readonly struct Template
+#if !IsGenerator
+    public
+#endif
+    readonly struct Template
     {
         readonly byte[] _source;
         readonly List<(BlockType Type, TextRange Range)> _blocks;

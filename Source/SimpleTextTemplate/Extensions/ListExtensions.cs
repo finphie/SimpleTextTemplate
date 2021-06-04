@@ -7,7 +7,7 @@ namespace SimpleTextTemplate.Extensions
     /// <summary>
     /// <see cref="List{T}"/>関連のヘルパークラスです。
     /// </summary>
-    public static class ListExtensions
+    static class ListExtensions
     {
         /// <summary>
         /// <see cref="List{T}"/>内部の配列を<see cref="ReadOnlySpan{T}"/>として取得します。
