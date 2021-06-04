@@ -8,5 +8,4 @@
     <ProjectReference Include="..\..\Source\SimpleTextTemplate\SimpleTextTemplate.csproj" />
   </ItemGroup>
 
-
 </Project>
