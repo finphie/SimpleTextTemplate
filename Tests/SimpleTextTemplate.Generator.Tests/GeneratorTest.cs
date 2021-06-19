@@ -16,7 +16,7 @@ namespace SimpleTextTemplate.Generator.Tests
             var message = (Utf8String)"Hello, World!";
 
             var symbols = new Utf8StringDictionary<Utf8String>();
-            symbols.Add(key, message);
+            symbols.TryAdd(key, message);
 
             using var bufferWriter = new ArrayPoolBufferWriter<byte>();
             ZTemplate.GeneratePageTemplate(bufferWriter, Context.Create(symbols));

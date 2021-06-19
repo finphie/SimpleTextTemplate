@@ -43,7 +43,7 @@ namespace SimpleTextTemplate.Benchmarks
 
             _template = Template.Parse(source);
             var utf8Dict = new Utf8StringDictionary<Utf8String>();
-            utf8Dict.Add((Utf8String)Identifier, (Utf8String)Message);
+            utf8Dict.TryAdd((Utf8String)Identifier, (Utf8String)Message);
             _context = Context.Create(utf8Dict);
 
             _scribanTemplate = ScribanTemplate.Parse(_utf16Source);
