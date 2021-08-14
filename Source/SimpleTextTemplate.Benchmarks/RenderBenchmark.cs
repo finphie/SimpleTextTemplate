@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
@@ -11,80 +8,78 @@ using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using ScribanTemplate = Scriban.Template;
 
-namespace SimpleTextTemplate.Benchmarks
+namespace SimpleTextTemplate.Benchmarks;
+
+[SimpleJob(RuntimeMoniker.Net60)]
+[MemoryDiagnoser]
+public class RenderBenchmark
 {
-    [SimpleJob(RuntimeMoniker.Net50)]
-    [SimpleJob(RuntimeMoniker.Net60)]
-    [MemoryDiagnoser]
-    public class RenderBenchmark
+    const string Identifier = "Identifier";
+    const string Message = "Hello, World!";
+    const string IdentifierBlock = "{{ " + Identifier + " }}";
+    const string Pattern = "{{ *" + Identifier + " *}}";
+
+    readonly ArrayPoolBufferWriter<byte> _bufferWriter = new();
+
+    string? _utf16Source;
+
+    IContext? _context;
+    Dictionary<string, string>? _model;
+
+    Template _template;
+    ScribanTemplate? _scribanTemplate;
+    ScribanTemplate? _scribanLiquidTemplate;
+    Regex? _regex;
+
+    [GlobalSetup]
+    public void Setup()
     {
-        const string Identifier = "Identifier";
-        const string Message = "Hello, World!";
-        const string IdentifierBlock = "{{ " + Identifier + " }}";
-        const string Pattern = "{{ *" + Identifier + " *}}";
+        var source = File.ReadAllBytes("Templates/Page.html");
+        _utf16Source = Encoding.UTF8.GetString(source);
 
-        readonly ArrayPoolBufferWriter<byte> _bufferWriter = new();
+        _template = Template.Parse(source);
+        var utf8Dict = new Utf8StringDictionary<Utf8String>();
+        utf8Dict.TryAdd((Utf8String)Identifier, (Utf8String)Message);
+        _context = Context.Create(utf8Dict);
 
-        string? _utf16Source;
-
-        IContext? _context;
-        Dictionary<string, string>? _model;
-
-        Template _template;
-        ScribanTemplate? _scribanTemplate;
-        ScribanTemplate? _scribanLiquidTemplate;
-        Regex? _regex;
-
-        [GlobalSetup]
-        public void Setup()
+        _scribanTemplate = ScribanTemplate.Parse(_utf16Source);
+        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(_utf16Source);
+        _model = new()
         {
-            var source = File.ReadAllBytes("Templates/Page.html");
-            _utf16Source = Encoding.UTF8.GetString(source);
+            { Identifier, Message }
+        };
 
-            _template = Template.Parse(source);
-            var utf8Dict = new Utf8StringDictionary<Utf8String>();
-            utf8Dict.TryAdd((Utf8String)Identifier, (Utf8String)Message);
-            _context = Context.Create(utf8Dict);
-
-            _scribanTemplate = ScribanTemplate.Parse(_utf16Source);
-            _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(_utf16Source);
-            _model = new()
-            {
-                { Identifier, Message }
-            };
-
-            _regex = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript);
-        }
-
-        [GlobalCleanup]
-        public void Cleanup() => _bufferWriter.Dispose();
-
-        [Benchmark]
-        public ReadOnlySpan<byte> SimpleTextTemplate()
-        {
-            _bufferWriter.Clear();
-            _template.RenderTo(_bufferWriter, _context!);
-            return _bufferWriter.WrittenSpan;
-        }
-
-        [Benchmark(Baseline = true)]
-        public ReadOnlySpan<byte> ZSimpleTextTemplate()
-        {
-            _bufferWriter.Clear();
-            ZTemplate.GeneratePageTemplate(_bufferWriter, _context);
-            return _bufferWriter.WrittenSpan;
-        }
-
-        [Benchmark]
-        public string Scriban() => _scribanTemplate!.Render(_model);
-
-        [Benchmark]
-        public string ScribanLiquid() => _scribanLiquidTemplate!.Render(_model);
-
-        [Benchmark]
-        public string Regex() => _regex!.Replace(_utf16Source!, Message);
-
-        [Benchmark]
-        public string StringReplace() => _utf16Source!.Replace(IdentifierBlock, Message);
+        _regex = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript);
     }
+
+    [GlobalCleanup]
+    public void Cleanup() => _bufferWriter.Dispose();
+
+    [Benchmark]
+    public ReadOnlySpan<byte> SimpleTextTemplate()
+    {
+        _bufferWriter.Clear();
+        _template.RenderTo(_bufferWriter, _context!);
+        return _bufferWriter.WrittenSpan;
+    }
+
+    [Benchmark(Baseline = true)]
+    public ReadOnlySpan<byte> ZSimpleTextTemplate()
+    {
+        _bufferWriter.Clear();
+        ZTemplate.GeneratePageTemplate(_bufferWriter, _context);
+        return _bufferWriter.WrittenSpan;
+    }
+
+    [Benchmark]
+    public string Scriban() => _scribanTemplate!.Render(_model);
+
+    [Benchmark]
+    public string ScribanLiquid() => _scribanLiquidTemplate!.Render(_model);
+
+    [Benchmark]
+    public string Regex() => _regex!.Replace(_utf16Source!, Message);
+
+    [Benchmark]
+    public string StringReplace() => _utf16Source!.Replace(IdentifierBlock, Message);
 }
