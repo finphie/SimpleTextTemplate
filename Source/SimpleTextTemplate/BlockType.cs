@@ -1,26 +1,25 @@
-﻿namespace SimpleTextTemplate
+﻿namespace SimpleTextTemplate;
+
+/// <summary>
+/// ブロックのタイプを表します。
+/// </summary>
+#if !IsGenerator
+public
+#endif
+enum BlockType
 {
     /// <summary>
-    /// ブロックのタイプを表します。
+    /// 空のブロック。
     /// </summary>
-#if !IsGenerator
-    public
-#endif
-    enum BlockType
-    {
-        /// <summary>
-        /// 空のブロック。
-        /// </summary>
-        None,
+    None,
 
-        /// <summary>
-        /// そのまま出力するブロック
-        /// </summary>
-        Raw,
+    /// <summary>
+    /// そのまま出力するブロック
+    /// </summary>
+    Raw,
 
-        /// <summary>
-        /// 識別子
-        /// </summary>
-        Identifier
-    }
+    /// <summary>
+    /// 識別子
+    /// </summary>
+    Identifier
 }

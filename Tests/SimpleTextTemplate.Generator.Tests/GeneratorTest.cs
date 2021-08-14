@@ -5,30 +5,29 @@ using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using Xunit;
 
-namespace SimpleTextTemplate.Generator.Tests
+namespace SimpleTextTemplate.Generator.Tests;
+
+public sealed class GeneratorTest
 {
-    public sealed class GeneratorTest
+    [Fact]
+    public void GeneratePageTemplateTest()
     {
-        [Fact]
-        public void GeneratePageTemplateTest()
-        {
-            var key = (Utf8String)"Identifier";
-            var message = (Utf8String)"Hello, World!";
+        var key = (Utf8String)"Identifier";
+        var message = (Utf8String)"Hello, World!";
 
-            var symbols = new Utf8StringDictionary<Utf8String>();
-            symbols.TryAdd(key, message);
+        var symbols = new Utf8StringDictionary<Utf8String>();
+        symbols.TryAdd(key, message);
 
-            using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-            ZTemplate.GeneratePageTemplate(bufferWriter, Context.Create(symbols));
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        ZTemplate.GeneratePageTemplate(bufferWriter, Context.Create(symbols));
 
-            var expected = @$"<html>
+        var expected = @$"<html>
 
 <body>
   {message}
 </body>
 
 </html>";
-            bufferWriter.WrittenSpan.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expected));
-        }
+        bufferWriter.WrittenSpan.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expected));
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using Microsoft.Toolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 using SimpleTextTemplate.Contexts;
