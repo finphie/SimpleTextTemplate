@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿#if NETSTANDARD2_0
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SimpleTextTemplate.Contexts.Helpers;
@@ -16,13 +17,5 @@ static class ThrowHelper
     [DoesNotReturn]
     public static void ThrowArgumentNullException(string paramName)
         => throw new ArgumentNullException(paramName);
-
-    /// <summary>
-    /// 新しい<see cref="ArgumentException"/>例外をスローします。
-    /// </summary>
-    /// <param name="paramName">引数名</param>
-    [DebuggerHidden]
-    [DoesNotReturn]
-    public static void ThrowArgumentNullOrWhitespaceException(string paramName)
-        => throw new ArgumentException($"引数'{paramName}'は、nullまたは空白のみの文字列にはできません。", paramName);
 }
+#endif

@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SimpleTextTemplate.Abstractions;
-using SimpleTextTemplate.Contexts.Helpers;
 using Utf8Utility;
 
 namespace SimpleTextTemplate.Contexts;
@@ -20,10 +19,14 @@ sealed class DictionaryContext : IContext
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public DictionaryContext(IReadOnlyUtf8StringDictionary<Utf8String> symbols)
     {
+#if NET6_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(symbols);
+#else
         if (symbols is null)
         {
-            ThrowHelper.ThrowArgumentNullException(nameof(symbols));
+            Helpers.ThrowHelper.ThrowArgumentNullException(nameof(symbols));
         }
+#endif
 
         _symbols = symbols;
     }
