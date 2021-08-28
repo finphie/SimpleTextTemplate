@@ -54,7 +54,7 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 ## サポートフレームワーク
 
 - .NET 6
-- .NET 5
+- .NET Standard 2.0（ソースジェネレーターのみ）
 
 ## 作者
 
