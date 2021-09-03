@@ -125,7 +125,7 @@ ref struct TemplateReader
         if (!IsStartIdentifierBlockInternal(ref bufferStart))
         {
             // 2文字の内、最初の1文字が'{'の場合
-            if (_position + 1 < _buffer.Length && Unsafe.Add(ref bufferStart, _position) == (byte)'{')
+            if (_position + 1 < _buffer.Length && Unsafe.Add(ref bufferStart, (nint)(uint)_position) == (byte)'{')
             {
                 _position++;
             }
@@ -173,7 +173,7 @@ ref struct TemplateReader
                 // 末尾のスペースを削除
                 for (; endPosition - 1 > startPosition; endPosition--)
                 {
-                    if (!Unsafe.Add(ref bufferStart, endPosition - 1).IsWhiteSpace())
+                    if (!Unsafe.Add(ref bufferStart, (nint)(uint)(endPosition - 1)).IsWhiteSpace())
                     {
                         break;
                     }
@@ -182,7 +182,7 @@ ref struct TemplateReader
                 _position += sizeof(ushort);
 
                 // '}'が3つ以上連続している場合
-                if (_position < _buffer.Length && Unsafe.Add(ref bufferStart, _position) == (byte)'}')
+                if (_position < _buffer.Length && Unsafe.Add(ref bufferStart, (nint)(uint)_position) == (byte)'}')
                 {
                     ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, _position);
                 }
@@ -231,14 +231,14 @@ ref struct TemplateReader
     bool IsStartIdentifierBlockInternal(ref byte bufferStart)
     {
         Debug.Assert(_buffer[0] == bufferStart, "Invalid position");
-        return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, _position)) == StartIdentifier;
+        return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == StartIdentifier;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool IsEndIdentifierBlockInternal(ref byte bufferStart)
     {
         Debug.Assert(_buffer[0] == bufferStart, "Invalid position");
-        return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, _position)) == EndIdentifier;
+        return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == EndIdentifier;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
