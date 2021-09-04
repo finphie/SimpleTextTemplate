@@ -135,17 +135,6 @@ ref struct TemplateReader
 
         _position += sizeof(ushort);
 
-        if (_position >= _buffer.Length)
-        {
-            ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, --_position);
-        }
-
-        // '{'が3つ以上連続している場合
-        if (Unsafe.Add(ref bufferStart, _position) == (byte)'{')
-        {
-            ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
-        }
-
         // '{'に連続するスペースを削除
         SkipWhiteSpaceInternal(ref bufferStart);
 
@@ -180,12 +169,6 @@ ref struct TemplateReader
                 }
 
                 _position += sizeof(ushort);
-
-                // '}'が3つ以上連続している場合
-                if (_position < _buffer.Length && Unsafe.Add(ref bufferStart, (nint)(uint)_position) == (byte)'}')
-                {
-                    ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, _position);
-                }
 
                 range = new TextRange(startPosition, endPosition);
                 return;

@@ -130,6 +130,10 @@ public sealed class SimpleTextTemplateReaderTest
     [InlineData("{{   A   }}", "A")]
     [InlineData("{{ ABC }}", "ABC")]
     [InlineData("{{ A B }}", "A B")]
+    [InlineData("{{{A}}", "{A")]
+    [InlineData("{{{ A}}", "{ A")]
+    [InlineData("{{A}}}", "A")]
+    [InlineData("{{A }}}", "A")]
     public void ReadIdentifierTest(string input, string expected)
     {
         var utf8Bytes = GetBytes(input);
@@ -149,15 +153,12 @@ public sealed class SimpleTextTemplateReaderTest
     [InlineData("abc", ParserError.ExpectedStartToken, 0)]
     [InlineData("z{{A}}z", ParserError.ExpectedStartToken, 0)]
     [InlineData("{A}", ParserError.ExpectedStartToken, 1)]
+    [InlineData("}}", ParserError.ExpectedStartToken, 0)]
     [InlineData("{ A }", ParserError.ExpectedStartToken, 1)]
-    [InlineData("{{{", ParserError.ExpectedStartToken, 2)]
-    [InlineData("{{{A}}", ParserError.ExpectedStartToken, 2)]
-    [InlineData("{{{ A}}", ParserError.ExpectedStartToken, 2)]
     [InlineData("{{", ParserError.ExpectedEndToken, 1)]
     [InlineData("{{ ", ParserError.ExpectedEndToken, 2)]
     [InlineData("{{ A", ParserError.ExpectedEndToken, 3)]
-    [InlineData("{{A}}}", ParserError.ExpectedEndToken, 5)]
-    [InlineData("{{A }}}", ParserError.ExpectedEndToken, 6)]
+    [InlineData("{{{", ParserError.ExpectedEndToken, 2)]
     public void ReadIdentifierTest_Error(string input, ParserError error, int position)
     {
         FluentActions.Invoking(Execute).Should().Throw<TemplateException>()
