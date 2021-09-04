@@ -137,33 +137,34 @@ ref struct TemplateReader
 
         while (_position + 1 < _buffer.Length)
         {
-            // '}}'で終わる場合
-            if (IsEndIdentifierBlockInternal(ref bufferStart))
+            // '}}'で終わらない場合
+            if (!IsEndIdentifierBlockInternal(ref bufferStart))
             {
-                var endPosition = _position;
-
-                // '{{'と'}}'の間に1文字もない場合
-                if (startPosition == endPosition)
-                {
-                    goto InvalidIdentifierFormat;
-                }
-
-                // 末尾のスペースを削除
-                for (; endPosition - 1 > startPosition; endPosition--)
-                {
-                    if (!Unsafe.Add(ref bufferStart, (nint)(uint)(endPosition - 1)).IsWhiteSpace())
-                    {
-                        break;
-                    }
-                }
-
-                _position += sizeof(ushort);
-
-                range = new TextRange(startPosition, endPosition);
-                return;
+                _position++;
+                continue;
             }
 
-            _position++;
+            var endPosition = _position;
+
+            // '{{'と'}}'の間に1文字もない場合
+            if (startPosition == endPosition)
+            {
+                goto InvalidIdentifierFormat;
+            }
+
+            // 末尾のスペースを削除
+            for (; endPosition - 1 > startPosition; endPosition--)
+            {
+                if (!Unsafe.Add(ref bufferStart, (nint)(uint)(endPosition - 1)).IsWhiteSpace())
+                {
+                    break;
+                }
+            }
+
+            _position += sizeof(ushort);
+
+            range = new TextRange(startPosition, endPosition);
+            return;
         }
 
         if (_position == _buffer.Length)
