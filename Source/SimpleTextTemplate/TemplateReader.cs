@@ -114,11 +114,6 @@ ref struct TemplateReader
     /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
     public void ReadIdentifier(out TextRange range)
     {
-        if (_position >= _buffer.Length)
-        {
-            ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
-        }
-
         ref var bufferStart = ref MemoryMarshal.GetReference(_buffer);
 
         // '{{'で始まらない場合
@@ -130,19 +125,13 @@ ref struct TemplateReader
                 _position++;
             }
 
-            ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
+            goto ExpectedStartToken;
         }
 
         _position += sizeof(ushort);
 
         // '{'に連続するスペースを削除
         SkipWhiteSpaceInternal(ref bufferStart);
-
-        // スペースを削除後、bufferの末尾に到達した場合
-        if (_position >= _buffer.Length)
-        {
-            ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, --_position);
-        }
 
         var startPosition = _position;
 
@@ -177,8 +166,21 @@ ref struct TemplateReader
             _position++;
         }
 
+        if (_position == _buffer.Length)
+        {
+            --_position;
+        }
+
+        goto ExpectedEndToken;
+
+    ExpectedStartToken:
+        ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
+
+    ExpectedEndToken:
         ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, _position);
-        range = default;
+
+        // 直前のコードで例外を出すはずなので、ここには到達しない。
+        Unsafe.SkipInit(out range);
     }
 
     /// <summary>
@@ -212,32 +214,23 @@ ref struct TemplateReader
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool IsStartIdentifierBlockInternal(ref byte bufferStart)
-    {
-        Debug.Assert(_buffer[0] == bufferStart, "Invalid position");
-        return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == StartIdentifier;
-    }
+        => _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == StartIdentifier;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool IsEndIdentifierBlockInternal(ref byte bufferStart)
-    {
-        Debug.Assert(_buffer[0] == bufferStart, "Invalid position");
-        return _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == EndIdentifier;
-    }
+        => _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == EndIdentifier;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void SkipWhiteSpaceInternal(ref byte bufferStart)
     {
-        Debug.Assert(_buffer[0] == bufferStart, "Invalid position");
-
         while (_position < _buffer.Length)
         {
-            if (!Unsafe.Add(ref bufferStart, _position).IsWhiteSpace())
+            if (!Unsafe.Add(ref bufferStart, (nint)(uint)_position).IsWhiteSpace())
             {
                 return;
             }
 
             _position++;
-            continue;
         }
     }
 }
