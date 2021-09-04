@@ -16,7 +16,6 @@ public class RenderBenchmark
 {
     const string Identifier = "Identifier";
     const string Message = "Hello, World!";
-    const string IdentifierBlock = "{{ " + Identifier + " }}";
     const string Pattern = "{{ *" + Identifier + " *}}";
 
     readonly ArrayPoolBufferWriter<byte> _bufferWriter = new();
@@ -79,7 +78,4 @@ public class RenderBenchmark
 
     [Benchmark]
     public string Regex() => _regex!.Replace(_utf16Source!, Message);
-
-    [Benchmark]
-    public string StringReplace() => _utf16Source!.Replace(IdentifierBlock, Message);
 }
