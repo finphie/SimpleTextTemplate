@@ -145,7 +145,7 @@ ref struct TemplateReader
                 // '{{'と'}}'の間に1文字もない場合
                 if (startPosition == endPosition)
                 {
-                    ThrowHelper.ThrowTemplateParserException(ParserError.InvalidIdentifierFormat, _position);
+                    goto InvalidIdentifierFormat;
                 }
 
                 // 末尾のスペースを削除
@@ -172,6 +172,9 @@ ref struct TemplateReader
         }
 
         goto ExpectedEndToken;
+
+    InvalidIdentifierFormat:
+        ThrowHelper.ThrowTemplateParserException(ParserError.InvalidIdentifierFormat, _position);
 
     ExpectedStartToken:
         ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
