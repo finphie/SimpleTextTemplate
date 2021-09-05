@@ -37,6 +37,11 @@ ref struct TemplateReader
         _buffer = input;
         _position = 0;
     }
+    
+    /// <summary>
+    /// '{{'
+    /// </summary>
+    static ReadOnlySpan<byte> StartIdentifierSpan => new[] { (byte)'{', (byte)'{' };
 
     /// <summary>
     /// テンプレート文字列を読み込みます。
@@ -78,31 +83,25 @@ ref struct TemplateReader
             return false;
         }
 
+        var buffer = _buffer[_position..];
+        var index = buffer.IndexOf(StartIdentifierSpan);
         var startPosition = _position;
-        ref var bufferStart = ref MemoryMarshal.GetReference(_buffer);
 
-        while (_position + 1 < _buffer.Length)
+        if (index == -1)
         {
-            // '{{'で始まらない場合
-            if (!IsStartIdentifierBlockInternal(ref bufferStart))
-            {
-                _position++;
-                continue;
-            }
-
-            // 出力対象文字が1文字もない場合
-            if (startPosition == _position)
-            {
-                // TODO
-                range = default;
-                return false;
-            }
-
+            _position = _buffer.Length;
             range = new TextRange(startPosition, _position);
             return true;
         }
 
-        range = new TextRange(startPosition, ++_position);
+        if (index == 0)
+        {
+            range = default;
+            return false;
+        }
+
+        _position += index;
+        range = new TextRange(startPosition, _position);
         return true;
     }
 
