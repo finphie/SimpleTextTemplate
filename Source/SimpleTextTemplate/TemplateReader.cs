@@ -81,8 +81,7 @@ ref struct TemplateReader
     {
         if (_position >= _buffer.Length)
         {
-            range = default;
-            return false;
+            goto NotFound;
         }
 
         var startPosition = _position;
@@ -94,19 +93,16 @@ ref struct TemplateReader
         if (index == -1)
         {
             _position = _buffer.Length;
-            range = new TextRange(startPosition, _position);
-            return true;
+            goto Found;
         }
 
         if (index == 0)
         {
-            range = default;
-            return false;
+            goto NotFound;
         }
 
         _position += index;
-        range = new TextRange(startPosition, _position);
-        return true;
+        goto Found;
 #else
         ref var bufferStart = ref MemoryMarshal.GetReference(_buffer);
 
@@ -122,17 +118,21 @@ ref struct TemplateReader
             // 出力対象文字が1文字もない場合
             if (startPosition == _position)
             {
-                range = default;
-                return false;
+                goto NotFound;
             }
 
-            range = new TextRange(startPosition, _position);
-            return true;
+            goto Found;
         }
 
-        range = new TextRange(startPosition, ++_position);
-        return true;
+        _position++;
+        goto Found;
 #endif
+    Found:
+        range = new TextRange(startPosition, _position);
+        return true;
+    NotFound:
+        range = default;
+        return false;
     }
 
     /// <summary>
