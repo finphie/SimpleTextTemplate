@@ -1,5 +1,4 @@
-﻿using SimpleTextTemplate.Abstractions;
-using Utf8Utility;
+﻿using Utf8Utility;
 
 namespace SimpleTextTemplate.Contexts;
 
