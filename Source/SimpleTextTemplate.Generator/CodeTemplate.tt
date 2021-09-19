@@ -1,7 +1,6 @@
 ﻿<#@ template language="C#" linePragmas="false" #>
 using System;
 using System.Buffers;
-using SimpleTextTemplate.Abstractions;
 
 namespace SimpleTextTemplate
 {
