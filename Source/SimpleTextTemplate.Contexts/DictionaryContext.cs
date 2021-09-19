@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using SimpleTextTemplate.Abstractions;
 using Utf8Utility;
 
 namespace SimpleTextTemplate.Contexts;

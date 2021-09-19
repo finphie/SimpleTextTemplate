@@ -1,6 +1,5 @@
 ﻿using System.Buffers;
 using System.Runtime.CompilerServices;
-using SimpleTextTemplate.Abstractions;
 using SimpleTextTemplate.Extensions;
 using SimpleTextTemplate.Helpers;
 using static SimpleTextTemplate.TemplateException;

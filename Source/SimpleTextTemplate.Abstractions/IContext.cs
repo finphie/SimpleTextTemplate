@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Utf8Utility;
 
-namespace SimpleTextTemplate.Abstractions;
+namespace SimpleTextTemplate;
 
 /// <summary>
 /// コンテキスト

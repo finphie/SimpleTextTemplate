@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using Microsoft.Toolkit.HighPerformance.Buffers;
-using SimpleTextTemplate.Abstractions;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using ScribanTemplate = Scriban.Template;
