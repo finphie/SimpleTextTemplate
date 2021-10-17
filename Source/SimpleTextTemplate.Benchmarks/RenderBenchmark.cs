@@ -36,8 +36,8 @@ public class RenderBenchmark
         _utf16Source = Encoding.UTF8.GetString(source);
 
         _template = Template.Parse(source);
-        var utf8Dict = new Utf8StringDictionary<Utf8String>();
-        utf8Dict.TryAdd((Utf8String)Identifier, (Utf8String)Message);
+        var utf8Dict = new Utf8ArrayDictionary<Utf8Array>();
+        utf8Dict.TryAdd((Utf8Array)Identifier, (Utf8Array)Message);
         _context = Context.Create(utf8Dict);
 
         _scribanTemplate = ScribanTemplate.Parse(_utf16Source);
