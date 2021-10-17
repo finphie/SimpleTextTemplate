@@ -10,8 +10,8 @@ public static class Context
     /// <summary>
     /// コンテキストを作成します。
     /// </summary>
-    /// <param name="symbols">識別子とUTF-8文字列のペアリスト</param>
+    /// <param name="symbols">識別子とUTF-8配列のペアリスト</param>
     /// <returns>コンテキスト</returns>
-    public static IContext Create(IReadOnlyUtf8StringDictionary<Utf8String> symbols)
+    public static IContext Create(IReadOnlyUtf8ArrayDictionary<Utf8Array> symbols)
         => new DictionaryContext(symbols);
 }

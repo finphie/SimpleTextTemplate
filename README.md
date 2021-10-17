@@ -36,8 +36,8 @@ using SimpleTextTemplate;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 
-var symbols = new Utf8StringDictionary<Utf8String>();
-symbols.TryAdd((Utf8String)"Identifier", (Utf8String)"Hello, World!");
+var symbols = new Utf8ArrayDictionary<Utf8Array>();
+symbols.TryAdd((Utf8Array)"Identifier", (Utf8Array)"Hello, World!");
 
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
 var source = Encoding.UTF8.GetBytes("<html><body>{{ Identifier }}</body></html>");

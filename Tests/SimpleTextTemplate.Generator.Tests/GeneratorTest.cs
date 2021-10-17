@@ -12,10 +12,10 @@ public sealed class GeneratorTest
     [Fact]
     public void GeneratePageTemplateTest()
     {
-        var key = (Utf8String)"Identifier";
-        var message = (Utf8String)"Hello, World!";
+        var key = (Utf8Array)"Identifier";
+        var message = (Utf8Array)"Hello, World!";
 
-        var symbols = new Utf8StringDictionary<Utf8String>();
+        var symbols = new Utf8ArrayDictionary<Utf8Array>();
         symbols.TryAdd(key, message);
 
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();

@@ -6,8 +6,8 @@ using Utf8Utility;
 
 #pragma warning disable SA1516 // Elements should be separated by blank line
 
-var symbols = new Utf8StringDictionary<Utf8String>();
-symbols.TryAdd((Utf8String)"Identifier", (Utf8String)"Hello, World!");
+var symbols = new Utf8ArrayDictionary<Utf8Array>();
+symbols.TryAdd((Utf8Array)"Identifier", (Utf8Array)"Hello, World!");
 
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
 ZTemplate.GeneratePageTemplate(bufferWriter, Context.Create(symbols));
