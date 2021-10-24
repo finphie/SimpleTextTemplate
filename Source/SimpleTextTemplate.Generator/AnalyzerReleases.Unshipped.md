@@ -1,7 +1,7 @@
-; Unshipped analyzer release
-; https://github.com/dotnet/roslyn-analyzers/blob/master/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
+; Unshipped analyzer release <!-- markdownlint-disable -->
 
 ### New Rules
+
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
 STT1001 | Generator | Error | TemplateGenerator
