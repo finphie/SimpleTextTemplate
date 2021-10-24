@@ -1,4 +1,4 @@
-; Unshipped analyzer release
+; Unshipped analyzer release <!-- markdownlint-disable -->
 
 ### New Rules
 

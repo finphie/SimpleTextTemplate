@@ -1,1 +1,1 @@
-﻿; Shipped analyzer releases
+; Shipped analyzer releases <!-- markdownlint-disable -->
