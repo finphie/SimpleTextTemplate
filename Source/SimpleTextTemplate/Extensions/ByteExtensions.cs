@@ -16,5 +16,5 @@ static class ByteExtensions
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsWhiteSpace(this byte value) => value == (byte)' ';
+    public static bool IsSpace(this byte value) => value == (byte)' ';
 }
