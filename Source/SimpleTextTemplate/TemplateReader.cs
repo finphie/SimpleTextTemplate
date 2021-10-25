@@ -159,7 +159,7 @@ ref struct TemplateReader
         _position += sizeof(ushort);
 
         // '{'に連続するスペースを削除
-        SkipWhiteSpaceInternal(ref bufferStart);
+        SkipSpaceInternal(ref bufferStart);
 
         var startPosition = _position;
 
@@ -183,7 +183,7 @@ ref struct TemplateReader
             // 末尾のスペースを削除
             for (; endPosition - 1 > startPosition; endPosition--)
             {
-                if (!Unsafe.Add(ref bufferStart, (nint)(uint)(endPosition - 1)).IsWhiteSpace())
+                if (!Unsafe.Add(ref bufferStart, (nint)(uint)(endPosition - 1)).IsSpace())
                 {
                     break;
                 }
@@ -241,8 +241,8 @@ ref struct TemplateReader
     /// 空白文字列をスキップします。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SkipWhiteSpace()
-        => SkipWhiteSpaceInternal(ref MemoryMarshal.GetReference(_buffer));
+    public void SkipSpace()
+        => SkipSpaceInternal(ref MemoryMarshal.GetReference(_buffer));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool IsStartIdentifierBlockInternal(ref byte bufferStart)
@@ -253,11 +253,11 @@ ref struct TemplateReader
         => _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == EndIdentifier;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void SkipWhiteSpaceInternal(ref byte bufferStart)
+    void SkipSpaceInternal(ref byte bufferStart)
     {
         while (_position < _buffer.Length)
         {
-            if (!Unsafe.Add(ref bufferStart, (nint)(uint)_position).IsWhiteSpace())
+            if (!Unsafe.Add(ref bufferStart, (nint)(uint)_position).IsSpace())
             {
                 return;
             }
