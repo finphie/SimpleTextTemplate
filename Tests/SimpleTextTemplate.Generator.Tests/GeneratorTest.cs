@@ -1,6 +1,6 @@
 ﻿using System.Text;
+using CommunityToolkit.HighPerformance.Buffers;
 using FluentAssertions;
-using Microsoft.Toolkit.HighPerformance.Buffers;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using Xunit;
