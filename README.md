@@ -31,7 +31,7 @@ dotnet add package SimpleTextTemplate -s https://pkgs.dev.azure.com/finphie/Main
 ```csharp
 using System;
 using System.Text;
-using Microsoft.Toolkit.HighPerformance.Buffers;
+using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
