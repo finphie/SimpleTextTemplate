@@ -7,7 +7,7 @@ namespace SimpleTextTemplate;
 /// </summary>
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
 [Conditional("SIMPLETEXTTEMPLATE_KEEP_SOURCE_GENERATOR_ATTRIBUTES")]
-sealed class TemplateFileAttribute : Attribute
+public sealed class TemplateFileAttribute : Attribute
 {
     /// <summary>
     /// <see cref="TemplateFileAttribute"/>クラスの新しいインスタンスを初期化します。

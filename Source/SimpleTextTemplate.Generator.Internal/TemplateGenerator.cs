@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using SimpleTextTemplate.Generator.Helpers;
 
 namespace SimpleTextTemplate.Generator;
 
@@ -26,7 +27,15 @@ public sealed class TemplateGenerator : IIncrementalGenerator
     static readonly DiagnosticDescriptor STT1001Rule = new(
         "STT1001",
         "識別子に無効な文字が含まれています。",
-        "テンプレート解析時にエラーが発生しました。識別子に無効な文字が含まれています。",
+        "テンプレート解析時にエラーが発生しました。識別子に無効な文字が含まれています。Source: {0}",
+        "Generator",
+        DiagnosticSeverity.Error,
+        true);
+
+    static readonly DiagnosticDescriptor STT1002Rule = new(
+        "STT1002",
+        "指定されたファイルが存在しません。",
+        "テンプレート解析時にエラーが発生しました。指定されたファイルが存在しません。Path: {0}",
         "Generator",
         DiagnosticSeverity.Error,
         true);
@@ -53,33 +62,57 @@ public sealed class TemplateGenerator : IIncrementalGenerator
                         continue;
                     }
 
-                    var source = attribute.ConstructorArguments[0].Value as string;
-                    return (Symbol: symbol, FullName: fullName, Source: source);
+                    var isPath = fullName == TemplateFileAttributeName;
+                    var sourceOrPath = attribute.ConstructorArguments[0].Value as string;
+
+                    return (Symbol: symbol, IsPath: isPath, SourceOrPath: sourceOrPath);
                 }
 
                 return default;
             })
-            .Where(x => !string.IsNullOrEmpty(x.Source));
+            .Where(x => !string.IsNullOrEmpty(x.SourceOrPath));
 
-        context.RegisterSourceOutput(methodSymbolsWithAttributeData, static (context, symbol) =>
+        context.RegisterSourceOutput(methodSymbolsWithAttributeData, static (context, method) =>
         {
-            var template = new SourceCodeTemplate(symbol.Symbol, symbol.Source!);
+            SourceCodeTemplate template;
+
+            if (method.IsPath)
+            {
+                if (!File.Exists(method.SourceOrPath))
+                {
+                    ReportDiagnostic(STT1002Rule);
+                    return;
+                }
+
+                template = new(method.Symbol, File.ReadAllBytes(method.SourceOrPath));
+            }
+            else
+            {
+                template = new(method.Symbol, method.SourceOrPath!);
+            }
+
             var result = template.TryParse();
 
             if (result == ParseResult.None)
             {
-                context.ReportDiagnostic(Diagnostic.Create(STT1000Rule, null));
+                ReportDiagnostic(STT1000Rule);
                 return;
             }
 
             if (result == ParseResult.InvalidIdentifier)
             {
-                context.ReportDiagnostic(Diagnostic.Create(STT1001Rule, null));
+                ReportDiagnostic(STT1001Rule);
                 return;
             }
 
             var fileName = template.ClassName + "." + template.MethodName + ".Generated.cs";
             context.AddSource(fileName, SourceText.From(template.TransformText(), Encoding.UTF8));
+
+            void ReportDiagnostic(DiagnosticDescriptor descriptor)
+            {
+                var location = LocationHelper.GetLocation(method.Symbol);
+                context.ReportDiagnostic(Diagnostic.Create(descriptor, location, method.SourceOrPath));
+            }
         });
     }
 }

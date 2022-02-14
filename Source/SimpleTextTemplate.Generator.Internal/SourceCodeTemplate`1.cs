@@ -197,7 +197,6 @@ partial class SourceCodeTemplate
         }
 
         var contextTypeName = contextParameter.ToDisplayString();
-
         return contextTypeName;
     }
 
