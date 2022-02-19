@@ -11,22 +11,14 @@ namespace SimpleTextTemplate.Generator;
 /// テンプレートを生成するソースジェネレーターです。
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-public sealed class TemplateGenerator : IIncrementalGenerator
+public sealed class TemplateFileGenerator : IIncrementalGenerator
 {
-    const string TemplateAttributeName = $"global::{nameof(SimpleTextTemplate)}.TemplateAttribute";
+    const string TemplateFileAttributeName = $"global::{nameof(SimpleTextTemplate)}.TemplateFileAttribute";
 
-    static readonly DiagnosticDescriptor STT1000Rule = new(
-        "STT1000",
-        "テンプレート解析時にエラーが発生しました。",
-        "テンプレート解析時に未知のエラーが発生しました。",
-        "Generator",
-        DiagnosticSeverity.Error,
-        true);
-
-    static readonly DiagnosticDescriptor STT1001Rule = new(
-        "STT1001",
-        "識別子に無効な文字が含まれています。",
-        "テンプレート解析時にエラーが発生しました。識別子に無効な文字が含まれています。Source: {0}",
+    static readonly DiagnosticDescriptor STT1002Rule = new(
+        "STT1002",
+        "指定されたファイルが存在しません。",
+        "テンプレート解析時にエラーが発生しました。指定されたファイルが存在しません。Path: {0}",
         "Generator",
         DiagnosticSeverity.Error,
         true);
@@ -48,24 +40,49 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 
                     var fullName = attribute.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
 
-                    if (fullName != TemplateAttributeName)
+                    if (fullName != TemplateFileAttributeName)
                     {
                         continue;
                     }
 
-                    var source = attribute.ConstructorArguments[0].Value as string;
-                    return (Symbol: symbol, Source: source);
+                    var path = attribute.ConstructorArguments[0].Value as string;
+                    return (Symbol: symbol, Path: path);
                 }
 
                 return default;
             })
-            .Where(x => !string.IsNullOrEmpty(x.Source));
+            .Where(x => !string.IsNullOrEmpty(x.Path));
+
+        var options = context.AnalyzerConfigOptionsProvider.Select(static (provider, token) =>
+        {
+            token.ThrowIfCancellationRequested();
+
+            var globalOptions = provider.GlobalOptions;
+
+            if (globalOptions.TryGetValue("build_property.SimpleTextTemplatePath", out var path) || string.IsNullOrEmpty(path))
+            {
+                return path;
+            }
+
+            if (globalOptions.TryGetValue("build_property.ProjectDir", out var projectDirectory) || string.IsNullOrEmpty(projectDirectory))
+            {
+                return projectDirectory;
+            }
+
+            return string.Empty;
+        });
 
         context.RegisterSourceOutput(methodSymbolsWithAttributeData, static (context, method) =>
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var template = new SourceCodeTemplate(method.Symbol, method.Source!);
+            if (!File.Exists(method.Path))
+            {
+                ReportDiagnostic(STT1002Rule);
+                return;
+            }
+
+            var template = new SourceCodeTemplate(method.Symbol, File.ReadAllBytes(method.Path));
             var result = template.TryParse();
 
             if (result == ParseResult.None)
@@ -80,13 +97,13 @@ public sealed class TemplateGenerator : IIncrementalGenerator
                 return;
             }
 
-            var fileName = $"__{nameof(TemplateGenerator)}.{template.ClassName}.{template.MethodName}.Generated.cs";
+            var fileName = $"__{nameof(TemplateFileGenerator)}.{template.ClassName}.{template.MethodName}.Generated.cs";
             context.AddSource(fileName, SourceText.From(template.TransformText(), Encoding.UTF8));
 
             void ReportDiagnostic(DiagnosticDescriptor descriptor)
             {
                 var location = LocationHelper.GetLocation(method.Symbol);
-                context.ReportDiagnostic(Diagnostic.Create(descriptor, location, method.Source));
+                context.ReportDiagnostic(Diagnostic.Create(descriptor, location, method.Path));
             }
         });
     }
