@@ -1,9 +1,7 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using SimpleTextTemplate.Generator.Helpers;
+using SimpleTextTemplate.Generator.Extensions;
 
 namespace SimpleTextTemplate.Generator;
 
@@ -15,96 +13,61 @@ public sealed class TemplateFileGenerator : IIncrementalGenerator
 {
     const string TemplateFileAttributeName = $"global::{nameof(SimpleTextTemplate)}.TemplateFileAttribute";
 
-    static readonly DiagnosticDescriptor STT1002Rule = new(
-        "STT1002",
-        "指定されたファイルが存在しません。",
-        "テンプレート解析時にエラーが発生しました。指定されたファイルが存在しません。Path: {0}",
-        "Generator",
-        DiagnosticSeverity.Error,
-        true);
-
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var methodSymbols = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                static (node, _) => node is MethodDeclarationSyntax { AttributeLists.Count: > 0 },
-                static (context, token) => (IMethodSymbol)context.SemanticModel.GetDeclaredSymbol(context.Node, token)!);
-
-        var methodSymbolsWithAttributeData = methodSymbols
-            .Select(static (symbol, token) =>
+        var methodSymbols = context.GetMethodSymbolsWithAttributeArgument(TemplateFileAttributeName);
+        var options = context.AnalyzerConfigOptionsProvider
+            .Select(static (provider, token) =>
             {
-                foreach (var attribute in symbol.GetAttributes())
+                token.ThrowIfCancellationRequested();
+
+                var globalOptions = provider.GlobalOptions;
+
+                if (globalOptions.TryGetValue("build_property.SimpleTextTemplatePath", out var path) && path is not null)
                 {
-                    token.ThrowIfCancellationRequested();
-
-                    var fullName = attribute.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                    if (fullName != TemplateFileAttributeName)
-                    {
-                        continue;
-                    }
-
-                    var path = attribute.ConstructorArguments[0].Value as string;
-                    return (Symbol: symbol, Path: path);
+                    return path;
                 }
 
-                return default;
+                if (globalOptions.TryGetValue("build_property.ProjectDir", out var projectDirectory) && projectDirectory is not null)
+                {
+                    return projectDirectory;
+                }
+
+                return string.Empty;
             })
-            .Where(x => !string.IsNullOrEmpty(x.Path));
+            .WithComparer(EqualityComparer<string>.Default);
 
-        var options = context.AnalyzerConfigOptionsProvider.Select(static (provider, token) =>
-        {
-            token.ThrowIfCancellationRequested();
-
-            var globalOptions = provider.GlobalOptions;
-
-            if (globalOptions.TryGetValue("build_property.SimpleTextTemplatePath", out var path) || string.IsNullOrEmpty(path))
-            {
-                return path;
-            }
-
-            if (globalOptions.TryGetValue("build_property.ProjectDir", out var projectDirectory) || string.IsNullOrEmpty(projectDirectory))
-            {
-                return projectDirectory;
-            }
-
-            return string.Empty;
-        });
-
-        context.RegisterSourceOutput(methodSymbolsWithAttributeData, static (context, method) =>
+        context.RegisterSourceOutput(methodSymbols.Combine(options), static (context, info) =>
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            if (!File.Exists(method.Path))
+            var (method, directory) = info;
+            var path = Path.Combine(directory, method.Argument);
+
+            if (!File.Exists(path))
             {
-                ReportDiagnostic(STT1002Rule);
+                context.ReportDiagnostic(DiagnosticDescriptors.STT1002Rule, method.Symbol, path);
                 return;
             }
 
-            var template = new SourceCodeTemplate(method.Symbol, File.ReadAllBytes(method.Path));
+            var template = new SourceCodeTemplate(method.Symbol, File.ReadAllBytes(path));
             var result = template.TryParse();
 
             if (result == ParseResult.None)
             {
-                ReportDiagnostic(STT1000Rule);
+                context.ReportDiagnostic(DiagnosticDescriptors.STT1000Rule, method.Symbol);
                 return;
             }
 
             if (result == ParseResult.InvalidIdentifier)
             {
-                ReportDiagnostic(STT1001Rule);
+                context.ReportDiagnostic(DiagnosticDescriptors.STT1001Rule, method.Symbol);
                 return;
             }
 
             var fileName = $"__{nameof(TemplateFileGenerator)}.{template.ClassName}.{template.MethodName}.Generated.cs";
             context.AddSource(fileName, SourceText.From(template.TransformText(), Encoding.UTF8));
-
-            void ReportDiagnostic(DiagnosticDescriptor descriptor)
-            {
-                var location = LocationHelper.GetLocation(method.Symbol);
-                context.ReportDiagnostic(Diagnostic.Create(descriptor, location, method.Path));
-            }
         });
     }
 }

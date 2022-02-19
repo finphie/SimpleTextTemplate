@@ -1,9 +1,7 @@
 ﻿using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using SimpleTextTemplate.Generator.Helpers;
+using SimpleTextTemplate.Generator.Extensions;
 
 namespace SimpleTextTemplate.Generator;
 
@@ -15,79 +13,32 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 {
     const string TemplateAttributeName = $"global::{nameof(SimpleTextTemplate)}.TemplateAttribute";
 
-    static readonly DiagnosticDescriptor STT1000Rule = new(
-        "STT1000",
-        "テンプレート解析時にエラーが発生しました。",
-        "テンプレート解析時に未知のエラーが発生しました。",
-        "Generator",
-        DiagnosticSeverity.Error,
-        true);
-
-    static readonly DiagnosticDescriptor STT1001Rule = new(
-        "STT1001",
-        "識別子に無効な文字が含まれています。",
-        "テンプレート解析時にエラーが発生しました。識別子に無効な文字が含まれています。Source: {0}",
-        "Generator",
-        DiagnosticSeverity.Error,
-        true);
-
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var methodSymbols = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                static (node, _) => node is MethodDeclarationSyntax { AttributeLists.Count: > 0 },
-                static (context, token) => (IMethodSymbol)context.SemanticModel.GetDeclaredSymbol(context.Node, token)!);
+        var methodSymbols = context.GetMethodSymbolsWithAttributeArgument(TemplateAttributeName);
 
-        var methodSymbolsWithAttributeData = methodSymbols
-            .Select(static (symbol, token) =>
-            {
-                foreach (var attribute in symbol.GetAttributes())
-                {
-                    token.ThrowIfCancellationRequested();
-
-                    var fullName = attribute.AttributeClass?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-
-                    if (fullName != TemplateAttributeName)
-                    {
-                        continue;
-                    }
-
-                    var source = attribute.ConstructorArguments[0].Value as string;
-                    return (Symbol: symbol, Source: source);
-                }
-
-                return default;
-            })
-            .Where(x => !string.IsNullOrEmpty(x.Source));
-
-        context.RegisterSourceOutput(methodSymbolsWithAttributeData, static (context, method) =>
+        context.RegisterSourceOutput(methodSymbols, static (context, method) =>
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
-            var template = new SourceCodeTemplate(method.Symbol, method.Source!);
+            var template = new SourceCodeTemplate(method.Symbol, method.Argument);
             var result = template.TryParse();
 
             if (result == ParseResult.None)
             {
-                ReportDiagnostic(STT1000Rule);
+                context.ReportDiagnostic(DiagnosticDescriptors.STT1000Rule, method.Symbol);
                 return;
             }
 
             if (result == ParseResult.InvalidIdentifier)
             {
-                ReportDiagnostic(STT1001Rule);
+                context.ReportDiagnostic(DiagnosticDescriptors.STT1001Rule, method.Symbol);
                 return;
             }
 
             var fileName = $"__{nameof(TemplateGenerator)}.{template.ClassName}.{template.MethodName}.Generated.cs";
             context.AddSource(fileName, SourceText.From(template.TransformText(), Encoding.UTF8));
-
-            void ReportDiagnostic(DiagnosticDescriptor descriptor)
-            {
-                var location = LocationHelper.GetLocation(method.Symbol);
-                context.ReportDiagnostic(Diagnostic.Create(descriptor, location, method.Source));
-            }
         });
     }
 }
