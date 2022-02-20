@@ -47,7 +47,7 @@ public sealed class TemplateFileGenerator : IIncrementalGenerator
 
             if (!File.Exists(path))
             {
-                context.ReportDiagnostic(DiagnosticDescriptors.STT1002Rule, method.Symbol, path);
+                context.ReportDiagnostic(DiagnosticDescriptors.FileNotFoundError, method.Symbol, path);
                 return;
             }
 
@@ -62,7 +62,7 @@ public sealed class TemplateFileGenerator : IIncrementalGenerator
 
             if (result == ParseResult.InvalidIdentifier)
             {
-                context.ReportDiagnostic(DiagnosticDescriptors.STT1001Rule, method.Symbol);
+                context.ReportDiagnostic(DiagnosticDescriptors.InvalidIdentifier, method.Symbol);
                 return;
             }
 

@@ -4,6 +4,6 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-STT1000 | Generator | Error | TemplateGenerator
-STT1001 | Generator | Error | TemplateGenerator
-STT1002 | Generator | Error | TemplateGenerator
+STT1000 | SimpleTextTemplate | Error | DiagnosticDescriptors
+STT1001 | SimpleTextTemplate | Error | DiagnosticDescriptors
+STT1002 | SimpleTextTemplate | Error | DiagnosticDescriptors

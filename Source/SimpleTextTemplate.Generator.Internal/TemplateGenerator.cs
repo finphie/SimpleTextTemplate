@@ -27,13 +27,13 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 
             if (result == ParseResult.None)
             {
-                context.ReportDiagnostic(DiagnosticDescriptors.STT1000Rule, method.Symbol);
+                context.ReportDiagnostic(DiagnosticDescriptors.UnknownError, method.Symbol);
                 return;
             }
 
             if (result == ParseResult.InvalidIdentifier)
             {
-                context.ReportDiagnostic(DiagnosticDescriptors.STT1001Rule, method.Symbol);
+                context.ReportDiagnostic(DiagnosticDescriptors.InvalidIdentifierError, method.Symbol);
                 return;
             }
 

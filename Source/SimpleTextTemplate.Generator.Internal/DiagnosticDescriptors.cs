@@ -2,29 +2,41 @@
 
 namespace SimpleTextTemplate.Generator;
 
+/// <summary>
+/// 診断情報
+/// </summary>
 static class DiagnosticDescriptors
 {
-    public static readonly DiagnosticDescriptor STT1000Rule = new(
+    /// <summary>
+    /// 未知のエラーの場合に出力する診断情報です。
+    /// </summary>
+    public static readonly DiagnosticDescriptor UnknownError = new(
         "STT1000",
         "テンプレート解析時にエラーが発生しました。",
         "テンプレート解析時に未知のエラーが発生しました。",
-        typeof(TemplateGenerator).FullName,
+        nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor STT1001Rule = new(
+    /// <summary>
+    /// 無効な文字が含まれている場合に出力する診断情報です。
+    /// </summary>
+    public static readonly DiagnosticDescriptor InvalidIdentifierError = new(
         "STT1001",
         "識別子に無効な文字が含まれています。",
         "テンプレート解析時にエラーが発生しました。識別子に無効な文字が含まれています。",
-        "Generator",
+        nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);
 
-    public static readonly DiagnosticDescriptor STT1002Rule = new(
+    /// <summary>
+    /// ファイルが存在しない場合に出力する診断情報です。
+    /// </summary>
+    public static readonly DiagnosticDescriptor FileNotFoundError = new(
         "STT1002",
         "指定されたファイルが存在しません。",
         "テンプレート解析時にエラーが発生しました。指定されたファイルが存在しません。Path: {0}",
-        "Generator",
+        nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);
 }
