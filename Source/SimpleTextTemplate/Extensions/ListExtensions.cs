@@ -18,9 +18,9 @@ static class ListExtensions
 #if NET5_0_OR_GREATER
         => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
 #else
+#pragma warning disable
         => Unsafe.As<InternalList<T>>(list)!._items.AsSpan(0, list.Count);
 
-#pragma warning disable
         class InternalList<T>
         {
             internal T[] _items;
