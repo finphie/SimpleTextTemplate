@@ -13,15 +13,15 @@ namespace SimpleTextTemplate.Benchmarks;
 [MemoryDiagnoser]
 public class RenderBenchmark
 {
-    const string Identifier = "Identifier";
     const string Message = "Hello, World!";
-    const string Pattern = "{{ *" + Identifier + " *}}";
 
-    readonly ArrayPoolBufferWriter<byte> _bufferWriter = new();
+    // lang=regex
+    const string Pattern = "{{ *" + ZTemplate.Identifier + " *}}";
 
     string? _utf16Source;
 
     IContext? _context;
+    SampleContext _contextObject;
     Dictionary<string, string>? _model;
 
     Template _template;
@@ -32,41 +32,58 @@ public class RenderBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        var source = File.ReadAllBytes("Templates/Page.html");
+        var source = Encoding.UTF8.GetBytes(ZTemplate.Source);
         _utf16Source = Encoding.UTF8.GetString(source);
+
+        var utf8Message = (Utf8Array)Message;
 
         _template = Template.Parse(source);
         var utf8Dict = new Utf8ArrayDictionary<Utf8Array>();
-        utf8Dict.TryAdd((Utf8Array)Identifier, (Utf8Array)Message);
+        utf8Dict.TryAdd((Utf8Array)ZTemplate.Identifier, utf8Message);
         _context = Context.Create(utf8Dict);
+
+        _contextObject = new(utf8Message.DangerousAsByteArray());
 
         _scribanTemplate = ScribanTemplate.Parse(_utf16Source);
         _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(_utf16Source);
         _model = new()
         {
-            { Identifier, Message }
+            { ZTemplate.Identifier, Message }
         };
 
-        _regex = new Regex(Pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript);
+        _regex = new(Pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript);
     }
 
-    [GlobalCleanup]
-    public void Cleanup() => _bufferWriter.Dispose();
+    [Benchmark]
+    public string SimpleTextTemplate()
+    {
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        _template.RenderTo(bufferWriter, _context!);
+        return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
+    }
 
     [Benchmark]
-    public ReadOnlySpan<byte> SimpleTextTemplate()
+    public ReadOnlySpan<byte> SimpleTextTemplateUtf8()
     {
-        _bufferWriter.Clear();
-        _template.RenderTo(_bufferWriter, _context!);
-        return _bufferWriter.WrittenSpan;
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        _template.RenderTo(bufferWriter, _context!);
+        return bufferWriter.WrittenSpan;
+    }
+
+    [Benchmark]
+    public string SimpleTextTemplateSourceGenerator()
+    {
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        ZTemplate.Render(bufferWriter, _contextObject);
+        return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
     }
 
     [Benchmark(Baseline = true)]
-    public ReadOnlySpan<byte> ZSimpleTextTemplate()
+    public ReadOnlySpan<byte> SimpleTextTemplateSourceGeneratorUtf8()
     {
-        _bufferWriter.Clear();
-        ZTemplate.GeneratePageTemplate(_bufferWriter, _context);
-        return _bufferWriter.WrittenSpan;
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        ZTemplate.Render(bufferWriter, _contextObject);
+        return bufferWriter.WrittenSpan;
     }
 
     [Benchmark]
