@@ -1,4 +1,8 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis;
+
+// https://github.com/dotnet/roslyn-analyzers/issues/5890
+[assembly: SuppressMessage("", "RS2002", Justification = ".NET 6.0.200で発生するため")]
 
 namespace SimpleTextTemplate.Generator;
 
