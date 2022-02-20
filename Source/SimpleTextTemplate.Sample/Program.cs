@@ -1,16 +1,13 @@
 ﻿using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
-using SimpleTextTemplate;
-using SimpleTextTemplate.Contexts;
-using Utf8Utility;
+using SimpleTextTemplate.Sample;
 
 #pragma warning disable SA1516 // Elements should be separated by blank line
 
-var symbols = new Utf8ArrayDictionary<Utf8Array>();
-symbols.TryAdd((Utf8Array)"Identifier", (Utf8Array)"Hello, World!");
+var context = new SampleContext(Encoding.UTF8.GetBytes("Hello, World!"));
 
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-ZTemplate.GeneratePageTemplate(bufferWriter, Context.Create(symbols));
+ZTemplate.Render(bufferWriter, context);
 
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
