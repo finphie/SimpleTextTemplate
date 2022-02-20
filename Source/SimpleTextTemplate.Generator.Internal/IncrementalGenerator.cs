@@ -11,8 +11,6 @@ namespace SimpleTextTemplate.Generator;
 /// </summary>
 public abstract class IncrementalGenerator : IIncrementalGenerator
 {
-    public IncrementalGenerator() { }
-
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
