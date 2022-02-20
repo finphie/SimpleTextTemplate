@@ -1,22 +1,24 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 using SimpleTextTemplate.Generator.Extensions;
 
 namespace SimpleTextTemplate.Generator;
 
 /// <summary>
-/// テンプレートを生成するソースジェネレーターです。
+/// ファイルからテンプレート文字列を取得して、ソースコードを生成します。
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-public sealed class TemplateFileGenerator : IIncrementalGenerator
+public sealed class TemplateFileGenerator : IncrementalGenerator
 {
     const string TemplateFileAttributeName = $"global::{nameof(SimpleTextTemplate)}.TemplateFileAttribute";
 
     /// <inheritdoc/>
-    public void Initialize(IncrementalGeneratorInitializationContext context)
+    protected override string GetGeneratorName() => nameof(TemplateFileGenerator);
+
+    /// <inheritdoc/>
+    protected override IncrementalValuesProvider<MethodSymbolWithArgument> GetProvider(IncrementalGeneratorInitializationContext context)
     {
-        var methodSymbols = context.GetMethodSymbolsWithAttributeArgument(TemplateFileAttributeName);
+        var methods = context.GetMethodSymbolsWithAttributeArgumentProvider(TemplateFileAttributeName);
         var options = context.AnalyzerConfigOptionsProvider
             .Select(static (provider, token) =>
             {
@@ -38,36 +40,34 @@ public sealed class TemplateFileGenerator : IIncrementalGenerator
             })
             .WithComparer(EqualityComparer<string>.Default);
 
-        context.RegisterSourceOutput(methodSymbols.Combine(options), static (context, info) =>
+        return methods.Combine(options).Select(static (info, token) =>
         {
-            context.CancellationToken.ThrowIfCancellationRequested();
+            token.ThrowIfCancellationRequested();
 
             var (method, directory) = info;
             var path = Path.Combine(directory, method.Argument);
 
-            if (!File.Exists(path))
+            return method with
             {
-                context.ReportDiagnostic(DiagnosticDescriptors.FileNotFoundError, method.Symbol, path);
-                return;
-            }
-
-            var template = new SourceCodeTemplate(method.Symbol, File.ReadAllBytes(path));
-            var result = template.TryParse();
-
-            if (result == ParseResult.None)
-            {
-                context.ReportDiagnostic(DiagnosticDescriptors.STT1000Rule, method.Symbol);
-                return;
-            }
-
-            if (result == ParseResult.InvalidIdentifier)
-            {
-                context.ReportDiagnostic(DiagnosticDescriptors.InvalidIdentifier, method.Symbol);
-                return;
-            }
-
-            var fileName = $"__{nameof(TemplateFileGenerator)}.{template.ClassName}.{template.MethodName}.Generated.cs";
-            context.AddSource(fileName, SourceText.From(template.TransformText(), Encoding.UTF8));
+                Argument = path
+            };
         });
+    }
+
+    /// <inheritdoc/>
+    protected override bool TryGetTemplateSource(SourceProductionContext context, MethodSymbolWithArgument method, [MaybeNullWhen(false)] out byte[] template)
+    {
+        var path = method.Argument;
+
+        if (!File.Exists(path))
+        {
+            context.ReportDiagnostic(DiagnosticDescriptors.FileNotFoundError, method.Symbol, path);
+
+            template = null;
+            return false;
+        }
+
+        template = File.ReadAllBytes(path);
+        return true;
     }
 }

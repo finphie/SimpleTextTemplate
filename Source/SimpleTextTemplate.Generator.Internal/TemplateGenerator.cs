@@ -1,44 +1,20 @@
-﻿using System.Text;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis;
 using SimpleTextTemplate.Generator.Extensions;
 
 namespace SimpleTextTemplate.Generator;
 
 /// <summary>
-/// テンプレートを生成するソースジェネレーターです。
+/// 属性引数からテンプレート文字列を取得して、ソースコードを生成します。
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-public sealed class TemplateGenerator : IIncrementalGenerator
+public sealed class TemplateGenerator : IncrementalGenerator
 {
     const string TemplateAttributeName = $"global::{nameof(SimpleTextTemplate)}.TemplateAttribute";
 
     /// <inheritdoc/>
-    public void Initialize(IncrementalGeneratorInitializationContext context)
-    {
-        var methodSymbols = context.GetMethodSymbolsWithAttributeArgument(TemplateAttributeName);
+    protected override string GetGeneratorName() => nameof(TemplateGenerator);
 
-        context.RegisterSourceOutput(methodSymbols, static (context, method) =>
-        {
-            context.CancellationToken.ThrowIfCancellationRequested();
-
-            var template = new SourceCodeTemplate(method.Symbol, method.Argument);
-            var result = template.TryParse();
-
-            if (result == ParseResult.None)
-            {
-                context.ReportDiagnostic(DiagnosticDescriptors.UnknownError, method.Symbol);
-                return;
-            }
-
-            if (result == ParseResult.InvalidIdentifier)
-            {
-                context.ReportDiagnostic(DiagnosticDescriptors.InvalidIdentifierError, method.Symbol);
-                return;
-            }
-
-            var fileName = $"__{nameof(TemplateGenerator)}.{template.ClassName}.{template.MethodName}.Generated.cs";
-            context.AddSource(fileName, SourceText.From(template.TransformText(), Encoding.UTF8));
-        });
-    }
+    /// <inheritdoc/>
+    protected override IncrementalValuesProvider<MethodSymbolWithArgument> GetProvider(IncrementalGeneratorInitializationContext context)
+        => context.GetMethodSymbolsWithAttributeArgumentProvider(TemplateAttributeName);
 }

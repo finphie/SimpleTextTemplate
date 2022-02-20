@@ -9,12 +9,12 @@ namespace SimpleTextTemplate.Generator.Extensions;
 static class IncrementalGeneratorInitializationContextExtensions
 {
     /// <summary>
-    /// 指定された属性が関連付けられているメソッドのシンボルと引数を取得します。
+    /// 指定された属性が関連付けられているメソッドのシンボルと引数のプロバイダーを取得します。
     /// </summary>
     /// <param name="context">コンテキスト</param>
     /// <param name="attributeName">属性の完全修飾名</param>
     /// <returns>ソースジェネレーターで使用するプロバイダーを返します。</returns>
-    public static IncrementalValuesProvider<MethodSymbolWithArgument> GetMethodSymbolsWithAttributeArgument(this IncrementalGeneratorInitializationContext context, string attributeName)
+    public static IncrementalValuesProvider<MethodSymbolWithArgument> GetMethodSymbolsWithAttributeArgumentProvider(this IncrementalGeneratorInitializationContext context, string attributeName)
     {
         return context.GetMethodSymbols()
             .Select((symbol, token) =>

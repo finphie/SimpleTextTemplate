@@ -7,4 +7,4 @@ namespace SimpleTextTemplate.Generator;
 /// </summary>
 /// <param name="Symbol">メソッドシンボル</param>
 /// <param name="Argument">属性の引数データ</param>
-readonly record struct MethodSymbolWithArgument(IMethodSymbol Symbol, string Argument);
+public readonly record struct MethodSymbolWithArgument(IMethodSymbol Symbol, string Argument);
