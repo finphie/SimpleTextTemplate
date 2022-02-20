@@ -26,12 +26,12 @@ public sealed class TemplateFileGenerator : IncrementalGenerator
 
                 var globalOptions = provider.GlobalOptions;
 
-                if (globalOptions.TryGetValue("build_property.SimpleTextTemplatePath", out var path) && path is not null)
+                if (globalOptions.TryGetValue("build_property.SimpleTextTemplatePath", out var path) && !string.IsNullOrEmpty(path))
                 {
                     return path;
                 }
 
-                if (globalOptions.TryGetValue("build_property.ProjectDir", out var projectDirectory) && projectDirectory is not null)
+                if (globalOptions.TryGetValue("build_property.ProjectDir", out var projectDirectory) && !string.IsNullOrEmpty(projectDirectory))
                 {
                     return projectDirectory;
                 }
