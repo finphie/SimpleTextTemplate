@@ -16,9 +16,9 @@ static class ListExtensions
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static ReadOnlySpan<T> AsSpan<T>(this List<T> list)
 #if NET5_0_OR_GREATER
-            => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
+        => System.Runtime.InteropServices.CollectionsMarshal.AsSpan(list);
 #else
-            => Unsafe.As<InternalList<T>>(list)!._items.AsSpan(0, list.Count);
+        => Unsafe.As<InternalList<T>>(list)!._items.AsSpan(0, list.Count);
 
 #pragma warning disable
         class InternalList<T>
