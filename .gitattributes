@@ -1,3 +1,7 @@
 * text=auto eol=lf
+*.tt text eol=crlf
+*Template.cs text eol=crlf
+Template.cs text eol=lf
+?Template.cs text eol=lf
 PSScriptAnalyzerSettings.psd1 linguist-vendored
 Source/Common/* linguist-vendored
