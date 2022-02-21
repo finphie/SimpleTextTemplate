@@ -50,7 +50,7 @@ ref struct TemplateReader
     /// </summary>
     /// <param name="range">テンプレートまたはオブジェクトの位置</param>
     /// <returns>ブロックのタイプ</returns>
-    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
+    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     public BlockType Read(out TextRange range)
     {
         if (_position >= _buffer.Length)
@@ -139,7 +139,7 @@ ref struct TemplateReader
     /// 識別子を読み込みます。
     /// </summary>
     /// <param name="range">オブジェクトの位置</param>
-    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、対象の例外をスローします。</exception>
+    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     public void ReadIdentifier(out TextRange range)
     {
         ref var bufferStart = ref MemoryMarshal.GetReference(_buffer);
