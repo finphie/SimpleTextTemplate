@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace SimpleTextTemplate.Generator.Extensions;
 
 /// <summary>
-/// <see cref="AnalyzerConfigOptions"/>クラスに関する拡張メソッド集です。
+/// <see cref="AnalyzerConfigOptions"/>クラス関連の拡張メソッド集です。
 /// </summary>
 static class AnalyzerConfigOptionsExtensions
 {

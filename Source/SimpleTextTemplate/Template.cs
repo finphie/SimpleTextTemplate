@@ -52,6 +52,7 @@ readonly struct Template
     /// </summary>
     /// <param name="bufferWriter">ターゲットの<see cref="IBufferWriter{Byte}"/></param>
     /// <param name="context">コンテキスト</param>
+    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     public void RenderTo(IBufferWriter<byte> bufferWriter, IContext context)
     {
         var source = _source.AsSpan();
