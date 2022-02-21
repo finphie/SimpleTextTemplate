@@ -8,25 +8,44 @@
 
 ## 説明
 
-SimpleTextTemplateは、文字列の置換のみに対応したテキストテンプレートエンジンです。
+SimpleTextTemplateは、識別子の置換のみに対応したテキストテンプレートエンジンです。
 
 ## インストール
+
+ライブラリ名|説明
+-|-
+[SimpleTextTemplate](https://www.nuget.org/packages/SimpleTextTemplate/)|テンプレートの解析及びレンダリングを行います。
+[SimpleTextTemplate.Abstractions](https://www.nuget.org/packages/SimpleTextTemplate/)|SimpleTextTemplateの抽象化です。
+[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)|テンプレートのレンダリングで使用するコンテキストの作成を行います。
+[SimpleTextTemplate.Generator](https://www.nuget.org/packages/SimpleTextTemplate.Generator/)|コンパイル時にテンプレートの解析を行うソースジェネレーターです。
 
 ### NuGet（正式リリース版）
 
 ```console
 dotnet add package SimpleTextTemplate
+dotnet add package SimpleTextTemplate.Contexts
+```
+
+```console
+dotnet add package SimpleTextTemplate.Generator
 ```
 
 ### Azure Artifacts（開発用ビルド）
 
 ```console
 dotnet add package SimpleTextTemplate -s https://pkgs.dev.azure.com/finphie/Main/_packaging/DotNet/nuget/v3/index.json
+dotnet add package SimpleTextTemplate.Contexts -s https://pkgs.dev.azure.com/finphie/Main/_packaging/DotNet/nuget/v3/index.json
+```
+
+```console
+dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/finphie/Main/_packaging/DotNet/nuget/v3/index.json
 ```
 
 ## 使い方
 
-### コアライブラリ
+次の例では、外部のライブラリである[CommunityToolkit.HighPerformance](https://www.nuget.org/packages/CommunityToolkit.HighPerformance/)を参照しています。
+
+### SimpleTextTemplate
 
 ```csharp
 using System;
@@ -40,21 +59,71 @@ var symbols = new Utf8ArrayDictionary<Utf8Array>();
 symbols.TryAdd((Utf8Array)"Identifier", (Utf8Array)"Hello, World!");
 
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-var source = Encoding.UTF8.GetBytes("<html><body>{{ Identifier }}</body></html>");
+var source = Encoding.UTF8.GetBytes("{{ Identifier }}");
 var template = Template.Parse(source);
-template.RenderTo(bufferWriter, Context.Create(symbols));
+template.Render(bufferWriter, Context.Create(symbols));
 
+// Hello, World!
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 ```
 
-### ソースジェネレーター
+### SimpleTextTemplate.Generator
 
-[サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)を参照してください。
+```csharp
+using System;
+using System.Text;
+using CommunityToolkit.HighPerformance.Buffers;
+using SimpleTextTemplate;
+
+var context = new SampleContext(Encoding.UTF8.GetBytes("Hello, World!"));
+
+using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+ZTemplate.Render(bufferWriter, context);
+
+// Hello, World!
+Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
+
+readonly record struct SampleContext(byte[] Identifier);
+
+static partial class ZTemplate
+{
+    // TemplateAttributeまたはTemplateFileAttributeでテンプレート文字列を指定してください。
+    [Template("{{ Identifier }}")]
+    public static partial void Render(IBufferWriter<byte> bufferWriter, SampleContext context);
+}
+```
+
+[サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
+
+## ベンチマーク
+
+### レンダリング
+
+``` ini
+BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1526 (21H1/May2021Update)
+AMD Ryzen 7 5800U with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
+.NET SDK=6.0.200-preview.22055.15
+  [Host]   : .NET 6.0.2 (6.0.222.6406), X64 RyuJIT
+  .NET 6.0 : .NET 6.0.2 (6.0.222.6406), X64 RyuJIT
+
+Job=.NET 6.0  Runtime=.NET 6.0  
+```
+
+|                                Method |         Mean |     Error |    StdDev |  Ratio | RatioSD |  Gen 0 |  Gen 1 | Allocated |
+|-------------------------------------- |-------------:|----------:|----------:|-------:|--------:|-------:|-------:|----------:|
+|                    SimpleTextTemplate |     89.95 ns |  0.674 ns |  0.631 ns |   1.45 |    0.01 | 0.0105 |      - |      88 B |
+|                SimpleTextTemplateUtf8 |     74.41 ns |  0.201 ns |  0.188 ns |   1.20 |    0.01 | 0.0095 |      - |      80 B |
+|     SimpleTextTemplateSourceGenerator |     71.16 ns |  0.377 ns |  0.352 ns |   1.14 |    0.01 | 0.0105 |      - |      88 B |
+| SimpleTextTemplateSourceGeneratorUtf8 |     62.16 ns |  0.359 ns |  0.336 ns |   1.00 |    0.00 | 0.0095 |      - |      80 B |
+|                               Scriban | 10,026.03 ns | 19.977 ns | 18.686 ns | 161.31 |    0.87 | 3.6469 | 0.3204 |  30,542 B |
+|                         ScribanLiquid |  8,569.52 ns | 35.784 ns | 31.721 ns | 137.92 |    0.78 | 3.9368 | 0.3662 |  32,952 B |
+|                                 Regex |    107.15 ns |  0.510 ns |  0.477 ns |   1.72 |    0.01 | 0.0057 |      - |      48 B |
+
+[ベンチマークプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Benchmarks)
 
 ## サポートフレームワーク
 
 - .NET 6
-- .NET Standard 2.0（ソースジェネレーターのみ）
 
 ## 作者
 
@@ -78,8 +147,8 @@ MIT
 
 ### テスト
 
-- [FluentAssertions](https://fluentassertions.com/)
-- [Microsoft.NET.Test.Sdk](https://github.com/microsoft/vstest/)
+- [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
+- [Microsoft.NET.Test.Sdk](https://github.com/microsoft/vstest)
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 - [NuGet.Frameworks](https://github.com/NuGet/NuGet.Client)
 - [xunit](https://github.com/xunit/xunit)
