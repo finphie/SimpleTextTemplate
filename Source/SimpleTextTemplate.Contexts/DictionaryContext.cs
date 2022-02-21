@@ -18,15 +18,7 @@ sealed class DictionaryContext : IContext
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public DictionaryContext(IReadOnlyUtf8ArrayDictionary<Utf8Array> symbols)
     {
-#if NET6_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(symbols);
-#else
-        if (symbols is null)
-        {
-            Helpers.ThrowHelper.ThrowArgumentNullException(nameof(symbols));
-        }
-#endif
-
         _symbols = symbols;
     }
 
