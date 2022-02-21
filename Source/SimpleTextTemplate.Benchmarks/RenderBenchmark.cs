@@ -58,7 +58,7 @@ public class RenderBenchmark
     public string SimpleTextTemplate()
     {
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-        _template.RenderTo(bufferWriter, _context!);
+        _template.Render(bufferWriter, _context!);
         return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
     }
 
@@ -66,7 +66,7 @@ public class RenderBenchmark
     public ReadOnlySpan<byte> SimpleTextTemplateUtf8()
     {
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-        _template.RenderTo(bufferWriter, _context!);
+        _template.Render(bufferWriter, _context!);
         return bufferWriter.WrittenSpan;
     }
 

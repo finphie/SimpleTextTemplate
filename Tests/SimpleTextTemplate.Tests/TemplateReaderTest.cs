@@ -5,7 +5,7 @@ using static SimpleTextTemplate.TemplateException;
 
 namespace SimpleTextTemplate.Tests;
 
-public sealed class SimpleTextTemplateReaderTest
+public sealed class TemplateReaderTest
 {
     public static TheoryData<string, MemberSerializer<Block[]>> TestData => new()
     {
