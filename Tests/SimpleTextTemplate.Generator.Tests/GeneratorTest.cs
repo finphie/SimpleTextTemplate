@@ -1,33 +1,35 @@
 ﻿using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using FluentAssertions;
-using SimpleTextTemplate.Contexts;
-using Utf8Utility;
 using Xunit;
 
 namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class GeneratorTest
 {
-    [Fact]
-    public void GeneratePageTemplateTest()
-    {
-        var key = (Utf8Array)"Identifier";
-        var message = (Utf8Array)"Hello, World!";
+    const string Identifier = "Hello, World!";
 
-        var symbols = new Utf8ArrayDictionary<Utf8Array>();
-        symbols.TryAdd(key, message);
+    [Fact]
+    public void Test()
+    {
+        var identifier = Encoding.UTF8.GetBytes(Identifier);
+        var context = new TestContext(identifier);
 
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-        ZTemplate.GeneratePageTemplate(bufferWriter, Context.Create(symbols));
+        ZTemplate.Render(bufferWriter, context);
 
-        var expected = @$"<html>
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan).Should().Be(Identifier);
+    }
 
-<body>
-  {message}
-</body>
+    [Fact]
+    public void FileTest()
+    {
+        var identifier = Encoding.UTF8.GetBytes(Identifier);
+        var context = new TestContext(identifier);
 
-</html>";
-        bufferWriter.WrittenSpan.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expected));
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        ZTemplate.FileRender(bufferWriter, context);
+
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan[..^1]).Should().Be(Identifier);
     }
 }

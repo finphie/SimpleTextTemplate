@@ -3,12 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
-    <SimpleTextTemplatePath>$(MSBuildThisFileDirectory)Templates</SimpleTextTemplatePath>
   </PropertyGroup>
-
-  <ItemGroup>
-    <CompilerVisibleProperty Include="SimpleTextTemplatePath" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
@@ -18,14 +13,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleTextTemplate.Contexts\SimpleTextTemplate.Contexts.csproj" />
-    <ProjectReference Include="..\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\SimpleTextTemplate.Generator.Internal\SimpleTextTemplate.Generator.Internal.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" />
     <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Templates\*.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

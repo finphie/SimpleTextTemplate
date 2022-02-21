@@ -1,8 +1,10 @@
-﻿using System.Buffers;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using SimpleTextTemplate.Extensions;
+#if !IsGenerator
+using System.Buffers;
 using SimpleTextTemplate.Helpers;
 using static SimpleTextTemplate.TemplateException;
+#endif
 
 namespace SimpleTextTemplate;
 
@@ -44,6 +46,7 @@ readonly struct Template
         return template;
     }
 
+#if !IsGenerator
     /// <summary>
     /// テンプレートをレンダリングして、<see cref="IBufferWriter{Byte}"/>に書き込みます。
     /// </summary>
@@ -74,6 +77,7 @@ readonly struct Template
             }
         }
     }
+#endif
 
     void ParseInternal()
     {
