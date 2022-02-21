@@ -4,4 +4,4 @@
 /// コンテキスト
 /// </summary>
 /// <param name="Identifier">識別子</param>
-record struct SampleContext(byte[] Identifier);
+readonly record struct SampleContext(byte[] Identifier);
