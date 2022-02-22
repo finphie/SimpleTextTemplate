@@ -7,7 +7,6 @@
 
   <PropertyGroup>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Description>シンプルなテキストテンプレートエンジンです。</Description>
     <PackageTags>templating</PackageTags>
   </PropertyGroup>
 
