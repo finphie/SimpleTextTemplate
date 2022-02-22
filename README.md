@@ -2,7 +2,7 @@
 
 [![Build(.NET)](https://github.com/finphie/SimpleTextTemplate/actions/workflows/build-dotnet.yml/badge.svg)](https://github.com/finphie/SimpleTextTemplate/actions/workflows/build-dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/v/SimpleTextTemplate?color=0078d4&label=NuGet)](https://www.nuget.org/packages/SimpleTextTemplate/)
-[![SimpleTextTemplate package in DotNet feed in Azure Artifacts](https://feeds.dev.azure.com/finphie/7af9aa4d-c550-43af-87a5-01539b2d9934/_apis/public/Packaging/Feeds/18cbb017-6f1d-41eb-b9a5-a6dbf411e3f7/Packages/07a7dc27-e20d-42fd-b8a6-5a219205bf87/Badge)](https://dev.azure.com/finphie/Main/_packaging?_a=package&feed=18cbb017-6f1d-41eb-b9a5-a6dbf411e3f7&package=07a7dc27-e20d-42fd-b8a6-5a219205bf87&preferRelease=true)
+[![AzureArtifacts](https://feeds.dev.azure.com/finphie/7af9aa4d-c550-43af-87a5-01539b2d9934/_apis/public/Packaging/Feeds/18cbb017-6f1d-41eb-b9a5-a6dbf411e3f7/Packages/07a7dc27-e20d-42fd-b8a6-5a219205bf87/Badge)](https://dev.azure.com/finphie/Main/_packaging?_a=package&feed=18cbb017-6f1d-41eb-b9a5-a6dbf411e3f7&package=07a7dc27-e20d-42fd-b8a6-5a219205bf87&preferRelease=true)
 
 シンプルなテキストテンプレートエンジンです。
 
@@ -71,6 +71,7 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ```csharp
 using System;
+using System.Buffers;
 using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
