@@ -94,7 +94,7 @@ static partial class ZTemplate
 
     // TemplateFileAttributeでは、指定されたファイルを解析します。
     // 相対パスを指定した場合、プロジェクトファイルが存在するディレクトリが基準となります。
-    // 基準ディレクトリを変更する場合は、プロジェクトファイル（.csproj）で次のように設定します。
+    // 基準ディレクトリを変更する場合は、プロジェクトファイルで次のように設定します。
     // <PropertyGroup>
     //     <SimpleTextTemplatePath><!-- 任意のパス --></SimpleTextTemplatePath>
     // </PropertyGroup>
