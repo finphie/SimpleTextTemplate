@@ -93,7 +93,7 @@ static partial class ZTemplate
     public static partial void Render(IBufferWriter<byte> bufferWriter, SampleContext context);
 
     // TemplateFileAttributeでは、指定されたファイルを解析します。
-    // プロジェクトファイルからの相対パスでファイル名を指定してください。
+    // 相対パスを指定した場合、プロジェクトファイルのパスが基準となります。
     // 基準ディレクトリを変更する場合は、プロジェクトファイル（.csproj）で次のように設定します。
     // <PropertyGroup>
     //     <SimpleTextTemplatePath><!-- 任意のパス --></SimpleTextTemplatePath>
