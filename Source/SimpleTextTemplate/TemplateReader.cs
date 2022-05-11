@@ -42,7 +42,7 @@ ref struct TemplateReader
     /// <summary>
     /// '{{'
     /// </summary>
-    static ReadOnlySpan<byte> StartIdentifierSpan => new[] { (byte)'{', (byte)'{' };
+    static ReadOnlySpan<byte> StartIdentifierSpan => "{{";
 #endif
 
     /// <summary>
