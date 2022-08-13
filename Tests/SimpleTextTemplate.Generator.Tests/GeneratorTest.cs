@@ -1,5 +1,4 @@
-﻿using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
+﻿using CommunityToolkit.HighPerformance.Buffers;
 using FluentAssertions;
 using Xunit;
 
@@ -7,29 +6,27 @@ namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class GeneratorTest
 {
-    const string Identifier = "Hello, World!";
+    static readonly byte[] Identifier = "Hello, World!"u8.ToArray();
 
     [Fact]
     public void Test()
     {
-        var identifier = Encoding.UTF8.GetBytes(Identifier);
-        var context = new TestContext(identifier);
+        var context = new TestContext(Identifier);
 
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
         ZTemplate.Render(bufferWriter, context);
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan).Should().Be(Identifier);
+        bufferWriter.WrittenSpan.ToArray().Should().Equal(Identifier);
     }
 
     [Fact]
     public void FileTest()
     {
-        var identifier = Encoding.UTF8.GetBytes(Identifier);
-        var context = new TestContext(identifier);
+        var context = new TestContext(Identifier);
 
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
         ZTemplate.FileRender(bufferWriter, context);
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan[..^1]).Should().Be(Identifier);
+        bufferWriter.WrittenSpan[..^1].ToArray().Should().Equal(Identifier);
     }
 }
