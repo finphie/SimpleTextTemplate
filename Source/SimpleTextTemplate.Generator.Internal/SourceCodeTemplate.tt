@@ -10,7 +10,7 @@ partial <#= ClassOrStructText #> <#= ClassName #>
     /// <summary>
     /// テンプレートをレンダリングして、<see cref="global::System.Buffers.IBufferWriter{Byte}"/>に書き込みます。
     /// </summary>
-    /// <param name="<#= BufferWriterParameterName #>">ターゲットの<see cref="IBufferWriter{Byte}"/></param>
+    /// <param name="<#= BufferWriterParameterName #>">ターゲットの<see cref="global::System.Buffers.IBufferWriter{Byte}"/></param>
     /// <param name="<#= ContextParameterName #>">コンテキスト</param>
     [global::System.CodeDom.Compiler.GeneratedCode("<#= GeneratorName #>", "<#= GeneratorVersion #>")]
     <#= MethodAccessibilityText #> static partial void <#= MethodName #>(global::System.Buffers.IBufferWriter<byte> <#= BufferWriterParameterName #>, <#= ContextTypeName #> <#= ContextParameterName #>)

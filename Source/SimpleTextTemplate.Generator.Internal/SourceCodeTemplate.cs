@@ -31,7 +31,8 @@ namespace SimpleTextTemplate.Generator
             this.Write("\r\n{\r\n    /// <summary>\r\n    /// テンプレートをレンダリングして、<see cref=\"global::System.Buffers" +
                     ".IBufferWriter{Byte}\"/>に書き込みます。\r\n    /// </summary>\r\n    /// <param name=\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(BufferWriterParameterName));
-            this.Write("\">ターゲットの<see cref=\"IBufferWriter{Byte}\"/></param>\r\n    /// <param name=\"");
+            this.Write("\">ターゲットの<see cref=\"global::System.Buffers.IBufferWriter{Byte}\"/></param>\r\n    ///" +
+                    " <param name=\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(ContextParameterName));
             this.Write("\">コンテキスト</param>\r\n    [global::System.CodeDom.Compiler.GeneratedCode(\"");
             this.Write(this.ToStringHelper.ToStringWithCulture(GeneratorName));
@@ -88,7 +89,7 @@ namespace SimpleTextTemplate.Generator
         /// <summary>
         /// The string builder that generation-time code is using to assemble generated output
         /// </summary>
-        protected System.Text.StringBuilder GenerationEnvironment
+        public System.Text.StringBuilder GenerationEnvironment
         {
             get
             {
