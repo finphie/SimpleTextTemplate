@@ -21,7 +21,7 @@ public sealed class MemberSerializer<T> : IXunitSerializable
     }
 
     /// <summary>
-    /// <see cref="MemberSerializer"/>クラスの新しいインスタンスを初期化します。
+    /// <see cref="MemberSerializer{T}"/>クラスの新しいインスタンスを初期化します。
     /// </summary>
     /// <param name="obj">オブジェクト</param>
     public MemberSerializer(T obj) => Value = obj;
