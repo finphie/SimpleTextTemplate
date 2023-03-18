@@ -11,7 +11,7 @@ namespace SimpleTextTemplate.Generator;
 partial class SourceCodeTemplate
 {
     static readonly Type GeneratorType = typeof(TemplateGenerator);
-    static readonly string GeneratorName = GeneratorType.FullName;
+    static readonly string GeneratorName = $"global::{GeneratorType.FullName}";
     static readonly string GeneratorVersion = GeneratorType.Assembly.GetName().Version.ToString();
 
     static readonly string ClassText = SyntaxFacts.GetText(SyntaxKind.ClassKeyword);
@@ -196,7 +196,7 @@ partial class SourceCodeTemplate
             return string.Empty;
         }
 
-        var contextTypeName = contextParameter.ToDisplayString();
+        var contextTypeName = contextParameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         return contextTypeName;
     }
 
