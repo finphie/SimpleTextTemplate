@@ -21,23 +21,23 @@ SimpleTextTemplateは、識別子の置換のみに対応したテキストテ�
 
 ### NuGet（正式リリース版）
 
-```console
+```shell
 dotnet add package SimpleTextTemplate
 dotnet add package SimpleTextTemplate.Contexts
 ```
 
-```console
+```shell
 dotnet add package SimpleTextTemplate.Generator
 ```
 
 ### Azure Artifacts（開発用ビルド）
 
-```console
+```shell
 dotnet add package SimpleTextTemplate -s https://pkgs.dev.azure.com/finphie/Main/_packaging/DotNet/nuget/v3/index.json
 dotnet add package SimpleTextTemplate.Contexts -s https://pkgs.dev.azure.com/finphie/Main/_packaging/DotNet/nuget/v3/index.json
 ```
 
-```console
+```shell
 dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/finphie/Main/_packaging/DotNet/nuget/v3/index.json
 ```
 
