@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <IsPackable>true</IsPackable>
-    <Description>テンプレートのレンダリングで使用するコンテキストの作成を行います。</Description>
   </PropertyGroup>
 
   <PropertyGroup>
+    <Description>テンプレートのレンダリングで使用するコンテキストの作成を行います。</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>templating</PackageTags>
   </PropertyGroup>
