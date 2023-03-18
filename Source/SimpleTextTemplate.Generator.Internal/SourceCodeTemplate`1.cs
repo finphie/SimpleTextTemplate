@@ -196,7 +196,7 @@ partial class SourceCodeTemplate
             return string.Empty;
         }
 
-        var contextTypeName = contextParameter.ToDisplayString();
+        var contextTypeName = contextParameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         return contextTypeName;
     }
 
