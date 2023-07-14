@@ -223,7 +223,7 @@ ref struct TemplateReader
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsStartIdentifierBlock()
+    public readonly bool IsStartIdentifierBlock()
         => IsStartIdentifierBlockInternal(ref MemoryMarshal.GetReference(_buffer));
 
     /// <summary>
@@ -234,7 +234,7 @@ ref struct TemplateReader
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsEndIdentifierBlock()
+    public readonly bool IsEndIdentifierBlock()
         => IsEndIdentifierBlockInternal(ref MemoryMarshal.GetReference(_buffer));
 
     /// <summary>
@@ -245,11 +245,11 @@ ref struct TemplateReader
         => SkipSpaceInternal(ref MemoryMarshal.GetReference(_buffer));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IsStartIdentifierBlockInternal(ref byte bufferStart)
+    readonly bool IsStartIdentifierBlockInternal(ref byte bufferStart)
         => _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == StartIdentifier;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool IsEndIdentifierBlockInternal(ref byte bufferStart)
+    readonly bool IsEndIdentifierBlockInternal(ref byte bufferStart)
         => _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == EndIdentifier;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
