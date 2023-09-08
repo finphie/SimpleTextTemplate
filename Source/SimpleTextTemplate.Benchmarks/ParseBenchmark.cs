@@ -5,7 +5,7 @@ using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;
 
-[SimpleJob(RuntimeMoniker.Net60)]
+[SimpleJob(RuntimeMoniker.Net80)]
 [MemoryDiagnoser]
 public class ParseBenchmark
 {

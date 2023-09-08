@@ -9,25 +9,25 @@ using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;
 
-[SimpleJob(RuntimeMoniker.Net60)]
+[SimpleJob(RuntimeMoniker.Net80)]
 [MemoryDiagnoser]
-public class RenderBenchmark
+public partial class RenderBenchmark
 {
     const string Message = "Hello, World!";
 
     // lang=regex
     const string Pattern = "{{ *" + ZTemplate.Identifier + " *}}";
 
-    string? _utf16Source;
+    string _utf16Source = null!;
 
-    IContext? _context;
+    IContext _context = null!;
     SampleContext _contextObject;
-    Dictionary<string, string>? _model;
+    Dictionary<string, string> _model = null!;
 
     Template _template;
-    ScribanTemplate? _scribanTemplate;
-    ScribanTemplate? _scribanLiquidTemplate;
-    Regex? _regex;
+    ScribanTemplate _scribanTemplate = null!;
+    ScribanTemplate _scribanLiquidTemplate = null!;
+    Regex _regex = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -51,14 +51,14 @@ public class RenderBenchmark
             { ZTemplate.Identifier, Message }
         };
 
-        _regex = new(Pattern, RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.ECMAScript);
+        _regex = RegexInternal();
     }
 
     [Benchmark]
     public string SimpleTextTemplate()
     {
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-        _template.Render(bufferWriter, _context!);
+        _template.Render(bufferWriter, _context);
         return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
     }
 
@@ -66,7 +66,7 @@ public class RenderBenchmark
     public byte[] SimpleTextTemplateUtf8()
     {
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-        _template.Render(bufferWriter, _context!);
+        _template.Render(bufferWriter, _context);
         return bufferWriter.WrittenSpan.ToArray();
     }
 
@@ -87,11 +87,14 @@ public class RenderBenchmark
     }
 
     [Benchmark]
-    public string Scriban() => _scribanTemplate!.Render(_model);
+    public string Scriban() => _scribanTemplate.Render(_model);
 
     [Benchmark]
-    public string ScribanLiquid() => _scribanLiquidTemplate!.Render(_model);
+    public string ScribanLiquid() => _scribanLiquidTemplate.Render(_model);
 
     [Benchmark]
-    public string Regex() => _regex!.Replace(_utf16Source!, Message);
+    public string Regex() => _regex.Replace(_utf16Source, Message);
+
+    [GeneratedRegex(Pattern, RegexOptions.Compiled | RegexOptions.ECMAScript | RegexOptions.CultureInvariant)]
+    private static partial Regex RegexInternal();
 }
