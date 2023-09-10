@@ -41,6 +41,10 @@ readonly struct Template
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template Parse(byte[] source)
     {
+#if !IsGenerator
+        ArgumentNullException.ThrowIfNull(source);
+#endif
+
         var template = new Template(source);
         template.ParseInternal();
         return template;
