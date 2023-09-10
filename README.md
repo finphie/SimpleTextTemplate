@@ -56,10 +56,10 @@ using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 
 var symbols = new Utf8ArrayDictionary<Utf8Array>();
-symbols.TryAdd((Utf8Array)"Identifier", (Utf8Array)"Hello, World!");
+symbols.TryAdd((Utf8Array)"Identifier"u8.ToArray(), (Utf8Array)"Hello, World!"u8.ToArray());
 
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-var source = Encoding.UTF8.GetBytes("{{ Identifier }}");
+var source = "{{ Identifier }}"u8.ToArray();
 var template = Template.Parse(source);
 template.Render(bufferWriter, Context.Create(symbols));
 
@@ -76,7 +76,7 @@ using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-var context = new SampleContext(Encoding.UTF8.GetBytes("Hello, World!"));
+var context = new SampleContext("Hello, World!"u8.ToArray());
 
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
 ZTemplate.Render(bufferWriter, context);
@@ -98,9 +98,8 @@ static partial class ZTemplate
     // <PropertyGroup>
     //     <SimpleTextTemplatePath><!-- 任意のパス --></SimpleTextTemplatePath>
     // </PropertyGroup>
-
-    // [TemplateFile("template.txt")]
-    // public static partial void Render(IBufferWriter<byte> bufferWriter, SampleContext context);
+    [TemplateFile("template.txt")]
+    public static partial void Render2(IBufferWriter<byte> bufferWriter, SampleContext context);
 }
 ```
 

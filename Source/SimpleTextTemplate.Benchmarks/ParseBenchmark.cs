@@ -9,18 +9,18 @@ namespace SimpleTextTemplate.Benchmarks;
 [MemoryDiagnoser]
 public class ParseBenchmark
 {
-    byte[]? _utf8Source;
-    string? _utf16Source;
+    byte[] _utf8Source = null!;
+    string _utf16Source = null!;
 
     [GlobalSetup]
     public void Setup()
     {
-        _utf8Source = File.ReadAllBytes("Templates/Page.html");
+        _utf8Source = "{{ Identifier }}"u8.ToArray();
         _utf16Source = Encoding.UTF8.GetString(_utf8Source);
     }
 
     [Benchmark(Baseline = true)]
-    public Template SimpleTextTemplate() => Template.Parse(_utf8Source!);
+    public Template SimpleTextTemplate() => Template.Parse(_utf8Source);
 
     [Benchmark]
     public ScribanTemplate Scriban() => ScribanTemplate.Parse(_utf16Source);
