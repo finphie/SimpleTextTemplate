@@ -61,6 +61,8 @@ readonly struct Template
     /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     public void Render(IBufferWriter<byte> bufferWriter, IContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         var source = _source.AsSpan();
         var blocks = Blocks;
 
