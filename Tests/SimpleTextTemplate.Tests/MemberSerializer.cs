@@ -9,8 +9,9 @@ namespace SimpleTextTemplate.Tests;
 /// xUnit.net標準で非対応のオブジェクトをシリアライズするためのクラスです。
 /// </summary>
 /// <typeparam name="T">シリアライズ対象の型</typeparam>
+/// <param name="obj">オブジェクト</param>
 [SuppressMessage("Extensibility", "xUnit3001:Classes that implement Xunit.Abstractions.IXunitSerializable must have a public parameterless constructor", Justification = "staticコンストラクター")]
-public sealed class MemberSerializer<T> : IXunitSerializable
+public sealed class MemberSerializer<T>(T obj) : IXunitSerializable
 {
     static readonly JsonSerializerOptions SerializerOptions;
 
@@ -21,18 +22,12 @@ public sealed class MemberSerializer<T> : IXunitSerializable
     }
 
     /// <summary>
-    /// <see cref="MemberSerializer{T}"/>クラスの新しいインスタンスを初期化します。
-    /// </summary>
-    /// <param name="obj">オブジェクト</param>
-    public MemberSerializer(T obj) => Value = obj;
-
-    /// <summary>
     /// オブジェクトを取得します。
     /// </summary>
     /// <value>
     /// オブジェクト
     /// </value>
-    public T Value { get; private set; }
+    public T Value { get; private set; } = obj;
 
     /// <inheritdoc/>
     public void Deserialize(IXunitSerializationInfo info)
