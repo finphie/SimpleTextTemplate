@@ -1,8 +1,11 @@
-﻿namespace SimpleTextTemplate;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace SimpleTextTemplate;
 
 /// <summary>
 /// 範囲を表す構造体です。
 /// </summary>
+[SuppressMessage("Performance", "CA1815:equals および operator equals を値型でオーバーライドします", Justification = "不要なため。")]
 #if !IsGenerator
 public
 #endif
