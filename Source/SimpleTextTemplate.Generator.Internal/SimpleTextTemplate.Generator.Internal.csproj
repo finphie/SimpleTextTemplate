@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <NoWarn>$(NoWarn);RS1035</NoWarn>
     <DefineConstants>$(DefineConstants);IsGenerator</DefineConstants>
   </PropertyGroup>
 
