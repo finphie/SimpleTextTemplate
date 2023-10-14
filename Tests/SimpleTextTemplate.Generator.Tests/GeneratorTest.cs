@@ -18,15 +18,4 @@ public sealed class GeneratorTest
 
         bufferWriter.WrittenSpan.ToArray().Should().Equal(Identifier);
     }
-
-    [Fact]
-    public void FileTest()
-    {
-        var context = new TestContext(Identifier);
-
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-        ZTemplate.FileRender(bufferWriter, context);
-
-        bufferWriter.WrittenSpan[..^1].ToArray().Should().Equal(Identifier);
-    }
 }

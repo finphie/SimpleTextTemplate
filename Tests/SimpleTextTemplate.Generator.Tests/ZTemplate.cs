@@ -9,7 +9,4 @@ static partial class ZTemplate
 {
     [Template("{{ Identifier }}")]
     public static partial void Render(IBufferWriter<byte> bufferWriter, TestContext context);
-
-    [TemplateFile("Templates/Test.txt")]
-    public static partial void FileRender(IBufferWriter<byte> bufferWriter, TestContext context);
 }

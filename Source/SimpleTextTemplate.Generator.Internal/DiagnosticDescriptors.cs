@@ -32,15 +32,4 @@ static class DiagnosticDescriptors
         nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);
-
-    /// <summary>
-    /// ファイルが存在しない場合に出力する診断情報です。
-    /// </summary>
-    public static readonly DiagnosticDescriptor FileNotFoundError = new(
-        "STT1002",
-        "指定されたファイルが存在しません。",
-        "テンプレート解析時にエラーが発生しました。指定されたファイルが存在しません。Path: {0}",
-        nameof(SimpleTextTemplate),
-        DiagnosticSeverity.Error,
-        true);
 }

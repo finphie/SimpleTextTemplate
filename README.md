@@ -91,15 +91,6 @@ static partial class ZTemplate
     // TemplateAttributeでは、テンプレート文字列を指定してください。
     [Template("{{ Identifier }}")]  
     public static partial void Render(IBufferWriter<byte> bufferWriter, SampleContext context);
-
-    // TemplateFileAttributeでは、指定されたファイルを解析します。
-    // 相対パスを指定した場合、プロジェクトファイルが存在するディレクトリが基準となります。
-    // 基準ディレクトリを変更する場合は、プロジェクトファイルで次のように設定します。
-    // <PropertyGroup>
-    //     <SimpleTextTemplatePath><!-- 任意のパス --></SimpleTextTemplatePath>
-    // </PropertyGroup>
-    [TemplateFile("template.txt")]
-    public static partial void Render2(IBufferWriter<byte> bufferWriter, SampleContext context);
 }
 ```
 
