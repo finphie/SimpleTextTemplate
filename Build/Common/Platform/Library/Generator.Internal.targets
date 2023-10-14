@@ -2,8 +2,14 @@
   <!-- ソースジェネレーター関連の設定（NuGet非公開） -->
 
   <PropertyGroup>
+    <!-- nullチェックは不要。 -->
+    <NoWarn>$(NoWarn);CA1062</NoWarn>
+
     <!-- Roslynコンポーネントとして扱う。 -->
     <IsRoslynComponent>true</IsRoslynComponent>
+
+    <!-- 一部のAPIを使用禁止にする。 -->
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
 
   <ItemGroup>
