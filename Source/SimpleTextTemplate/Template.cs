@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using SimpleTextTemplate.Extensions;
 #if !IsGenerator
 using System.Buffers;
@@ -11,6 +12,7 @@ namespace SimpleTextTemplate;
 /// <summary>
 /// テンプレートを解析・レンダリングする構造体です。
 /// </summary>
+[SuppressMessage("Performance", "CA1815:equals および operator equals を値型でオーバーライドします", Justification = "不要なため。")]
 #if !IsGenerator
 public
 #endif
@@ -59,6 +61,8 @@ readonly struct Template
     /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     public void Render(IBufferWriter<byte> bufferWriter, IContext context)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         var source = _source.AsSpan();
         var blocks = Blocks;
 

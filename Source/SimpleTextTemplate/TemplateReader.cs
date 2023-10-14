@@ -9,10 +9,11 @@ namespace SimpleTextTemplate;
 /// <summary>
 /// UTF-8でエンコードされたテンプレートを読み込みます。
 /// </summary>
+/// <param name="input">処理対象にするUTF-8のテンプレート文字列</param>
 #if !IsGenerator
 public
 #endif
-ref struct TemplateReader
+ref struct TemplateReader(ReadOnlySpan<byte> input)
 {
     /// <summary>
     /// '{{'
@@ -24,19 +25,9 @@ ref struct TemplateReader
     /// </summary>
     const ushort EndIdentifier = 0x7d7d;
 
-    readonly ReadOnlySpan<byte> _buffer;
+    readonly ReadOnlySpan<byte> _buffer = input;
 
-    int _position;
-
-    /// <summary>
-    /// <see cref="TemplateReader"/>構造体の新しいインスタンスを初期化します。
-    /// </summary>
-    /// <param name="input">処理対象にするUTF-8のテンプレート文字列</param>
-    public TemplateReader(ReadOnlySpan<byte> input)
-    {
-        _buffer = input;
-        _position = 0;
-    }
+    int _position = 0;
 
 #if NET6_0_OR_GREATER
     /// <summary>

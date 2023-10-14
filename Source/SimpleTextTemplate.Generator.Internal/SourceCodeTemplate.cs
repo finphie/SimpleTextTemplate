@@ -49,7 +49,7 @@ namespace SimpleTextTemplate.Generator
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(ContextParameterName));
             this.Write(")\r\n    {\r\n");
- foreach (var (type, range) in GetBlocks()) { 
+ foreach (var (type, range) in Blocks) { 
  if (type == BlockType.Raw) { 
             this.Write("        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(BufferWriterParameterName));

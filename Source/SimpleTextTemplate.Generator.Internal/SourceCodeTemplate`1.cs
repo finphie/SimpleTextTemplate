@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text;
+﻿using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
@@ -33,6 +32,36 @@ partial class SourceCodeTemplate
     {
         _symbol = symbol;
         _source = utf8Source;
+
+        // トップレベルステートメントでは、名前空間の設定は不要。
+        NamespaceText = _symbol.ContainingNamespace.CanBeReferencedByName
+            ? $"namespace {_symbol.ContainingNamespace.ToDisplayString()};"
+            : string.Empty;
+
+        var type = _symbol.ContainingType;
+
+#pragma warning disable IDE0072 // 欠落しているケースの追加
+        ClassOrStructText = (type.IsReferenceType, type.IsRecord) switch
+        {
+            (true, true) => RecordText,
+            (true, false) => ClassText,
+            (false, true) => RecordStructText,
+            (false, false) => StructText
+        };
+#pragma warning restore IDE0072 // 欠落しているケースの追加
+
+        ClassName = _symbol.ContainingType.Name;
+        MethodAccessibilityText = SyntaxFacts.GetText(_symbol.DeclaredAccessibility);
+        MethodName = _symbol.Name;
+
+        var parameters = _symbol.Parameters;
+        BufferWriterParameterName = parameters.Length == 0 ? string.Empty : parameters[0].Name;
+
+        var contextParameter = parameters.Length == 2 ? parameters[1] : null;
+        ContextTypeName = contextParameter is null
+            ? string.Empty
+            : contextParameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        ContextParameterName = contextParameter?.Name ?? string.Empty;
     }
 
     /// <summary>
@@ -46,87 +75,72 @@ partial class SourceCodeTemplate
     }
 
     /// <summary>
-    /// 名前空間を設定する文を取得、設定します。
+    /// 名前空間を設定する文を取得します。
     /// </summary>
     /// <value>
     /// トップレベルステートメントでは空文字列、
     /// それ以外では"<see langword="namespace"/> <![CDATA[<名前空間名>;"]]>を返します。
     /// </value>
-    public string? NamespaceText { get; private set; }
+    public string NamespaceText { get; }
 
     /// <summary>
-    /// クラスや構造体、レコードのキーワード名を取得、設定します。
+    /// クラスや構造体、レコードのキーワード名を取得します。
     /// </summary>
     /// <value>"class"または"struct"、"record"、"record struct"のいずれか</value>
-    public string? ClassOrStructText { get; private set; }
+    public string ClassOrStructText { get; }
 
     /// <summary>
-    /// クラス名を取得、設定します。
+    /// クラス名を取得します。
     /// </summary>
     /// <value>クラス名</value>
-    public string? ClassName { get; private set; }
+    public string ClassName { get; private set; }
 
     /// <summary>
-    /// アクセシビリティ名を取得、設定します。
+    /// アクセシビリティ名を取得します。
     /// </summary>
     /// <value>"public"や"private"などのアクセシビリティ名</value>
-    public string? MethodAccessibilityText { get; private set; }
+    public string MethodAccessibilityText { get; }
 
     /// <summary>
-    /// メソッド名を取得、設定します。
+    /// メソッド名を取得します。
     /// </summary>
     /// <value>
     /// メソッド名
     /// </value>
-    public string? MethodName { get; private set; }
+    public string MethodName { get; }
 
     /// <summary>
-    /// <![CDATA[IBufferWriter<byte>]]>型が設定されている引数の名前を取得、設定します。
+    /// <![CDATA[IBufferWriter<byte>]]>型が設定されている引数の名前を取得します。
     /// </summary>
     /// <value>
     /// 引数名
     /// </value>
-    public string? BufferWriterParameterName { get; private set; }
+    public string BufferWriterParameterName { get; }
 
     /// <summary>
-    /// コンテキストの型名を取得、設定します。
+    /// コンテキストの型名を取得します。
     /// </summary>
     /// <value>
     /// コンテキストの型名
     /// </value>
-    public string? ContextTypeName { get; private set; }
+    public string ContextTypeName { get; }
 
     /// <summary>
-    /// コンテキストの引数名を取得、設定します。
+    /// コンテキストの引数名を取得します。
     /// </summary>
     /// <value>
     /// コンテキストの引数名
     /// </value>
-    public string? ContextParameterName { get; private set; }
+    public string ContextParameterName { get; }
+
+    ReadOnlySpan<(BlockType Type, TextRange Range)> Blocks => _template.Blocks;
 
     /// <summary>
     /// ソースコードを解析します。
     /// </summary>
     /// <returns>解析結果</returns>
-    [MemberNotNull(nameof(NamespaceText))]
-    [MemberNotNull(nameof(ClassOrStructText))]
-    [MemberNotNull(nameof(ClassName))]
-    [MemberNotNull(nameof(MethodAccessibilityText))]
-    [MemberNotNull(nameof(MethodName))]
-    [MemberNotNull(nameof(BufferWriterParameterName))]
-    [MemberNotNull(nameof(ContextTypeName))]
-    [MemberNotNull(nameof(ContextParameterName))]
     public ParseResult TryParse()
     {
-        NamespaceText = GetNamespaceText();
-        ClassOrStructText = GetClassOrStructText();
-        ClassName = GetClassName();
-        MethodAccessibilityText = GetMethodAccessibilityText();
-        MethodName = GetMethodName();
-        BufferWriterParameterName = GetBufferWriterParameterName();
-        ContextTypeName = GetContextTypeName();
-        ContextParameterName = GetContextParameterName();
-
         _template = Template.Parse(_source);
         return IsValidIdentifier() ? ParseResult.Success : ParseResult.InvalidIdentifier;
     }
@@ -148,68 +162,6 @@ partial class SourceCodeTemplate
 
         return true;
     }
-
-    string GetNamespaceText()
-    {
-        // トップレベルステートメントでは、名前空間の設定は不要。
-        if (_symbol.ContainingNamespace.CanBeReferencedByName)
-        {
-            var result = _symbol.ContainingNamespace.ToDisplayString();
-            return "namespace " + result + ";";
-        }
-
-        return string.Empty;
-    }
-
-    [SuppressMessage("Style", "IDE0046:条件式に変換します", Justification = "可読性のため")]
-    string GetClassOrStructText()
-    {
-        var type = _symbol.ContainingType;
-
-        if (type.IsReferenceType)
-        {
-            return type.IsRecord ? RecordText : ClassText;
-        }
-
-        return type.IsRecord ? RecordStructText : StructText;
-    }
-
-    string GetClassName() => _symbol.ContainingType.Name;
-
-    string GetMethodAccessibilityText()
-        => SyntaxFacts.GetText(_symbol.DeclaredAccessibility);
-
-    string GetMethodName() => _symbol.Name;
-
-    string GetBufferWriterParameterName()
-    {
-        var parameters = _symbol.Parameters;
-        return parameters.Length == 0 ? string.Empty : parameters[0].Name;
-    }
-
-    string GetContextTypeName()
-    {
-        var contextParameter = GetContextParameter();
-
-        if (contextParameter is null)
-        {
-            return string.Empty;
-        }
-
-        var contextTypeName = contextParameter.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        return contextTypeName;
-    }
-
-    string GetContextParameterName()
-        => GetContextParameter()?.Name ?? string.Empty;
-
-    IParameterSymbol? GetContextParameter()
-    {
-        var parameters = _symbol.Parameters;
-        return parameters.Length == 2 ? parameters[1] : null;
-    }
-
-    ReadOnlySpan<(BlockType Type, TextRange Range)> GetBlocks() => _template.Blocks;
 
     string GetArrayText(TextRange range)
         => string.Join(", ", _source.AsSpan(range.Start, range.Length).ToArray());
