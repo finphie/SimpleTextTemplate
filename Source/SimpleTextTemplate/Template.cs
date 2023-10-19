@@ -41,19 +41,25 @@ readonly struct Template
     /// </summary>
     /// <param name="source">テンプレート文字列</param>
     /// <param name="template"><see cref="Template"/>構造体のインスタンス</param>
+    /// <param name="consumed">読み取ったバイト数</param>
     /// <returns>
     /// 解析に成功した場合は<see langword="true"/>を返します。
     /// それ以外の場合は<see langword="false"/>を返します。
     /// </returns>
     /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
-    public static bool TryParse(byte[] source, out Template template)
+    public static bool TryParse(byte[] source, out Template template, out nuint consumed)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(source);
 #endif
 
         template = new Template(source);
-        return template.TryParseInternal();
+        var reader = new TemplateReader(source);
+
+        var success = template.TryParseInternal(ref reader);
+        consumed = reader.Consumed;
+
+        return success;
     }
 
     /// <summary>
@@ -85,6 +91,7 @@ readonly struct Template
     /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     public void Render(IBufferWriter<byte> bufferWriter, IContext context)
     {
+        ArgumentNullException.ThrowIfNull(bufferWriter);
         ArgumentNullException.ThrowIfNull(context);
 
         var source = _source.AsSpan();
@@ -115,10 +122,8 @@ readonly struct Template
 #endif
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool TryParseInternal()
+    bool TryParseInternal(ref TemplateReader reader)
     {
-        var reader = new TemplateReader(_source);
-
         while (reader.TryRead(out var value) is var type)
         {
             if (type == BlockType.None)

@@ -133,6 +133,11 @@ partial class SourceCodeTemplate
     /// </value>
     public string ContextParameterName { get; }
 
+    /// <summary>
+    /// 解析失敗位置を取得します。
+    /// </summary>
+    public nuint ErrorPosition { get; private set; }
+
     ReadOnlySpan<(BlockType Type, TextRange Range)> Blocks => _template.Blocks;
 
     /// <summary>
@@ -141,7 +146,12 @@ partial class SourceCodeTemplate
     /// <returns>解析結果</returns>
     public ParseResult TryParse()
     {
-        _template = Template.Parse(_source);
+        if (!Template.TryParse(_source, out _template, out var consumed))
+        {
+            ErrorPosition = consumed;
+            return ParseResult.InvalidIdentifier;
+        }
+
         return IsValidIdentifier() ? ParseResult.Success : ParseResult.InvalidIdentifier;
     }
 

@@ -28,13 +28,13 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 
             if (result == ParseResult.InvalidIdentifier)
             {
-                context.ReportDiagnostic(DiagnosticDescriptors.InvalidIdentifierError, method.Symbol);
+                context.ReportDiagnostic(DiagnosticDescriptors.InvalidIdentifierError, method.Symbol, template.ErrorPosition);
                 return;
             }
 
             if (result != ParseResult.Success)
             {
-                context.ReportDiagnostic(DiagnosticDescriptors.UnknownError, method.Symbol);
+                context.ReportDiagnostic(DiagnosticDescriptors.UnknownError, method.Symbol, template.ErrorPosition);
                 return;
             }
 
