@@ -1,259 +1,248 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using SimpleTextTemplate.Extensions;
 using SimpleTextTemplate.Helpers;
-using static SimpleTextTemplate.TemplateException;
+
+#if NET8_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 
 namespace SimpleTextTemplate;
 
 /// <summary>
 /// UTF-8でエンコードされたテンプレートを読み込みます。
 /// </summary>
-/// <param name="input">処理対象にするUTF-8のテンプレート文字列</param>
-#if !IsGenerator
-public
-#endif
-ref struct TemplateReader(ReadOnlySpan<byte> input)
+public ref struct TemplateReader
 {
-    /// <summary>
-    /// '{{'
-    /// </summary>
-    const ushort StartIdentifier = 0x7b7b;
+#if NET8_0_OR_GREATER
+    readonly ref readonly byte _start;
+    ref byte _buffer;
 
-    /// <summary>
-    /// '}}'
-    /// </summary>
-    const ushort EndIdentifier = 0x7d7d;
-
-    readonly ReadOnlySpan<byte> _buffer = input;
-
-    int _position = 0;
-
-#if NET6_0_OR_GREATER
-    /// <summary>
-    /// '{{'
-    /// </summary>
-    static ReadOnlySpan<byte> StartIdentifierSpan => "{{"u8;
+    [SuppressMessage("Style", "IDE0032:自動プロパティを使用する", Justification = "誤検知")]
+    int _length;
+#else
+    readonly ReadOnlySpan<byte> _start;
+    ReadOnlySpan<byte> _buffer;
 #endif
 
     /// <summary>
-    /// テンプレート文字列を読み込みます。
+    /// <see cref="TemplateReader"/>構造体の新しいインスタンスを初期化します。
     /// </summary>
-    /// <param name="range">テンプレートまたはオブジェクトの位置</param>
-    /// <returns>ブロックのタイプ</returns>
-    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
-    public BlockType Read(out TextRange range)
+    /// <param name="input">処理対象にするUTF-8のテンプレート文字列</param>
+    public TemplateReader(ReadOnlySpan<byte> input)
     {
-        if (_position >= _buffer.Length)
+#if NET8_0_OR_GREATER
+        _start = ref MemoryMarshal.GetReference(input);
+        _buffer = ref MemoryMarshal.GetReference(input);
+        _length = input.Length;
+#else
+        _start = input;
+        _buffer = input;
+#endif
+    }
+
+    /// <summary>
+    /// 読み取ったバイト数
+    /// </summary>
+    public readonly nuint Consumed
+#if NET8_0_OR_GREATER
+        => (nuint)Unsafe.ByteOffset(ref Unsafe.AsRef(in _start), ref _buffer);
+#else
+        => (uint)Unsafe.ByteOffset(ref MemoryMarshal.GetReference(_start), ref MemoryMarshal.GetReference(_buffer));
+#endif
+
+    /// <summary>
+    /// {{
+    /// </summary>
+    static ReadOnlySpan<byte> StartIdentifier => "{{"u8;
+
+    /// <summary>
+    /// }}
+    /// </summary>
+    static ReadOnlySpan<byte> EndIdentifier => "}}"u8;
+
+    readonly ref byte Buffer =>
+#if NET8_0_OR_GREATER
+        ref _buffer;
+#else
+        ref MemoryMarshal.GetReference(_buffer);
+#endif
+
+#if NET8_0_OR_GREATER
+    [SuppressMessage("Style", "IDE0032:自動プロパティを使用する", Justification = "誤検知")]
+#endif
+    readonly int Length =>
+#if NET8_0_OR_GREATER
+        _length;
+#else
+        _buffer.Length;
+#endif
+
+    /// <summary>
+    /// 文字列または識別子を読み込みます。
+    /// </summary>
+    /// <param name="range">文字列または識別子の範囲。文字列や識別子ではない場合、<see cref="BlockType.None"/>を返す。</param>
+    /// <returns>ブロックのタイプ</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BlockType TryRead(out TextRange range)
+    {
+        if (Length <= 0)
         {
             range = default;
             return BlockType.None;
         }
 
-        if (TryReadTemplate(out range))
+        if (TryReadString(out range))
         {
             return BlockType.Raw;
         }
 
-        ReadIdentifier(out range);
-        return BlockType.Identifier;
+        if (TryReadIdentifier(out range))
+        {
+            return BlockType.Identifier;
+        }
+
+        range = default;
+        return BlockType.None;
     }
 
     /// <summary>
-    /// テンプレート文字列を読み込みます。
+    /// 文字列または識別子を読み込みます。
     /// </summary>
-    /// <param name="range">テンプレートの位置</param>
+    /// <param name="range">文字列または識別子の範囲</param>
+    /// <returns>ブロックのタイプ</returns>
+    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BlockType Read(out TextRange range)
+    {
+        var result = TryRead(out range);
+
+        if (result == BlockType.None)
+        {
+            ThrowHelper.ThrowTemplateParserException(Consumed);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 文字列を読み込みます。
+    /// </summary>
+    /// <param name="range">文字列の範囲</param>
     /// <returns>
     /// 現在位置の文字列が'{{'の場合は<see langword="true"/>、
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryReadTemplate(out TextRange range)
+    public bool TryReadString(out TextRange range)
     {
-        if (_position >= _buffer.Length)
+        if (Length == 0)
         {
-            goto NotFound;
+            range = default;
+            return false;
         }
 
-        var startPosition = _position;
-
-#if NET6_0_OR_GREATER
-        var buffer = _buffer[_position..];
-        var index = buffer.IndexOf(StartIdentifierSpan);
-
-        if (index == -1)
-        {
-            _position = _buffer.Length;
-            goto Found;
-        }
+        // "{{"がある位置までは文字列となる。
+        var index = BinaryHelper.IndexOf(ref Buffer, Length, StartIdentifier);
 
         if (index == 0)
         {
-            goto NotFound;
+            range = default;
+            return false;
         }
 
-        _position += index;
-        goto Found;
-#else
-        ref var bufferStart = ref MemoryMarshal.GetReference(_buffer);
-
-        while (_position + 1 < _buffer.Length)
+        if (index == -1)
         {
-            // '{{'で始まらない場合
-            if (!IsStartIdentifierBlockInternal(ref bufferStart))
-            {
-                _position++;
-                continue;
-            }
-
-            // 出力対象文字が1文字もない場合
-            if (startPosition == _position)
-            {
-                goto NotFound;
-            }
-
-            goto Found;
+            index = Length;
         }
 
-        _position++;
-        goto Found;
-#endif
-    Found:
-        range = new TextRange(startPosition, _position);
+        var consumed = (int)Consumed;
+        range = new TextRange(consumed, consumed + index);
+        Advance(index);
+
         return true;
-    NotFound:
-        range = default;
-        return false;
     }
 
     /// <summary>
     /// 識別子を読み込みます。
     /// </summary>
-    /// <param name="range">オブジェクトの位置</param>
-    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
-    public void ReadIdentifier(out TextRange range)
+    /// <param name="range">識別子の範囲</param>
+    /// <returns>
+    /// 識別子を取得できた場合は<see langword="true"/>、
+    /// それ以外の場合は<see langword="false"/>。
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryReadIdentifier(out TextRange range)
     {
-        ref var bufferStart = ref MemoryMarshal.GetReference(_buffer);
-
-        // '{{'で始まらない場合
-        if (!IsStartIdentifierBlockInternal(ref bufferStart))
+        // "{{"で始まらない場合
+        if (Length < StartIdentifier.Length || Unsafe.ReadUnaligned<ushort>(ref Buffer) != MemoryMarshal.Read<ushort>(StartIdentifier))
         {
-            // 2文字の内、最初の1文字が'{'の場合
-            if (_position + 1 < _buffer.Length && Unsafe.Add(ref bufferStart, (nint)(uint)_position) == (byte)'{')
-            {
-                _position++;
-            }
-
-            goto ExpectedStartToken;
+            range = default;
+            return false;
         }
 
-        _position += sizeof(ushort);
+        Advance(StartIdentifier.Length);
 
-        // '{'に連続するスペースを削除
-        SkipSpaceInternal(ref bufferStart);
+        // "{{"に連続するスペースを削除
+        SkipSpace();
 
-        var startPosition = _position;
+        // "}}"がある位置までは識別子となる。
+        var index = BinaryHelper.IndexOf(ref Buffer, Length, EndIdentifier);
 
-        while (_position + 1 < _buffer.Length)
+        // "{{"と"}}"の間に1文字もないか、"}}"が見つからない場合
+        if (index <= 0)
         {
-            // '}}'で終わらない場合
-            if (!IsEndIdentifierBlockInternal(ref bufferStart))
-            {
-                _position++;
-                continue;
-            }
-
-            var endPosition = _position;
-
-            // '{{'と'}}'の間に1文字もない場合
-            if (startPosition == endPosition)
-            {
-                goto InvalidIdentifierFormat;
-            }
-
-            // 末尾のスペースを削除
-            for (; endPosition - 1 > startPosition; endPosition--)
-            {
-                if (!Unsafe.Add(ref bufferStart, (nint)(uint)(endPosition - 1)).IsSpace())
-                {
-                    break;
-                }
-            }
-
-            _position += sizeof(ushort);
-
-            range = new TextRange(startPosition, endPosition);
-            return;
+            range = default;
+            return false;
         }
 
-        if (_position == _buffer.Length)
-        {
-            --_position;
-        }
+        Advance(index);
 
-        goto ExpectedEndToken;
+        // 識別子と"}}"の間にある連続するスペースを削除
+        var endIndex = BinaryHelper.GetTrailingSpaceLength(ref Unsafe.SubtractByteOffset(ref Buffer, 1), Length + 1);
 
-    InvalidIdentifierFormat:
-        ThrowHelper.ThrowTemplateParserException(ParserError.InvalidIdentifierFormat, _position);
+        var consumed = (int)Consumed;
+        range = new(consumed - index, consumed - endIndex);
 
-    ExpectedStartToken:
-        ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedStartToken, _position);
-
-    ExpectedEndToken:
-        ThrowHelper.ThrowTemplateParserException(ParserError.ExpectedEndToken, _position);
-
-        // 直前のコードで例外を出すはずなので、ここには到達しない。
-        Unsafe.SkipInit(out range);
+        Advance(EndIdentifier.Length);
+        return true;
     }
 
     /// <summary>
-    /// 現在位置の文字列が'{{'であるかどうかを示す値を返します。
+    /// 指定されたバイト数読み取り完了したことを通知します。
     /// </summary>
-    /// <returns>
-    /// 現在位置の文字列が'{{'の場合は<see langword="true"/>、
-    /// それ以外の場合は<see langword="false"/>。
-    /// </returns>
+    /// <param name="count">進めるバイト数</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool IsStartIdentifierBlock()
-        => IsStartIdentifierBlockInternal(ref MemoryMarshal.GetReference(_buffer));
-
-    /// <summary>
-    /// 現在位置の文字列が'}}'であるかどうかを示す値を返します。
-    /// </summary>
-    /// <returns>
-    /// 現在位置の文字列が'}}'の場合は<see langword="true"/>、
-    /// それ以外の場合は<see langword="false"/>。
-    /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly bool IsEndIdentifierBlock()
-        => IsEndIdentifierBlockInternal(ref MemoryMarshal.GetReference(_buffer));
-
-    /// <summary>
-    /// 空白文字列をスキップします。
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SkipSpace()
-        => SkipSpaceInternal(ref MemoryMarshal.GetReference(_buffer));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    readonly bool IsStartIdentifierBlockInternal(ref byte bufferStart)
-        => _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == StartIdentifier;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    readonly bool IsEndIdentifierBlockInternal(ref byte bufferStart)
-        => _position + 1 < _buffer.Length && Unsafe.ReadUnaligned<ushort>(ref Unsafe.Add(ref bufferStart, (nint)(uint)_position)) == EndIdentifier;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void SkipSpaceInternal(ref byte bufferStart)
+    void Advance(int count)
     {
-        while (_position < _buffer.Length)
-        {
-            if (!Unsafe.Add(ref bufferStart, (nint)(uint)_position).IsSpace())
-            {
-                return;
-            }
+        Debug.Assert(count > 0, "バイト数は0より大きい数値である必要があります。");
 
-            _position++;
+#if NET8_0_OR_GREATER
+        _buffer = ref Unsafe.AddByteOffset(ref _buffer, (nint)(uint)count);
+        _length -= count;
+#else
+        _buffer = BinaryHelper.CreateReadOnlySpan(ref Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(_buffer), (nint)(uint)count), _buffer.Length - count);
+#endif
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void SkipSpace()
+    {
+        var count = 0;
+
+        for (; count < Length; count++)
+        {
+            if (Unsafe.AddByteOffset(ref Buffer, (nint)(uint)count) != (byte)' ')
+            {
+                break;
+            }
         }
+
+        if (count == 0)
+        {
+            return;
+        }
+
+        Advance(count);
     }
 }
