@@ -13,7 +13,7 @@ namespace SimpleTextTemplate;
 /// テンプレートを解析・レンダリングする構造体です。
 /// </summary>
 [SuppressMessage("Performance", "CA1815:equals および operator equals を値型でオーバーライドします", Justification = "不要なため。")]
-#if !IsGenerator
+#if NET8_0_OR_GREATER
 public
 #endif
 readonly struct Template
@@ -43,7 +43,7 @@ readonly struct Template
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template Parse(byte[] source)
     {
-#if !IsGenerator
+#if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(source);
 #endif
 
@@ -52,7 +52,7 @@ readonly struct Template
         return template;
     }
 
-#if !IsGenerator
+#if NET8_0_OR_GREATER
     /// <summary>
     /// テンプレートをレンダリングして、<see cref="IBufferWriter{Byte}"/>に書き込みます。
     /// </summary>
@@ -81,7 +81,7 @@ readonly struct Template
                     break;
                 case BlockType.None:
                 default:
-                    ThrowHelper.ThrowTemplateParserException(ParserError.InvalidFormat, block.Range.Start);
+                    ThrowHelper.ThrowTemplateParserException((nuint)block.Range.Start);
                     break;
             }
         }
@@ -92,7 +92,7 @@ readonly struct Template
     {
         var reader = new TemplateReader(_source);
 
-        while ((reader.Read(out var value) is var type) && type != BlockType.None)
+        while (reader.Read(out var value) is var type)
         {
             _blocks.Add((type, value));
         }
