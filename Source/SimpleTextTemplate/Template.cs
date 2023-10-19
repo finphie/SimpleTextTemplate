@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SimpleTextTemplate.Extensions;
-#if !IsGenerator
+
+#if NET8_0_OR_GREATER
 using System.Buffers;
 using SimpleTextTemplate.Helpers;
-using static SimpleTextTemplate.TemplateException;
 #endif
 
 namespace SimpleTextTemplate;
