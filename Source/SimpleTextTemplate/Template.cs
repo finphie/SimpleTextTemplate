@@ -4,6 +4,7 @@ using SimpleTextTemplate.Extensions;
 
 #if NET8_0_OR_GREATER
 using System.Buffers;
+using System.Runtime.InteropServices;
 using SimpleTextTemplate.Helpers;
 #endif
 
@@ -64,11 +65,13 @@ readonly struct Template
         ArgumentNullException.ThrowIfNull(context);
 
         var source = _source.AsSpan();
+        ref var sourceStart = ref MemoryMarshal.GetReference(source);
+
         var blocks = Blocks;
 
         foreach (ref readonly var block in blocks)
         {
-            var value = source.Slice(block.Range.Start, block.Range.Length);
+            var value = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AddByteOffset(ref sourceStart, (nint)(uint)block.Range.Start), block.Range.Length);
 
             switch (block.Type)
             {
@@ -88,6 +91,7 @@ readonly struct Template
     }
 #endif
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void ParseInternal()
     {
         var reader = new TemplateReader(_source);
