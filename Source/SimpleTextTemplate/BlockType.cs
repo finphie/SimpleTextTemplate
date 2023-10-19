@@ -3,10 +3,7 @@
 /// <summary>
 /// ブロックのタイプを表します。
 /// </summary>
-#if !IsGenerator
-public
-#endif
-enum BlockType
+public enum BlockType
 {
     /// <summary>
     /// 空のブロック。
