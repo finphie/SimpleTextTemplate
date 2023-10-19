@@ -40,7 +40,29 @@ readonly struct Template
     /// テンプレート文字列を解析します。
     /// </summary>
     /// <param name="source">テンプレート文字列</param>
+    /// <param name="template"><see cref="Template"/>構造体のインスタンス</param>
+    /// <returns>
+    /// 解析に成功した場合は<see langword="true"/>を返します。
+    /// それ以外の場合は<see langword="false"/>を返します。
+    /// </returns>
+    /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
+    public static bool TryParse(byte[] source, out Template template)
+    {
+#if NET8_0_OR_GREATER
+        ArgumentNullException.ThrowIfNull(source);
+#endif
+
+        template = new Template(source);
+        return template.TryParseInternal();
+    }
+
+    /// <summary>
+    /// テンプレート文字列を解析します。
+    /// </summary>
+    /// <param name="source">テンプレート文字列</param>
     /// <returns><see cref="Template"/>構造体のインスタンス</returns>
+    /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
+    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template Parse(byte[] source)
     {
@@ -59,6 +81,7 @@ readonly struct Template
     /// </summary>
     /// <param name="bufferWriter">ターゲットの<see cref="IBufferWriter{Byte}"/></param>
     /// <param name="context">コンテキスト</param>
+    /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
     /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     public void Render(IBufferWriter<byte> bufferWriter, IContext context)
     {
@@ -90,6 +113,24 @@ readonly struct Template
         }
     }
 #endif
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    bool TryParseInternal()
+    {
+        var reader = new TemplateReader(_source);
+
+        while (reader.TryRead(out var value) is var type)
+        {
+            if (type == BlockType.None)
+            {
+                return false;
+            }
+
+            _blocks.Add((type, value));
+        }
+
+        return true;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void ParseInternal()
