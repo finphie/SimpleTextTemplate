@@ -18,5 +18,10 @@ public enum BlockType
     /// <summary>
     /// 識別子
     /// </summary>
-    Identifier
+    Identifier,
+
+    /// <summary>
+    /// 末尾
+    /// </summary>
+    End
 }

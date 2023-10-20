@@ -89,7 +89,7 @@ public ref struct TemplateReader
         if (Length <= 0)
         {
             range = default;
-            return BlockType.None;
+            return BlockType.End;
         }
 
         if (TryReadString(out range))

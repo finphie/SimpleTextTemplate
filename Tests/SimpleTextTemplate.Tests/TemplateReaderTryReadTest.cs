@@ -43,8 +43,18 @@ public sealed class TemplateReaderTryReadTest
     public void 文字列_識別子_文字列_識別子_文字列_文字列または識別子の範囲を返す()
         => Execute("x{{ A }}123{{ B }}x"u8, (Raw, "x", 1), (Identifier, "A", 8), (Raw, "123", 11), (Identifier, "B", 18), (Raw, "x", 19));
 
+    [Fact]
+    public void 末尾_ブロックタイプEndとfalseを返す()
+    {
+        var reader = new TemplateReader([]);
+
+        reader.TryRead(out var range).Should().Be(End);
+        reader.Consumed.Should().Be(0);
+
+        range.Should().Be(default(TextRange));
+    }
+
     [Theory]
-    [InlineData("", 0)]
     [InlineData("{{", 2)]
     [InlineData("{{ ", 3)]
     [InlineData("{{ }", 3)]
