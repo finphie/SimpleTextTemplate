@@ -7,14 +7,14 @@ namespace SimpleTextTemplate.Tests;
 public sealed class TemplateTryParseTest
 {
     [Theory]
-    [InlineData("", 0)]
-    [InlineData("{", 1)]
-    [InlineData("a", 1)]
-    [InlineData("ab", 2)]
-    [InlineData("abc", 3)]
-    [InlineData("{ A }", 5)]
-    [InlineData("}}", 2)]
-    public void 文字列_trueを返す(string input, int consumed) => Execute(input, consumed);
+    [InlineData("")]
+    [InlineData("{")]
+    [InlineData("a")]
+    [InlineData("ab")]
+    [InlineData("abc")]
+    [InlineData("{ A }")]
+    [InlineData("}}")]
+    public void 文字列_trueを返す(string input) => Execute(input, input.Length);
 
     [Theory]
     [InlineData("{{ A }}{{ B }}", 14)]
