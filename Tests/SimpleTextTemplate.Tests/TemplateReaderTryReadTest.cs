@@ -78,7 +78,7 @@ public sealed class TemplateReaderTryReadTest
             reader.TryRead(out var range).Should().Be(type);
             reader.Consumed.Should().Be(consumed);
 
-            buffer.Slice(range.Start, range.Length).ToArray()
+            buffer[range.Start..range.End].ToArray()
                .Should()
                .Equal(Encoding.UTF8.GetBytes(value));
         }

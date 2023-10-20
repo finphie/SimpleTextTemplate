@@ -22,7 +22,7 @@ public sealed class TemplateReaderTryReadStringTest
         reader.TryReadString(out var range).Should().BeTrue();
         reader.Consumed.Should().Be((nuint)consumed);
 
-        utf8Input.AsSpan(range.Start, range.Length).ToArray()
+        utf8Input[range.Start..range.End]
             .Should()
             .Equal(Encoding.UTF8.GetBytes(template));
     }
