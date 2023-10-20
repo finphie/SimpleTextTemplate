@@ -121,8 +121,13 @@ public readonly struct Template
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     bool TryParseInternal(ref TemplateReader reader)
     {
-        while (reader.TryRead(out var value) is var type && (type is not BlockType.None and not BlockType.End))
+        while (reader.TryRead(out var value) is var type && type != BlockType.End)
         {
+            if (type == BlockType.None)
+            {
+                return false;
+            }
+
             _blocks.Add((type, value));
         }
 
@@ -134,7 +139,7 @@ public readonly struct Template
     {
         var reader = new TemplateReader(_source);
 
-        while (reader.Read(out var value) is var type)
+        while (reader.Read(out var value) is var type && type != BlockType.End)
         {
             _blocks.Add((type, value));
         }
