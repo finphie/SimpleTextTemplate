@@ -14,10 +14,7 @@ namespace SimpleTextTemplate;
 /// テンプレートを解析・レンダリングする構造体です。
 /// </summary>
 [SuppressMessage("Performance", "CA1815:equals および operator equals を値型でオーバーライドします", Justification = "不要なため。")]
-#if NET8_0_OR_GREATER
-public
-#endif
-readonly struct Template
+public readonly struct Template
 {
     readonly byte[] _source;
     readonly List<(BlockType Type, TextRange Range)> _blocks;
@@ -55,10 +52,9 @@ readonly struct Template
 
         template = new Template(source);
         var reader = new TemplateReader(source);
-
         var success = template.TryParseInternal(ref reader);
-        consumed = reader.Consumed;
 
+        consumed = reader.Consumed;
         return success;
     }
 
@@ -78,6 +74,7 @@ readonly struct Template
 
         var template = new Template(source);
         template.ParseInternal();
+
         return template;
     }
 
