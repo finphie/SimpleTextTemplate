@@ -63,7 +63,7 @@ public partial class RenderBenchmark
     }
 
     [Benchmark(Baseline = true)]
-    public byte[] SimpleTextTemplateSourceGenerator()
+    public byte[] SimpleTextTemplate_SG()
     {
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
         ZTemplate.Render(bufferWriter, _contextObject);
