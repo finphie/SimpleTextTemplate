@@ -60,25 +60,31 @@ static class BinaryHelper
     }
 
     /// <summary>
-    /// データ末尾にある空白の数を取得します。
+    /// 検索対象空間を末尾から検索を行い、指定された値以外が出現する位置を取得します。
     /// </summary>
-    /// <param name="end">データの末尾への参照</param>
-    /// <param name="length">データの長さ</param>
-    /// <returns>データ末尾にある空白の数を返します。</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetTrailingSpaceLength(scoped ref readonly byte end, int length)
+    /// <param name="searchSpace">検索対象空間</param>
+    /// <param name="length">検索対象空間の長さ</param>
+    /// <param name="value">値</param>
+    /// <returns>
+    /// 末尾から検索を行い、指定された値以外が出現した位置を返します。
+    /// 一致しなかった場合は-1を返します。
+    /// </returns>
+    public static int LastIndexOfAnyExcept(scoped ref readonly byte searchSpace, int length, byte value)
     {
-        var count = 0;
-
-        for (; count < length; count++)
+#if NET8_0_OR_GREATER
+        var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
+        return span.LastIndexOfAnyExcept(value);
+#else
+        for (var index = (nint)length - 1; index >= 0; index--)
         {
-            if (Unsafe.SubtractByteOffset(ref Unsafe.AsRef(in end), (nint)(uint)count) != (byte)' ')
+            if (Unsafe.AddByteOffset(ref Unsafe.AsRef(in searchSpace), index) != value)
             {
-                break;
+                return (int)index;
             }
         }
 
-        return count;
+        return -1;
+#endif
     }
 
     /// <summary>

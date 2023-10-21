@@ -183,7 +183,7 @@ public ref struct TemplateReader
 
         Advance(StartIdentifier.Length);
 
-        // "{{"に連続するスペースを削除
+        // "{{"に連続する空白を削除
         SkipSpace();
 
         // "}}"がある位置までは識別子となる。
@@ -196,13 +196,20 @@ public ref struct TemplateReader
             return false;
         }
 
+        ref var buffer = ref Buffer;
         Advance(index);
 
-        // 識別子と"}}"の間にある連続するスペースを削除
-        var endIndex = BinaryHelper.GetTrailingSpaceLength(ref Unsafe.SubtractByteOffset(ref Buffer, 1), Length + 1);
+        // 識別子と"}}"の間にある連続する空白の位置を取得
+        var endIndex = BinaryHelper.LastIndexOfAnyExcept(ref buffer, index, (byte)' ');
 
-        var consumed = (int)Consumed;
-        range = new(consumed - index, consumed - endIndex);
+        // 識別子と"}}"の間に空白がない場合は、"{{"と"}}"の間の文字は識別子名となる。
+        if (endIndex == -1)
+        {
+            endIndex = index;
+        }
+
+        var start = (int)Consumed - index;
+        range = new(start, start + endIndex + 1);
 
         Advance(EndIdentifier.Length);
         return true;
