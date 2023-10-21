@@ -15,10 +15,10 @@ static class BinaryHelper
     /// 検索対象空間で指定されたバイトシーケンスが出現する位置を取得します。
     /// </summary>
     /// <param name="searchSpace">検索対象空間</param>
-    /// <param name="length">検索対象の長さ</param>
+    /// <param name="length">検索対象空間の長さ</param>
     /// <param name="value">検索するバイトシーケンス</param>
     /// <returns>
-    /// バイトシーケンスに一致した場合は一致した位置を返します。
+    /// 指定されたバイトシーケンスが出現した位置を返します。
     /// 一致しなかった場合は-1を返します。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -26,6 +26,37 @@ static class BinaryHelper
     {
         var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
         return span.IndexOf(value);
+    }
+
+    /// <summary>
+    /// 検索対象空間で指定された値以外が出現する位置を取得します。
+    /// </summary>
+    /// <param name="searchSpace">検索対象空間</param>
+    /// <param name="length">検索対象空間の長さ</param>
+    /// <param name="value">値</param>
+    /// <returns>
+    /// 指定された値以外が出現した位置を返します。
+    /// 一致しなかった場合は-1を返します。
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int IndexOfAnyExcept(scoped ref readonly byte searchSpace, int length, byte value)
+    {
+#if NET8_0_OR_GREATER
+        var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
+        return span.IndexOfAnyExcept(value);
+#else
+        nint count = 0;
+
+        for (; count < length; count++)
+        {
+            if (Unsafe.AddByteOffset(ref Unsafe.AsRef(in searchSpace), count) != value)
+            {
+                return (int)count;
+            }
+        }
+
+        return -1;
+#endif
     }
 
     /// <summary>

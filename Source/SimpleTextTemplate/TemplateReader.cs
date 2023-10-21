@@ -228,16 +228,15 @@ public ref struct TemplateReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void SkipSpace()
     {
-        var count = 0;
+        var count = BinaryHelper.IndexOfAnyExcept(ref Buffer, Length, (byte)' ');
 
-        for (; count < Length; count++)
+        // 末尾まで空白の場合は、末尾までスキップ対象とする。
+        if (count == -1)
         {
-            if (Unsafe.AddByteOffset(ref Buffer, (nint)(uint)count) != (byte)' ')
-            {
-                break;
-            }
+            count = Length;
         }
 
+        // 末尾まで空白または既に末尾まで読み取り済みの場合
         if (count == 0)
         {
             return;
