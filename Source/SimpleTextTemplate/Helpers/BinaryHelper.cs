@@ -60,7 +60,7 @@ static class BinaryHelper
     }
 
     /// <summary>
-    /// 検索対象空間を末尾から検索を行い、指定された値以外が出現する位置を取得します。
+    /// 検索対象空間末尾から検索を行い、指定された値以外が出現する位置を取得します。
     /// </summary>
     /// <param name="searchSpace">検索対象空間</param>
     /// <param name="length">検索対象空間の長さ</param>
