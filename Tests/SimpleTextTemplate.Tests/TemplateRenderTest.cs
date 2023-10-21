@@ -1,0 +1,105 @@
+﻿#if NET8_0_OR_GREATER
+using System.Text;
+using CommunityToolkit.HighPerformance.Buffers;
+using FluentAssertions;
+using SimpleTextTemplate.Contexts;
+using Utf8Utility;
+using Xunit;
+
+namespace SimpleTextTemplate.Tests;
+
+public sealed class TemplateRenderTest
+{
+    [Theory]
+    [InlineData("{{A}}")]
+    [InlineData("{{ A }}")]
+    [InlineData("{{  A  }}")]
+    public void 識別子_識別子を置換(string input)
+    {
+        var template = Template.Parse(Encoding.UTF8.GetBytes(input));
+
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var dic = new Utf8ArrayDictionary<Utf8Array>();
+        dic.TryAdd(new("A"u8), new("Test1"u8));
+
+        template.Render(bufferWriter, Context.Create(dic));
+        bufferWriter.WrittenSpan.ToArray()
+            .Should()
+            .Equal("Test1"u8.ToArray());
+    }
+
+    [Theory]
+    [InlineData("{{ A }}{{ B }}")]
+    [InlineData("{{ AAA }}{{ BBB }}")]
+    public void 識別子_識別子_識別子を置換(string input)
+    {
+        var template = Template.Parse(Encoding.UTF8.GetBytes(input));
+
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var dic = new Utf8ArrayDictionary<Utf8Array>();
+        dic.TryAdd(new("A"u8), new("Test1"u8));
+        dic.TryAdd(new("AAA"u8), new("Test1"u8));
+        dic.TryAdd(new("B"u8), new("Test2"u8));
+        dic.TryAdd(new("BBB"u8), new("Test2"u8));
+
+        template.Render(bufferWriter, Context.Create(dic));
+        bufferWriter.WrittenSpan.ToArray()
+            .Should()
+            .Equal("Test1Test2"u8.ToArray());
+    }
+
+    [Theory]
+    [InlineData("z{{A}}z")]
+    [InlineData("z{{ A }}z")]
+    public void 文字列_識別子_文字列_識別子を置換(string input)
+    {
+        var template = Template.Parse(Encoding.UTF8.GetBytes(input));
+
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var dic = new Utf8ArrayDictionary<Utf8Array>();
+        dic.TryAdd(new("A"u8), new("Test1"u8));
+
+        template.Render(bufferWriter, Context.Create(dic));
+        bufferWriter.WrittenSpan.ToArray()
+            .Should()
+            .Equal("zTest1z"u8.ToArray());
+    }
+
+    [Theory]
+    [InlineData("{{ A }}z{{ B }}")]
+    [InlineData("{{ AAA }}z{{ BBB }}")]
+    public void 識別子_文字列_識別子_識別子を置換(string input)
+    {
+        var template = Template.Parse(Encoding.UTF8.GetBytes(input));
+
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var dic = new Utf8ArrayDictionary<Utf8Array>();
+        dic.TryAdd(new("A"u8), new("Test1"u8));
+        dic.TryAdd(new("AAA"u8), new("Test1"u8));
+        dic.TryAdd(new("B"u8), new("Test2"u8));
+        dic.TryAdd(new("BBB"u8), new("Test2"u8));
+
+        template.Render(bufferWriter, Context.Create(dic));
+        bufferWriter.WrittenSpan.ToArray()
+            .Should()
+            .Equal("Test1zTest2"u8.ToArray());
+    }
+
+    [Theory]
+    [InlineData("x{{ A }}123{{ B }}x")]
+    public void 文字列_識別子_文字列_識別子_文字列_識別子を置換(string input)
+    {
+        var template = Template.Parse(Encoding.UTF8.GetBytes(input));
+
+        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var dic = new Utf8ArrayDictionary<Utf8Array>();
+        dic.TryAdd(new("A"u8), new("Test1"u8));
+        dic.TryAdd(new("B"u8), new("Test2"u8));
+
+        template.Render(bufferWriter, Context.Create(dic));
+        bufferWriter.WrittenSpan.ToArray()
+            .Should()
+            .Equal("xTest1123Test2x"u8.ToArray());
+    }
+}
+#endif
