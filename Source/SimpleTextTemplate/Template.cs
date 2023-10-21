@@ -4,8 +4,8 @@ using SimpleTextTemplate.Extensions;
 
 #if NET8_0_OR_GREATER
 using System.Buffers;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using SimpleTextTemplate.Helpers;
 #endif
 
 namespace SimpleTextTemplate;
@@ -85,34 +85,31 @@ public readonly struct Template
     /// <param name="bufferWriter">ターゲットの<see cref="IBufferWriter{Byte}"/></param>
     /// <param name="context">コンテキスト</param>
     /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
-    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     public void Render(IBufferWriter<byte> bufferWriter, IContext context)
     {
         ArgumentNullException.ThrowIfNull(bufferWriter);
         ArgumentNullException.ThrowIfNull(context);
 
-        var source = _source.AsSpan();
-        ref var sourceStart = ref MemoryMarshal.GetReference(source);
-
+        ref var sourceStart = ref MemoryMarshal.GetArrayDataReference(_source);
         var blocks = Blocks;
 
         foreach (ref readonly var block in blocks)
         {
-            var value = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AddByteOffset(ref sourceStart, (nint)(uint)block.Range.Start), block.Range.Length);
+            var stringOrIdentifier = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AddByteOffset(ref sourceStart, (nint)(uint)block.Range.Start), block.Range.Length);
 
             switch (block.Type)
             {
                 case BlockType.Raw:
-                    bufferWriter.Write(value);
+                    bufferWriter.Write(stringOrIdentifier);
                     break;
                 case BlockType.Identifier:
-                    context.TryGetValue(value, out var x);
-                    bufferWriter.Write(x.AsSpan());
+                    context.TryGetValue(stringOrIdentifier, out var value);
+                    bufferWriter.Write(value.AsSpan());
                     break;
                 case BlockType.None:
+                case BlockType.End:
                 default:
-                    ThrowHelper.ThrowTemplateParserException((nuint)block.Range.Start);
-                    break;
+                    throw new UnreachableException();
             }
         }
     }
