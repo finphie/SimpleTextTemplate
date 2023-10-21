@@ -55,31 +55,15 @@ public partial class RenderBenchmark
     }
 
     [Benchmark]
-    public string SimpleTextTemplate()
-    {
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-        _template.Render(bufferWriter, _context);
-        return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
-    }
-
-    [Benchmark]
-    public byte[] SimpleTextTemplateUtf8()
+    public byte[] SimpleTextTemplate()
     {
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
         _template.Render(bufferWriter, _context);
         return bufferWriter.WrittenSpan.ToArray();
     }
 
-    [Benchmark]
-    public string SimpleTextTemplateSourceGenerator()
-    {
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-        ZTemplate.Render(bufferWriter, _contextObject);
-        return Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
-    }
-
     [Benchmark(Baseline = true)]
-    public byte[] SimpleTextTemplateSourceGeneratorUtf8()
+    public byte[] SimpleTextTemplate_SG()
     {
         using var bufferWriter = new ArrayPoolBufferWriter<byte>();
         ZTemplate.Render(bufferWriter, _contextObject);

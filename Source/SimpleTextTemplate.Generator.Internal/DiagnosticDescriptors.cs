@@ -1,8 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.CodeAnalysis;
-
-// https://github.com/dotnet/roslyn-analyzers/issues/5890
-[assembly: SuppressMessage("", "RS2002", Justification = ".NET 6.0.200で発生するため")]
+﻿using Microsoft.CodeAnalysis;
 
 namespace SimpleTextTemplate.Generator;
 
@@ -17,7 +13,7 @@ static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor UnknownError = new(
         "STT1000",
         "テンプレート解析時にエラーが発生しました。",
-        "テンプレート解析時に未知のエラーが発生しました。",
+        "テンプレート解析時に未知のエラーが発生しました。位置:{0}",
         nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);
@@ -28,7 +24,7 @@ static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor InvalidIdentifierError = new(
         "STT1001",
         "識別子に無効な文字が含まれています。",
-        "テンプレート解析時にエラーが発生しました。識別子に無効な文字が含まれています。",
+        "テンプレート解析時にエラーが発生しました。識別子に無効な文字が含まれています。位置:{0}",
         nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);

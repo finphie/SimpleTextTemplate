@@ -3,10 +3,7 @@
 /// <summary>
 /// ブロックのタイプを表します。
 /// </summary>
-#if !IsGenerator
-public
-#endif
-enum BlockType
+public enum BlockType
 {
     /// <summary>
     /// 空のブロック。
@@ -21,5 +18,10 @@ enum BlockType
     /// <summary>
     /// 識別子
     /// </summary>
-    Identifier
+    Identifier,
+
+    /// <summary>
+    /// 末尾
+    /// </summary>
+    End
 }
