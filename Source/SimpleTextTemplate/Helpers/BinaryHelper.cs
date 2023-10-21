@@ -69,6 +69,7 @@ static class BinaryHelper
     /// 末尾から検索を行い、指定された値以外が出現した位置を返します。
     /// 一致しなかった場合は-1を返します。
     /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int LastIndexOfAnyExcept(scoped ref readonly byte searchSpace, int length, byte value)
     {
 #if NET8_0_OR_GREATER
