@@ -12,11 +12,15 @@ public class ParseBenchmark
     byte[] _utf8Source = null!;
     string _utf16Source = null!;
 
+    string _format = null!;
+
     [GlobalSetup]
     public void Setup()
     {
-        _utf8Source = "{{ Identifier }}"u8.ToArray();
-        _utf16Source = Encoding.UTF8.GetString(_utf8Source);
+        _utf8Source = Encoding.UTF8.GetBytes(ZTemplate.Source);
+        _utf16Source = ZTemplate.Source;
+
+        _format = "abcdef{0}01234567890";
     }
 
     [Benchmark(Baseline = true)]
@@ -27,4 +31,7 @@ public class ParseBenchmark
 
     [Benchmark]
     public ScribanTemplate ScribanLiquid() => ScribanTemplate.ParseLiquid(_utf16Source);
+
+    [Benchmark(Description = "(CompositeFormat)")]
+    public CompositeFormat CompositeFormatParse() => CompositeFormat.Parse(_format);
 }

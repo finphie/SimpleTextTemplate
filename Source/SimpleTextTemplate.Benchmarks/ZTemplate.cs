@@ -8,7 +8,7 @@ namespace SimpleTextTemplate.Benchmarks;
 static partial class ZTemplate
 {
     public const string Identifier = nameof(SampleContext.Identifier);
-    public const string Source = "{{ " + Identifier + " }}";
+    public const string Source = "abcdef{{ " + Identifier + " }}01234567890";
 
     [Template(Source)]
     public static partial void Render(IBufferWriter<byte> bufferWriter, SampleContext context);
