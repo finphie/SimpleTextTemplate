@@ -140,10 +140,9 @@ MIT
 
 ### ライブラリ
 
+- [CommunityToolkit.Diagnostics](https://github.com/CommunityToolkit/dotnet)
 - [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet)
-- [Humanizer.Core](https://github.com/Humanizr/Humanizer)
-- [Microsoft.CodeAnalysis.Analyzers](https://github.com/dotnet/roslyn-analyzers)
-- [Microsoft.CodeAnalysis.CSharp.Workspaces](https://github.com/dotnet/roslyn)
+- [Microsoft.CodeAnalysis.CSharp](https://github.com/dotnet/roslyn)
 - [Utf8Utility](https://github.com/finphie/Utf8Utility)
 
 ### テスト
@@ -157,7 +156,8 @@ MIT
 
 ### アナライザー
 
-- Microsoft.CodeAnalysis.NetAnalyzers (SDK組み込み)
+- [Microsoft.CodeAnalysis.Analyzers](https://github.com/dotnet/roslyn-analyzers)
+- [Microsoft.CodeAnalysis.NetAnalyzers](https://github.com/dotnet/roslyn-analyzers)
 - [Microsoft.VisualStudio.Threading.Analyzers](https://github.com/Microsoft/vs-threading)
 - [StyleCop.Analyzers](https://github.com/DotNetAnalyzers/StyleCopAnalyzers)
 
@@ -172,6 +172,7 @@ MIT
 - [Microsoft.Diagnostics.Tracing.TraceEvent](https://github.com/Microsoft/perfview)
 - [Perfolizer](https://github.com/AndreyAkinshin/perfolizer)
 - [Scriban](https://github.com/scriban/scriban)
+- [Utf8StringInterpolation](https://github.com/Cysharp/Utf8StringInterpolation)
 
 ### その他
 
