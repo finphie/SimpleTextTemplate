@@ -113,27 +113,27 @@ Runtime=.NET 8.0
 
 ```
 
-| Method                    | Job    | Mean        | Ratio  | Gen0   | Gen1   | Allocated | 
-|-------------------------- |------- |------------:|-------:|-------:|-------:|----------:|-
-| SimpleTextTemplate        | No PGO |    61.88 ns |   1.49 | 0.0067 |      - |      56 B | 
-| SimpleTextTemplate_SG     | No PGO |    41.62 ns |   1.00 | 0.0067 |      - |      56 B | 
-| Scriban                   | No PGO | 9,686.50 ns | 232.76 | 3.6774 | 0.3510 |   30778 B | 
-| ScribanLiquid             | No PGO | 8,648.37 ns | 207.81 | 3.9673 | 0.3815 |   33194 B | 
-| (Regex.Replace)           | No PGO |   150.77 ns |   3.62 | 0.0105 |      - |      88 B | 
-| (string.Format)           | No PGO |    56.61 ns |   1.36 | 0.0105 |      - |      88 B | 
-| (CompositeFormat)         | No PGO |    42.79 ns |   1.03 | 0.0105 |      - |      88 B | 
-| (Utf8String.Format)       | No PGO |    63.07 ns |   1.52 | 0.0067 |      - |      56 B | 
-| (Utf8String.CreateWriter) | No PGO |    41.90 ns |   1.01 | 0.0067 |      - |      56 B | 
-|                           |        |             |        |        |        |           | 
-| SimpleTextTemplate        | PGO    |    41.64 ns |   1.50 | 0.0067 |      - |      56 B | 
-| SimpleTextTemplate_SG     | PGO    |    27.84 ns |   1.00 | 0.0067 |      - |      56 B | 
-| Scriban                   | PGO    | 8,685.00 ns | 312.03 | 3.6621 | 0.3357 |   30778 B | 
-| ScribanLiquid             | PGO    | 7,659.60 ns | 283.28 | 3.9673 | 0.3891 |   33194 B | 
-| (Regex.Replace)           | PGO    |   133.82 ns |   4.80 | 0.0105 |      - |      88 B | 
-| (string.Format)           | PGO    |    52.77 ns |   1.97 | 0.0105 |      - |      88 B | 
-| (CompositeFormat)         | PGO    |    37.94 ns |   1.36 | 0.0105 |      - |      88 B | 
-| (Utf8String.Format)       | PGO    |    53.61 ns |   1.92 | 0.0067 |      - |      56 B | 
-| (Utf8String.CreateWriter) | PGO    |    37.31 ns |   1.34 | 0.0067 |      - |      56 B | 
+| Method                    | Job    | Mean        | Ratio  | Gen0   | Gen1   | Allocated |
+|-------------------------- |------- |------------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate        | No PGO |    61.88 ns |   1.49 | 0.0067 |      - |      56 B |
+| SimpleTextTemplate_SG     | No PGO |    41.62 ns |   1.00 | 0.0067 |      - |      56 B |
+| Scriban                   | No PGO | 9,686.50 ns | 232.76 | 3.6774 | 0.3510 |   30778 B |
+| ScribanLiquid             | No PGO | 8,648.37 ns | 207.81 | 3.9673 | 0.3815 |   33194 B |
+| (Regex.Replace)           | No PGO |   150.77 ns |   3.62 | 0.0105 |      - |      88 B |
+| (string.Format)           | No PGO |    56.61 ns |   1.36 | 0.0105 |      - |      88 B |
+| (CompositeFormat)         | No PGO |    42.79 ns |   1.03 | 0.0105 |      - |      88 B |
+| (Utf8String.Format)       | No PGO |    63.07 ns |   1.52 | 0.0067 |      - |      56 B |
+| (Utf8String.CreateWriter) | No PGO |    41.90 ns |   1.01 | 0.0067 |      - |      56 B |
+|                           |        |             |        |        |        |           |
+| SimpleTextTemplate        | PGO    |    41.64 ns |   1.50 | 0.0067 |      - |      56 B |
+| SimpleTextTemplate_SG     | PGO    |    27.84 ns |   1.00 | 0.0067 |      - |      56 B |
+| Scriban                   | PGO    | 8,685.00 ns | 312.03 | 3.6621 | 0.3357 |   30778 B |
+| ScribanLiquid             | PGO    | 7,659.60 ns | 283.28 | 3.9673 | 0.3891 |   33194 B |
+| (Regex.Replace)           | PGO    |   133.82 ns |   4.80 | 0.0105 |      - |      88 B |
+| (string.Format)           | PGO    |    52.77 ns |   1.97 | 0.0105 |      - |      88 B |
+| (CompositeFormat)         | PGO    |    37.94 ns |   1.36 | 0.0105 |      - |      88 B |
+| (Utf8String.Format)       | PGO    |    53.61 ns |   1.92 | 0.0067 |      - |      56 B |
+| (Utf8String.CreateWriter) | PGO    |    37.31 ns |   1.34 | 0.0067 |      - |      56 B |
 
 > [!Note]
 > UTF-8またはUTF-16で出力
