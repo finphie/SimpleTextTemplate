@@ -100,25 +100,44 @@ static partial class ZTemplate
 
 ### レンダリング
 
-``` ini
-BenchmarkDotNet=v0.13.1, OS=Windows 10.0.19043.1526 (21H1/May2021Update)
-AMD Ryzen 7 5800U with Radeon Graphics, 1 CPU, 16 logical and 8 physical cores
-.NET SDK=6.0.200-preview.22055.15
-  [Host]   : .NET 6.0.2 (6.0.222.6406), X64 RyuJIT
-  .NET 6.0 : .NET 6.0.2 (6.0.222.6406), X64 RyuJIT
-
-Job=.NET 6.0  Runtime=.NET 6.0  
 ```
 
-|                                Method |         Mean |     Error |    StdDev |  Ratio | RatioSD |  Gen 0 |  Gen 1 | Allocated |
-|-------------------------------------- |-------------:|----------:|----------:|-------:|--------:|-------:|-------:|----------:|
-|                    SimpleTextTemplate |     89.95 ns |  0.674 ns |  0.631 ns |   1.45 |    0.01 | 0.0105 |      - |      88 B |
-|                SimpleTextTemplateUtf8 |     74.41 ns |  0.201 ns |  0.188 ns |   1.20 |    0.01 | 0.0095 |      - |      80 B |
-|     SimpleTextTemplateSourceGenerator |     71.16 ns |  0.377 ns |  0.352 ns |   1.14 |    0.01 | 0.0105 |      - |      88 B |
-| SimpleTextTemplateSourceGeneratorUtf8 |     62.16 ns |  0.359 ns |  0.336 ns |   1.00 |    0.00 | 0.0095 |      - |      80 B |
-|                               Scriban | 10,026.03 ns | 19.977 ns | 18.686 ns | 161.31 |    0.87 | 3.6469 | 0.3204 |  30,542 B |
-|                         ScribanLiquid |  8,569.52 ns | 35.784 ns | 31.721 ns | 137.92 |    0.78 | 3.9368 | 0.3662 |  32,952 B |
-|                                 Regex |    107.15 ns |  0.510 ns |  0.477 ns |   1.72 |    0.01 | 0.0057 |      - |      48 B |
+BenchmarkDotNet v0.13.9+228a464e8be6c580ad9408e98f18813f6407fb5a, Windows 11 (10.0.22621.2428/22H2/2022Update/SunValley2)
+AMD Ryzen 7 3700X, 1 CPU, 16 logical and 8 physical cores
+.NET SDK 8.0.100-rc.2.23502.2
+  [Host] : .NET 8.0.0 (8.0.23.47906), X64 RyuJIT AVX2
+  No PGO : .NET 8.0.0 (8.0.23.47906), X64 RyuJIT AVX2
+  PGO    : .NET 8.0.0 (8.0.23.47906), X64 RyuJIT AVX2
+
+Runtime=.NET 8.0  
+
+```
+
+| Method                    | Job    | Mean        | Ratio  | Gen0   | Gen1   | Allocated | 
+|-------------------------- |------- |------------:|-------:|-------:|-------:|----------:|-
+| SimpleTextTemplate        | No PGO |    61.88 ns |   1.49 | 0.0067 |      - |      56 B | 
+| SimpleTextTemplate_SG     | No PGO |    41.62 ns |   1.00 | 0.0067 |      - |      56 B | 
+| Scriban                   | No PGO | 9,686.50 ns | 232.76 | 3.6774 | 0.3510 |   30778 B | 
+| ScribanLiquid             | No PGO | 8,648.37 ns | 207.81 | 3.9673 | 0.3815 |   33194 B | 
+| (Regex.Replace)           | No PGO |   150.77 ns |   3.62 | 0.0105 |      - |      88 B | 
+| (string.Format)           | No PGO |    56.61 ns |   1.36 | 0.0105 |      - |      88 B | 
+| (CompositeFormat)         | No PGO |    42.79 ns |   1.03 | 0.0105 |      - |      88 B | 
+| (Utf8String.Format)       | No PGO |    63.07 ns |   1.52 | 0.0067 |      - |      56 B | 
+| (Utf8String.CreateWriter) | No PGO |    41.90 ns |   1.01 | 0.0067 |      - |      56 B | 
+|                           |        |             |        |        |        |           | 
+| SimpleTextTemplate        | PGO    |    41.64 ns |   1.50 | 0.0067 |      - |      56 B | 
+| SimpleTextTemplate_SG     | PGO    |    27.84 ns |   1.00 | 0.0067 |      - |      56 B | 
+| Scriban                   | PGO    | 8,685.00 ns | 312.03 | 3.6621 | 0.3357 |   30778 B | 
+| ScribanLiquid             | PGO    | 7,659.60 ns | 283.28 | 3.9673 | 0.3891 |   33194 B | 
+| (Regex.Replace)           | PGO    |   133.82 ns |   4.80 | 0.0105 |      - |      88 B | 
+| (string.Format)           | PGO    |    52.77 ns |   1.97 | 0.0105 |      - |      88 B | 
+| (CompositeFormat)         | PGO    |    37.94 ns |   1.36 | 0.0105 |      - |      88 B | 
+| (Utf8String.Format)       | PGO    |    53.61 ns |   1.92 | 0.0067 |      - |      56 B | 
+| (Utf8String.CreateWriter) | PGO    |    37.31 ns |   1.34 | 0.0067 |      - |      56 B | 
+
+> [!Note]
+> UTF-8またはUTF-16で出力
+> ()で囲まれているメソッドは正確には処理が異なるため、参考情報
 
 [ベンチマークプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Benchmarks)
 
