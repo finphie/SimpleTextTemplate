@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using SimpleTextTemplate.Contexts;
 using Utf8StringInterpolation;
 using Utf8Utility;
@@ -11,8 +10,6 @@ using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;
 
-[SimpleJob(RuntimeMoniker.Net80)]
-[MemoryDiagnoser]
 public partial class RenderBenchmark
 {
     const string Format = "abcdef{0}01234567890";

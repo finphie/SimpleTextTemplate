@@ -1,12 +1,9 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Jobs;
 using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;
 
-[SimpleJob(RuntimeMoniker.Net80)]
-[MemoryDiagnoser]
 public class ParseBenchmark
 {
     byte[] _utf8Source = null!;
