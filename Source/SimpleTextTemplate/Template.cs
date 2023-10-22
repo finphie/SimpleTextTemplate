@@ -31,7 +31,7 @@ public readonly struct Template
     /// <value>
     /// ブロック単位のバッファ
     /// </value>
-    internal ReadOnlySpan<(BlockType Type, TextRange Range)> Blocks => _blocks.AsSpan();
+    public ReadOnlySpan<(BlockType Type, TextRange Range)> Blocks => _blocks.AsSpan();
 
     /// <summary>
     /// テンプレート文字列を解析します。
