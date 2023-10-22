@@ -8,5 +8,5 @@ var config = DefaultConfig.Instance
     .AddJob(Job.Default.WithId("No PGO").WithRuntime(CoreRuntime.Core80).WithEnvironmentVariable("DOTNET_TieredPGO", "0"))
     .AddJob(Job.Default.WithId("PGO").WithRuntime(CoreRuntime.Core80))
     .AddDiagnoser(MemoryDiagnoser.Default)
-    .HideColumns("Error", "StdDev", "RatioSD", "Alloc Ratio", "EnvironmentVariables");
+    .HideColumns("Error", "StdDev", "Median", "RatioSD", "Alloc Ratio", "EnvironmentVariables");
 BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, config);
