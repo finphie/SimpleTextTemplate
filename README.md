@@ -100,7 +100,7 @@ static partial class ZTemplate
 
 ### レンダリング
 
-```
+```ini
 
 BenchmarkDotNet v0.13.9+228a464e8be6c580ad9408e98f18813f6407fb5a, Windows 11 (10.0.22621.2428/22H2/2022Update/SunValley2)
 AMD Ryzen 7 3700X, 1 CPU, 16 logical and 8 physical cores
