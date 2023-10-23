@@ -1,10 +1,10 @@
 ﻿using System.Buffers;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 using SimpleTextTemplate.Contexts;
-using Utf8StringInterpolation;
 using Utf8Utility;
 using ScribanTemplate = Scriban.Template;
 
@@ -91,6 +91,13 @@ public partial class RenderBenchmark
     [Benchmark(Description = "(Regex.Replace)")]
     public string Regex() => _regex.Replace(_utf16Source, _message);
 
+    [Benchmark(Description = "(InterpolatedStringHandler)")]
+    public string InterpolatedStringHandler()
+    {
+        DefaultInterpolatedStringHandler handler = $"abcdef{_message}01234567890";
+        return handler.ToStringAndClear();
+    }
+
     [Benchmark(Description = "(string.Format)")]
 #pragma warning disable CA1863 // 'CompositeFormat' を使用してください
     public string StringFormat() => string.Format(CultureInfo.InvariantCulture, Format, _message);
@@ -98,27 +105,6 @@ public partial class RenderBenchmark
 
     [Benchmark(Description = "(CompositeFormat)")]
     public string StringFormat_CF() => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _message);
-
-    [Benchmark(Description = "(Utf8String.Format)")]
-    public byte[] Utf8StringFormat() => Utf8String.Format($"abcdef{_message}01234567890");
-
-    [Benchmark(Description = "(Utf8String.CreateWriter)")]
-    public byte[] Utf8StringCreateWriter()
-    {
-#pragma warning disable CA2000 // スコープを失う前にオブジェクトを破棄
-        var writer = Utf8String.CreateWriter(_bufferWriter);
-#pragma warning restore CA2000 // スコープを失う前にオブジェクトを破棄
-
-        writer.AppendUtf8("abcdef"u8);
-        writer.AppendFormatted(_message);
-        writer.AppendUtf8("01234567890"u8);
-        writer.Flush();
-
-        var result = _bufferWriter.WrittenSpan.ToArray();
-        _bufferWriter.ResetWrittenCount();
-
-        return result;
-    }
 
     [GeneratedRegex(Pattern, RegexOptions.Compiled | RegexOptions.ECMAScript | RegexOptions.CultureInvariant)]
     private static partial Regex RegexInternal();
