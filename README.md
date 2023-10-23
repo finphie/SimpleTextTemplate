@@ -154,7 +154,6 @@ MIT
 - [Microsoft.Diagnostics.Tracing.TraceEvent](https://github.com/Microsoft/perfview)
 - [Perfolizer](https://github.com/AndreyAkinshin/perfolizer)
 - [Scriban](https://github.com/scriban/scriban)
-- [Utf8StringInterpolation](https://github.com/Cysharp/Utf8StringInterpolation)
 
 ### その他
 
