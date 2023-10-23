@@ -87,15 +87,16 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## ベンチマーク
 
-| Method                    | Mean        | Ratio  | Gen0   | Gen1   | Allocated |
-|-------------------------- |------------:|-------:|-------:|-------:|----------:|
-| SimpleTextTemplate        |    41.64 ns |   1.50 | 0.0067 |      - |      56 B |
-| SimpleTextTemplate_SG     |    27.84 ns |   1.00 | 0.0067 |      - |      56 B |
-| Scriban                   | 8,685.00 ns | 312.03 | 3.6621 | 0.3357 |   30778 B |
-| ScribanLiquid             | 7,659.60 ns | 283.28 | 3.9673 | 0.3891 |   33194 B |
-| (Regex.Replace)           |   133.82 ns |   4.80 | 0.0105 |      - |      88 B |
-| (string.Format)           |    52.77 ns |   1.97 | 0.0105 |      - |      88 B |
-| (CompositeFormat)         |    37.94 ns |   1.36 | 0.0105 |      - |      88 B |
+| Method                      | Mean        | Ratio  | Gen0   | Gen1   | Allocated |
+|---------------------------- |------------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate          |    42.39 ns |   1.53 | 0.0067 |      - |      56 B |
+| SimpleTextTemplate_SG       |    27.73 ns |   1.00 | 0.0067 |      - |      56 B |
+| Scriban                     | 8,733.83 ns | 314.99 | 3.6621 | 0.3357 |   30778 B |
+| ScribanLiquid               | 6,690.69 ns | 241.30 | 3.9673 | 0.3891 |   33194 B |
+| (Regex.Replace)             |   148.43 ns |   5.35 | 0.0105 |      - |      88 B |
+| (InterpolatedStringHandler) |    40.49 ns |   1.46 | 0.0105 |      - |      88 B |
+| (string.Format)             |    55.60 ns |   2.00 | 0.0105 |      - |      88 B |
+| (CompositeFormat)           |    35.28 ns |   1.27 | 0.0105 |      - |      88 B |
 
 > [!Note]
 > UTF-8またはUTF-16で出力  
