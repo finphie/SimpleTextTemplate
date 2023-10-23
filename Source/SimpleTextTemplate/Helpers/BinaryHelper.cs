@@ -45,9 +45,7 @@ static class BinaryHelper
         var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
         return span.IndexOfAnyExcept(value);
 #else
-        nint index = 0;
-
-        for (; index < length; index++)
+        for (nint index = 0; index < length; index++)
         {
             if (Unsafe.AddByteOffset(ref Unsafe.AsRef(in searchSpace), index) != value)
             {
