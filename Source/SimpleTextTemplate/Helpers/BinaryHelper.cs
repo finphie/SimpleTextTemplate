@@ -12,13 +12,13 @@ namespace SimpleTextTemplate.Helpers;
 static class BinaryHelper
 {
     /// <summary>
-    /// 検索対象空間で指定されたバイトシーケンスが出現する位置を取得します。
+    /// 検索対象空間で指定されたバイトシーケンスが最初に出現する位置を取得します。
     /// </summary>
     /// <param name="searchSpace">検索対象空間</param>
     /// <param name="length">検索対象空間の長さ</param>
     /// <param name="value">検索するバイトシーケンス</param>
     /// <returns>
-    /// 指定されたバイトシーケンスが出現した位置を返します。
+    /// 指定されたバイトシーケンスが最初に出現した位置を返します。
     /// 一致しなかった場合は-1を返します。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -29,13 +29,13 @@ static class BinaryHelper
     }
 
     /// <summary>
-    /// 検索対象空間で指定された値以外が出現する位置を取得します。
+    /// 検索対象空間で指定された値以外が最初に出現する位置を取得します。
     /// </summary>
     /// <param name="searchSpace">検索対象空間</param>
     /// <param name="length">検索対象空間の長さ</param>
     /// <param name="value">値</param>
     /// <returns>
-    /// 指定された値以外が出現した位置を返します。
+    /// 指定された値以外が最初に出現した位置を返します。
     /// 一致しなかった場合は-1を返します。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -58,13 +58,13 @@ static class BinaryHelper
     }
 
     /// <summary>
-    /// 検索対象空間末尾から検索を行い、指定された値以外が出現する位置を取得します。
+    /// 検索対象空間の末尾から検索を行い、指定された値以外が最初に出現する位置を取得します。
     /// </summary>
     /// <param name="searchSpace">検索対象空間</param>
     /// <param name="length">検索対象空間の長さ</param>
     /// <param name="value">値</param>
     /// <returns>
-    /// 末尾から検索を行い、指定された値以外が出現した位置を返します。
+    /// 末尾から検索を行い、指定された値以外が最初に出現した位置を返します。
     /// 一致しなかった場合は-1を返します。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

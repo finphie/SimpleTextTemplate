@@ -63,7 +63,7 @@ static partial class ZTemplate
 
 ### SimpleTextTemplate（非推奨）
 
-[SimpleTextTemplate](https://www.nuget.org/packages/SimpleTextTemplate/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)の参照が必要です。
+[SimpleTextTemplate](https://www.nuget.org/packages/SimpleTextTemplate/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)への参照が必要です。
 
 ```csharp
 using System;
