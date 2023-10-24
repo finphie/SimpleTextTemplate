@@ -243,7 +243,7 @@ public ref struct TemplateReader
             count = Length;
         }
 
-        // 末尾まで空白または既に末尾まで読み取り済みの場合
+        // 先頭が空白または既に末尾まで読み取り済みの場合
         if (count == 0)
         {
             return;
