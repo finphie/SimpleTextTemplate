@@ -16,14 +16,9 @@ namespace SimpleTextTemplate;
 [SuppressMessage("Performance", "CA1815:equals および operator equals を値型でオーバーライドします", Justification = "不要なため。")]
 public readonly struct Template
 {
-    readonly byte[] _source;
-    readonly List<(BlockType Type, TextRange Range)> _blocks;
+    readonly (BlockType Type, byte[] Value)[] _blocks;
 
-    Template(byte[] source)
-    {
-        _source = source;
-        _blocks = new(16);
-    }
+    Template((BlockType Type, byte[] Value)[] blocks) => _blocks = blocks;
 
     /// <summary>
     /// ブロック単位のバッファを取得します。
@@ -31,7 +26,7 @@ public readonly struct Template
     /// <value>
     /// ブロック単位のバッファ
     /// </value>
-    public ReadOnlySpan<(BlockType Type, TextRange Range)> Blocks => _blocks.AsSpan();
+    public ReadOnlySpan<(BlockType Type, byte[] Value)> Blocks => _blocks.AsSpan();
 
     /// <summary>
     /// テンプレート文字列を解析します。
@@ -44,18 +39,30 @@ public readonly struct Template
     /// それ以外の場合は<see langword="false"/>を返します。
     /// </returns>
     /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
+    [SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "https://github.com/dotnet/roslyn/issues/69988")]
     public static bool TryParse(byte[] source, out Template template, out nuint consumed)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(source);
 #endif
-
-        template = new Template(source);
         var reader = new TemplateReader(source);
-        var success = template.TryParseInternal(ref reader);
+        var list = new List<(BlockType Type, byte[] Value)>();
 
+        while (reader.TryRead(out var value) is var type && type != BlockType.End)
+        {
+            if (type == BlockType.None)
+            {
+                template = new([]);
+                consumed = reader.Consumed;
+                return false;
+            }
+
+            list.Add((type, value.ToArray()));
+        }
+
+        template = new(list.ToArray());
         consumed = reader.Consumed;
-        return success;
+        return true;
     }
 
     /// <summary>
@@ -65,17 +72,22 @@ public readonly struct Template
     /// <returns><see cref="Template"/>構造体のインスタンス</returns>
     /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
     /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
+    [SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "https://github.com/dotnet/roslyn/issues/69988")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template Parse(byte[] source)
     {
 #if NET8_0_OR_GREATER
         ArgumentNullException.ThrowIfNull(source);
 #endif
+        var reader = new TemplateReader(source);
+        var list = new List<(BlockType Type, byte[] Value)>();
 
-        var template = new Template(source);
-        template.ParseInternal();
+        while (reader.Read(out var value) is var type && type != BlockType.End)
+        {
+            list.Add((type, value.ToArray()));
+        }
 
-        return template;
+        return new(list.ToArray());
     }
 
 #if NET8_0_OR_GREATER
@@ -90,20 +102,17 @@ public readonly struct Template
         ArgumentNullException.ThrowIfNull(bufferWriter);
         ArgumentNullException.ThrowIfNull(context);
 
-        ref var sourceStart = ref MemoryMarshal.GetArrayDataReference(_source);
-        var blocks = Blocks;
-
-        foreach (ref readonly var block in blocks)
+        foreach (var (type, stringOrIdentifier) in Blocks)
         {
-            var stringOrIdentifier = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AddByteOffset(ref sourceStart, (nint)(uint)block.Range.Start), block.Range.Length);
+            var span = MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(stringOrIdentifier), stringOrIdentifier.Length);
 
-            switch (block.Type)
+            switch (type)
             {
                 case BlockType.Raw:
-                    bufferWriter.Write(stringOrIdentifier);
+                    bufferWriter.Write(span);
                     break;
                 case BlockType.Identifier:
-                    context.TryGetValue(stringOrIdentifier, out var value);
+                    context.TryGetValue(span, out var value);
                     bufferWriter.Write(value.AsSpan());
                     break;
                 case BlockType.None:
@@ -114,31 +123,4 @@ public readonly struct Template
         }
     }
 #endif
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    bool TryParseInternal(ref TemplateReader reader)
-    {
-        while (reader.TryRead(out var value) is var type && type != BlockType.End)
-        {
-            if (type == BlockType.None)
-            {
-                return false;
-            }
-
-            _blocks.Add((type, value));
-        }
-
-        return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void ParseInternal()
-    {
-        var reader = new TemplateReader(_source);
-
-        while (reader.Read(out var value) is var type && type != BlockType.End)
-        {
-            _blocks.Add((type, value));
-        }
-    }
 }

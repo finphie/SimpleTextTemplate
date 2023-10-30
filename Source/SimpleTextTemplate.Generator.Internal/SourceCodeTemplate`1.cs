@@ -138,7 +138,7 @@ partial class SourceCodeTemplate
     /// </summary>
     public nuint ErrorPosition { get; private set; }
 
-    ReadOnlySpan<(BlockType Type, TextRange Range)> Blocks => _template.Blocks;
+    ReadOnlySpan<(BlockType Type, byte[] Value)> Blocks => _template.Blocks;
 
     /// <summary>
     /// ソースコードを解析します。
@@ -155,16 +155,20 @@ partial class SourceCodeTemplate
         return IsValidIdentifier() ? ParseResult.Success : ParseResult.InvalidIdentifier;
     }
 
+    static string GetArrayText(byte[] value) => string.Join(", ", value);
+
+    static string GetText(byte[] value) => Encoding.UTF8.GetString(value);
+
     bool IsValidIdentifier()
     {
-        foreach (var (type, range) in _template.Blocks)
+        foreach (var (type, value) in _template.Blocks)
         {
             if (type != BlockType.Identifier)
             {
                 continue;
             }
 
-            if (!SyntaxFacts.IsValidIdentifier(Encoding.UTF8.GetString(_source, range.Start, range.Length)))
+            if (!SyntaxFacts.IsValidIdentifier(Encoding.UTF8.GetString(value)))
             {
                 return false;
             }
@@ -172,10 +176,4 @@ partial class SourceCodeTemplate
 
         return true;
     }
-
-    string GetArrayText(TextRange range)
-        => string.Join(", ", _source.AsSpan(range.Start, range.Length).ToArray());
-
-    string GetText(TextRange range)
-        => Encoding.UTF8.GetString(_source, range.Start, range.Length);
 }

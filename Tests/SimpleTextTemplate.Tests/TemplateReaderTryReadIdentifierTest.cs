@@ -22,10 +22,10 @@ public sealed class TemplateReaderTryReadIdentifierTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryReadIdentifier(out var range).Should().BeTrue();
+        reader.TryReadIdentifier(out var value).Should().BeTrue();
         reader.Consumed.Should().Be((nuint)consumed);
 
-        utf8Input[range.Start..range.End]
+        value.ToArray()
             .Should()
             .Equal(Encoding.UTF8.GetBytes(identifier));
     }
@@ -50,9 +50,9 @@ public sealed class TemplateReaderTryReadIdentifierTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryReadIdentifier(out var range).Should().BeFalse();
+        reader.TryReadIdentifier(out var value).Should().BeFalse();
         reader.Consumed.Should().Be((nuint)consumed);
 
-        range.Should().Be(default(TextRange));
+        value.ToArray().Should().BeEmpty();
     }
 }
