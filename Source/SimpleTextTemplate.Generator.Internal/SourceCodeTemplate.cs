@@ -49,12 +49,12 @@ namespace SimpleTextTemplate.Generator
             this.Write(" ");
             this.Write(this.ToStringHelper.ToStringWithCulture(ContextParameterName));
             this.Write(")\r\n    {\r\n");
- foreach (var (type, range) in Blocks) { 
+ foreach (var (type, value) in Blocks) { 
  if (type == BlockType.Raw) { 
             this.Write("        ");
             this.Write(this.ToStringHelper.ToStringWithCulture(BufferWriterParameterName));
             this.Write(".Write(new byte[] { ");
-            this.Write(this.ToStringHelper.ToStringWithCulture(GetArrayText(range)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetArrayText(value)));
             this.Write(" });\r\n");
  } else if (type == BlockType.Identifier) { 
             this.Write("        ");
@@ -62,7 +62,7 @@ namespace SimpleTextTemplate.Generator
             this.Write(".Write(");
             this.Write(this.ToStringHelper.ToStringWithCulture(ContextParameterName));
             this.Write(".");
-            this.Write(this.ToStringHelper.ToStringWithCulture(GetText(range)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetText(value)));
             this.Write(");\r\n");
  } 
  } 

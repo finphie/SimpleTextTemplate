@@ -81,41 +81,41 @@ public ref struct TemplateReader
     /// <summary>
     /// 文字列または識別子を読み込みます。
     /// </summary>
-    /// <param name="range">文字列または識別子の範囲。文字列や識別子ではない場合、<see cref="BlockType.None"/>を返す。</param>
+    /// <param name="value">文字列または識別子。文字列や識別子ではない場合、<see cref="BlockType.None"/>を返す。</param>
     /// <returns>ブロックのタイプ</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BlockType TryRead(out TextRange range)
+    public BlockType TryRead(out ReadOnlySpan<byte> value)
     {
         if (Length <= 0)
         {
-            range = default;
+            value = default;
             return BlockType.End;
         }
 
-        if (TryReadString(out range))
+        if (TryReadString(out value))
         {
             return BlockType.Raw;
         }
 
-        if (TryReadIdentifier(out range))
+        if (TryReadIdentifier(out value))
         {
             return BlockType.Identifier;
         }
 
-        range = default;
+        value = default;
         return BlockType.None;
     }
 
     /// <summary>
     /// 文字列または識別子を読み込みます。
     /// </summary>
-    /// <param name="range">文字列または識別子の範囲</param>
+    /// <param name="value">文字列または識別子</param>
     /// <returns>ブロックのタイプ</returns>
     /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BlockType Read(out TextRange range)
+    public BlockType Read(out ReadOnlySpan<byte> value)
     {
-        var result = TryRead(out range);
+        var result = TryRead(out value);
 
         if (result == BlockType.None)
         {
@@ -128,17 +128,17 @@ public ref struct TemplateReader
     /// <summary>
     /// 文字列を読み込みます。
     /// </summary>
-    /// <param name="range">文字列の範囲</param>
+    /// <param name="value">文字列</param>
     /// <returns>
     /// 現在位置の文字列が'{{'の場合は<see langword="true"/>、
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryReadString(out TextRange range)
+    public bool TryReadString(out ReadOnlySpan<byte> value)
     {
         if (Length == 0)
         {
-            range = default;
+            value = default;
             return false;
         }
 
@@ -147,7 +147,7 @@ public ref struct TemplateReader
 
         if (index == 0)
         {
-            range = default;
+            value = default;
             return false;
         }
 
@@ -156,8 +156,7 @@ public ref struct TemplateReader
             index = Length;
         }
 
-        var consumed = (int)Consumed;
-        range = new TextRange(consumed, consumed + index);
+        value = BinaryHelper.CreateReadOnlySpan(ref Buffer, index);
         Advance(index);
 
         return true;
@@ -166,18 +165,18 @@ public ref struct TemplateReader
     /// <summary>
     /// 識別子を読み込みます。
     /// </summary>
-    /// <param name="range">識別子の範囲</param>
+    /// <param name="value">識別子</param>
     /// <returns>
     /// 識別子を取得できた場合は<see langword="true"/>、
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryReadIdentifier(out TextRange range)
+    public bool TryReadIdentifier(out ReadOnlySpan<byte> value)
     {
         // "{{"で始まらない場合
         if (Length < StartIdentifier.Length || Unsafe.ReadUnaligned<ushort>(ref Buffer) != MemoryMarshal.Read<ushort>(StartIdentifier))
         {
-            range = default;
+            value = default;
             return false;
         }
 
@@ -192,7 +191,7 @@ public ref struct TemplateReader
         // "{{"と"}}"の間に1文字もないか、"}}"が見つからない場合
         if (index <= 0)
         {
-            range = default;
+            value = default;
             return false;
         }
 
@@ -208,8 +207,7 @@ public ref struct TemplateReader
             endIndex = index;
         }
 
-        var start = (int)Consumed - index;
-        range = new(start, start + endIndex + 1);
+        value = BinaryHelper.CreateReadOnlySpan(ref Unsafe.SubtractByteOffset(ref Buffer, (nint)(uint)index), endIndex + 1);
 
         Advance(EndIdentifier.Length);
         return true;

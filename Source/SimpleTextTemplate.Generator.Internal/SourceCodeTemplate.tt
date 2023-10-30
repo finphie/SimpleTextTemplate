@@ -15,11 +15,11 @@ partial <#= ClassOrStructText #> <#= ClassName #>
     [global::System.CodeDom.Compiler.GeneratedCode("<#= GeneratorName #>", "<#= GeneratorVersion #>")]
     <#= MethodAccessibilityText #> static partial void <#= MethodName #>(global::System.Buffers.IBufferWriter<byte> <#= BufferWriterParameterName #>, <#= ContextTypeName #> <#= ContextParameterName #>)
     {
-<# foreach (var (type, range) in GetBlocks()) { #>
+<# foreach (var (type, value) in Blocks) { #>
 <# if (type == BlockType.Raw) { #>
-        <#= BufferWriterParameterName #>.Write(new byte[] { <#= GetArrayText(range) #> });
+        <#= BufferWriterParameterName #>.Write(new byte[] { <#= GetArrayText(value) #> });
 <# } else if (type == BlockType.Identifier) { #>
-        <#= BufferWriterParameterName #>.Write(<#= ContextParameterName #>.<#= GetText(range) #>);
+        <#= BufferWriterParameterName #>.Write(<#= ContextParameterName #>.<#= GetText(value) #>);
 <# } #>
 <# } #>
     }

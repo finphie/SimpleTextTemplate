@@ -48,10 +48,10 @@ public sealed class TemplateReaderTryReadTest
     {
         var reader = new TemplateReader([]);
 
-        reader.TryRead(out var range).Should().Be(End);
+        reader.TryRead(out var value).Should().Be(End);
         reader.Consumed.Should().Be(0);
 
-        range.Should().Be(default(TextRange));
+        value.ToArray().Should().BeEmpty();
     }
 
     [Theory]
@@ -63,24 +63,24 @@ public sealed class TemplateReaderTryReadTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryRead(out var range).Should().Be(None);
+        reader.TryRead(out var value).Should().Be(None);
         reader.Consumed.Should().Be((nuint)consumed);
 
-        range.Should().Be(default(TextRange));
+        value.ToArray().Should().BeEmpty();
     }
 
-    static void Execute(ReadOnlySpan<byte> buffer, params (BlockType Type, string Value, nuint Consumed)[] blocks)
+    static void Execute(ReadOnlySpan<byte> buffer, params (BlockType Type, string ExpectedValue, nuint Consumed)[] blocks)
     {
         var reader = new TemplateReader(buffer);
 
-        foreach (var (type, value, consumed) in blocks)
+        foreach (var (type, expectedValue, consumed) in blocks)
         {
-            reader.TryRead(out var range).Should().Be(type);
+            reader.TryRead(out var value).Should().Be(type);
             reader.Consumed.Should().Be(consumed);
 
-            buffer[range.Start..range.End].ToArray()
+            value.ToArray()
                .Should()
-               .Equal(Encoding.UTF8.GetBytes(value));
+               .Equal(Encoding.UTF8.GetBytes(expectedValue));
         }
     }
 }
