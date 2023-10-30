@@ -1,6 +1,6 @@
 ﻿#if NET8_0_OR_GREATER
+using System.Buffers;
 using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
 using FluentAssertions;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
@@ -18,7 +18,7 @@ public sealed class TemplateRenderTest
     {
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<Utf8Array>();
         dic.TryAdd(new("A"u8), new("Test1"u8));
 
@@ -35,7 +35,7 @@ public sealed class TemplateRenderTest
     {
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<Utf8Array>();
         dic.TryAdd(new("A"u8), new("Test1"u8));
         dic.TryAdd(new("AAA"u8), new("Test1"u8));
@@ -55,7 +55,7 @@ public sealed class TemplateRenderTest
     {
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<Utf8Array>();
         dic.TryAdd(new("A"u8), new("Test1"u8));
 
@@ -72,7 +72,7 @@ public sealed class TemplateRenderTest
     {
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<Utf8Array>();
         dic.TryAdd(new("A"u8), new("Test1"u8));
         dic.TryAdd(new("AAA"u8), new("Test1"u8));
@@ -91,7 +91,7 @@ public sealed class TemplateRenderTest
     {
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<Utf8Array>();
         dic.TryAdd(new("A"u8), new("Test1"u8));
         dic.TryAdd(new("B"u8), new("Test2"u8));
