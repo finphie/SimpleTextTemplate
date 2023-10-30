@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.HighPerformance.Buffers;
+﻿using System.Buffers;
 using FluentAssertions;
 using Xunit;
 
@@ -13,7 +13,7 @@ public sealed class GeneratorTest
     {
         var context = new TestContext(Identifier);
 
-        using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+        var bufferWriter = new ArrayBufferWriter<byte>();
         ZTemplate.Render(bufferWriter, context);
 
         bufferWriter.WrittenSpan.ToArray().Should().Equal(Identifier);
