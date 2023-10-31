@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using Utf8Utility;
 
 namespace SimpleTextTemplate.Contexts;
@@ -24,11 +23,11 @@ sealed class DictionaryContext : IContext
 
     /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryGetValue(Utf8Array key, [NotNullWhen(true)] out Utf8Array value)
+    public bool TryGetValue(Utf8Array key, out Utf8Array value)
         => _symbols.TryGetValue(key, out value);
 
     /// <inheritdoc/>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryGetValue(ReadOnlySpan<byte> key, [NotNullWhen(true)] out Utf8Array value)
+    public bool TryGetValue(ReadOnlySpan<byte> key, out Utf8Array value)
         => _symbols.TryGetValue(key, out value);
 }
