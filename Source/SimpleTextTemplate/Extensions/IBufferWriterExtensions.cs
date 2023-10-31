@@ -1,13 +1,10 @@
-﻿using System.Runtime.CompilerServices;
-
-#if NET8_0_OR_GREATER
+﻿#if NET8_0_OR_GREATER
 using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-#endif
 
 namespace SimpleTextTemplate.Extensions;
 
-#if NET8_0_OR_GREATER
 /// <summary>
 /// <see cref="IBufferWriter{T}"/>関連の拡張メソッド集です。
 /// </summary>
