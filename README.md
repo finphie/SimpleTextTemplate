@@ -87,16 +87,16 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## ベンチマーク
 
-| Method                      | Mean        | Ratio  | Gen0   | Gen1   | Allocated |
-|---------------------------- |------------:|-------:|-------:|-------:|----------:|
-| SimpleTextTemplate          |    42.39 ns |   1.53 | 0.0067 |      - |      56 B |
-| SimpleTextTemplate_SG       |    27.73 ns |   1.00 | 0.0067 |      - |      56 B |
-| Scriban                     | 8,733.83 ns | 314.99 | 3.6621 | 0.3357 |   30778 B |
-| ScribanLiquid               | 6,690.69 ns | 241.30 | 3.9673 | 0.3891 |   33194 B |
-| (Regex.Replace)             |   148.43 ns |   5.35 | 0.0105 |      - |      88 B |
-| (InterpolatedStringHandler) |    40.49 ns |   1.46 | 0.0105 |      - |      88 B |
-| (string.Format)             |    55.60 ns |   2.00 | 0.0105 |      - |      88 B |
-| (CompositeFormat)           |    35.28 ns |   1.27 | 0.0105 |      - |      88 B |
+| Method                      | Mean        | Error      | Ratio  | Gen0   | Gen1   | Allocated | 
+|---------------------------- |------------:|-----------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate          |    38.20 ns |   0.661 ns |   1.36 | 0.0067 |      - |      56 B | 
+| SimpleTextTemplate_SG       |    28.12 ns |   0.115 ns |   1.00 | 0.0067 |      - |      56 B | 
+| Scriban                     | 8,526.65 ns | 111.069 ns | 303.22 | 3.6621 | 0.3357 |   30778 B | 
+| ScribanLiquid               | 6,871.13 ns |  21.458 ns | 244.31 | 3.9673 | 0.3891 |   33194 B | 
+| (Regex.Replace)             |   133.06 ns |   0.212 ns |   4.73 | 0.0105 |      - |      88 B | 
+| (InterpolatedStringHandler) |    40.82 ns |   0.328 ns |   1.45 | 0.0105 |      - |      88 B | 
+| (string.Format)             |    51.77 ns |   0.365 ns |   1.84 | 0.0105 |      - |      88 B | 
+| (CompositeFormat)           |    36.29 ns |   0.430 ns |   1.29 | 0.0105 |      - |      88 B | 
 
 > [!Note]
 > UTF-8またはUTF-16で出力  
