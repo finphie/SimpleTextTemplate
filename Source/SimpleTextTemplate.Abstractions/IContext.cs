@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Utf8Utility;
+﻿using Utf8Utility;
 
 namespace SimpleTextTemplate;
 
@@ -17,7 +16,7 @@ public interface IContext
     /// 指定された識別子に関連付けられた文字列を取得できた場合は<see langword="true"/>、
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
-    bool TryGetValue(Utf8Array key, [NotNullWhen(true)] out Utf8Array value);
+    bool TryGetValue(Utf8Array key, out Utf8Array value);
 
     /// <summary>
     /// 指定された識別子に関連付けられているUTF-8配列を取得します。
@@ -28,5 +27,5 @@ public interface IContext
     /// 指定された識別子に関連付けられた文字列を取得できた場合は<see langword="true"/>、
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
-    bool TryGetValue(ReadOnlySpan<byte> key, [NotNullWhen(true)] out Utf8Array value);
+    bool TryGetValue(ReadOnlySpan<byte> key, out Utf8Array value);
 }

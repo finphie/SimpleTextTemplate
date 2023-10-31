@@ -92,28 +92,33 @@ public readonly struct Template
 
 #if NET8_0_OR_GREATER
     /// <summary>
-    /// テンプレートをレンダリングして、<see cref="IBufferWriter{Byte}"/>に書き込みます。
+    /// テンプレートをレンダリングして、バッファーライターに書き込みます。
     /// </summary>
-    /// <param name="bufferWriter">ターゲットの<see cref="IBufferWriter{Byte}"/></param>
+    /// <typeparam name="TWriter">使用するバッファーライターの型</typeparam>
+    /// <typeparam name="TContext">コンテキストの型</typeparam>
+    /// <param name="bufferWriter">バッファーライター</param>
     /// <param name="context">コンテキスト</param>
     /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
-    public void Render(IBufferWriter<byte> bufferWriter, IContext context)
+    public void Render<TWriter, TContext>(TWriter bufferWriter, TContext context)
+        where TWriter : notnull, IBufferWriter<byte>
+        where TContext : notnull, IContext
     {
         ArgumentNullException.ThrowIfNull(bufferWriter);
         ArgumentNullException.ThrowIfNull(context);
 
         foreach (var (type, stringOrIdentifier) in Blocks)
         {
-            var span = MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(stringOrIdentifier), stringOrIdentifier.Length);
+            ref var stringOrIdentifierStart = ref MemoryMarshal.GetArrayDataReference(stringOrIdentifier);
 
             switch (type)
             {
                 case BlockType.Raw:
-                    bufferWriter.Write(span);
+                    bufferWriter.Write(ref stringOrIdentifierStart, stringOrIdentifier.Length);
                     break;
                 case BlockType.Identifier:
+                    var span = MemoryMarshal.CreateReadOnlySpan(ref stringOrIdentifierStart, stringOrIdentifier.Length);
                     context.TryGetValue(span, out var value);
-                    bufferWriter.Write(value.AsSpan());
+                    bufferWriter.Write(ref value.DangerousGetReference(), value.ByteCount);
                     break;
                 case BlockType.None:
                 case BlockType.End:

@@ -3,7 +3,7 @@
 namespace SimpleTextTemplate.Extensions;
 
 /// <summary>
-/// <see cref="List{T}"/>関連のヘルパークラスです。
+/// <see cref="List{T}"/>関連の拡張メソッド集です。
 /// </summary>
 static class ListExtensions
 {
