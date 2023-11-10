@@ -40,23 +40,20 @@ using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-var context = new SampleContext("Hello, World!"u8.ToArray());
+var context = new SampleContext("Hello, World");
 
-using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-ZTemplate.Render(bufferWriter, context);
+var bufferWriter = new ArrayPoolBufferWriter<byte>();
+var template = new TemplateWriter<ArrayPoolBufferWriter<byte>>(ref bufferWriter);
 
-// Hello, World!
+template.Write("{{ Identifier }}!!!", context);
+template.Dispose();
+
+// Hello, World!!!
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
-readonly record struct SampleContext(byte[] Identifier);
+bufferWriter.Dispose();
 
-static partial class ZTemplate
-{
-    // TemplateAttributeでは、テンプレート文字列を指定してください。
-    // context内にテンプレート変数と同名のプロパティまたはフィールドが存在する必要があります。
-    [Template("{{ Identifier }}")]  
-    public static partial void Render(IBufferWriter<byte> bufferWriter, SampleContext context);
-}
+readonly record struct SampleContext(string Identifier);
 ```
 
 [サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
