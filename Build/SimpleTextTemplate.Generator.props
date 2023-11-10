@@ -1,6 +1,7 @@
 <Project>
-  <ItemGroup>
-    <CompilerVisibleProperty Include="ProjectDir" />
-    <CompilerVisibleProperty Include="SimpleTextTemplatePath" />
-  </ItemGroup>
+
+  <PropertyGroup>
+    <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);SimpleTextTemplate.Generator</InterceptorsPreviewNamespaces>
+  </PropertyGroup>
+
 </Project>

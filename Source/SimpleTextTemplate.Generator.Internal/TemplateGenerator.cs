@@ -1,7 +1,7 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
-using SimpleTextTemplate.Generator.Extensions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Operations;
 
 namespace SimpleTextTemplate.Generator;
 
@@ -11,35 +11,45 @@ namespace SimpleTextTemplate.Generator;
 [Generator(LanguageNames.CSharp)]
 public sealed class TemplateGenerator : IIncrementalGenerator
 {
-    const string TemplateAttributeName = $"global::{nameof(SimpleTextTemplate)}.TemplateAttribute";
-
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var methods = context.GetMethodSymbolsWithAttributeArgumentProvider(TemplateAttributeName);
-
-        context.RegisterSourceOutput(methods, (context, method) =>
+#if DEBUG
+        if (!Debugger.IsAttached)
         {
-            context.CancellationToken.ThrowIfCancellationRequested();
+            // Debugger.Launch();
+        }
+#endif
+        var provider = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                static (node, _) => node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "Write" } },
+                static (context, cancellationToken) =>
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
 
-            var source = Encoding.UTF8.GetBytes(method.Argument);
-            var template = new SourceCodeTemplate(method.Symbol, source);
-            var result = template.TryParse();
+                    var invocationExpression = (context.Node as InvocationExpressionSyntax)!;
+                    var memberAccessorExpression = (invocationExpression.Expression as MemberAccessExpressionSyntax)!;
 
-            if (result == ParseResult.InvalidIdentifier)
-            {
-                context.ReportDiagnostic(DiagnosticDescriptors.InvalidIdentifierError, method.Symbol, template.ErrorPosition);
-                return;
-            }
+                    if (context.SemanticModel.GetOperation(invocationExpression, cancellationToken) is not IInvocationOperation operation)
+                    {
+                        return null;
+                    }
 
-            if (result != ParseResult.Success)
-            {
-                context.ReportDiagnostic(DiagnosticDescriptors.UnknownError, method.Symbol, template.ErrorPosition);
-                return;
-            }
+                    if (operation is not { TargetMethod.ContainingType: { Name: "TemplateWriter", ContainingNamespace: { Name: nameof(SimpleTextTemplate), ContainingNamespace.IsGlobalNamespace: true } } })
+                    {
+                        return null;
+                    }
 
-            var fileName = $"__{nameof(TemplateGenerator)}.{template.ClassName}.{template.MethodName}.Generated.cs";
-            context.AddSource(fileName, SourceText.From(template.TransformText(), Encoding.UTF8));
-        });
+                    var arguments = invocationExpression.ArgumentList.Arguments;
+                    return arguments.Count == 0 ? null : InterceptInfoCreator.Create(context, operation, cancellationToken);
+                })
+            .Where(static x => x is not null)
+            .Select(static (x, _) => x!);
+
+        var diagnostics = provider.Where(static x => x.Diagnostic is not null).Select(static (x, _) => x.Diagnostic!);
+        context.RegisterSourceOutput(diagnostics, static (context, diagnostic) => context.ReportDiagnostic(diagnostic));
+
+        var infoList = provider.Where(static x => x.Info is not null).Select(static (x, _) => x.Info!).Collect();
+        context.RegisterSourceOutput(infoList, Emitter.Emit);
     }
 }

@@ -56,7 +56,7 @@ public sealed class TemplateWriterWriteValueTest
             writer.WriteValue(value);
         }
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan.ToArray())
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be(value.ToString(CultureInfo.InvariantCulture));
     }
