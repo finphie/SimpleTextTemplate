@@ -172,6 +172,12 @@ public ref struct TemplateWriter<T>
             return;
         }
 
+        if (value is IFormattable formattableValue)
+        {
+            WriteString(formattableValue.ToString(null, CultureInfo.InvariantCulture));
+            return;
+        }
+
         WriteString(value?.ToString());
     }
 
