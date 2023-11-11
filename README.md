@@ -54,6 +54,7 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 bufferWriter.Dispose();
 
 readonly record struct SampleContext(string Identifier, [property: Identifier("o")] DateTimeOffset DateTime);
+```
 
 [サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
 
