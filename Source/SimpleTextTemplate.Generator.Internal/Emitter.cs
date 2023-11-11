@@ -63,13 +63,13 @@ static class Emitter
             builder.AppendLine("        }");
         }
 
-        builder.AppendLine("""
+        builder.AppendLine($$"""
                 }
             }
             
             namespace System.Runtime.CompilerServices
             {
-                [global::System.CodeDom.Compiler.GeneratedCode("{FullName}", "{Version}")]
+                [global::System.CodeDom.Compiler.GeneratedCode("{{FullName}}", "{{Version}}")]
                 [global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]
                 file sealed class InterceptsLocationAttribute(string filePath, int line, int column) : global::System.Attribute;
             }
