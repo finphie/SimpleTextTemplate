@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using FluentAssertions;
 using Xunit;
@@ -22,7 +23,7 @@ public sealed class TemplateWriterWriteTest
         var context = new TestContext();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
         {
             writer.Write(
                 """
@@ -92,7 +93,7 @@ public sealed class TemplateWriterWriteTest
         var context = new TestContext();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
         {
             writer.Write("{{ StringConstantField }}", context);
             writer.Write("{{ BytesStaticField }}", context);

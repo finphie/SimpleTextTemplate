@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -16,6 +15,7 @@ public ref struct TemplateWriter<T>
     where T : notnull, IBufferWriter<byte>
 {
     readonly ref T _bufferWriter;
+    readonly IFormatProvider? _provider;
 
     ref readonly byte _destinationStart;
     ref byte _destination;
@@ -26,9 +26,10 @@ public ref struct TemplateWriter<T>
     /// </summary>
     /// <param name="bufferWriter">バッファーライター</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TemplateWriter(ref T bufferWriter)
+    public TemplateWriter(ref T bufferWriter, IFormatProvider? provider = null)
     {
         _bufferWriter = ref bufferWriter;
+        _provider = provider;
 
         var span = _bufferWriter.GetSpan();
         _destinationStart = ref MemoryMarshal.GetReference(span);
@@ -174,7 +175,7 @@ public ref struct TemplateWriter<T>
 
         if (value is IFormattable formattableValue)
         {
-            WriteString(formattableValue.ToString(null, CultureInfo.InvariantCulture));
+            WriteString(formattableValue.ToString(null, _provider));
             return;
         }
 
@@ -186,7 +187,7 @@ public ref struct TemplateWriter<T>
     {
         Debug.Assert(value is IUtf8SpanFormattable, "IUtf8SpanFormattableではありません。");
 
-        if (!((IUtf8SpanFormattable)value).TryFormat(Destination, out var bytesWritten, default, CultureInfo.InvariantCulture))
+        if (!((IUtf8SpanFormattable)value).TryFormat(Destination, out var bytesWritten, default, _provider))
         {
             var newLength = _destinationLength * 2;
 
@@ -199,7 +200,7 @@ public ref struct TemplateWriter<T>
 
             GrowCore(newLength);
 
-            var success = ((IUtf8SpanFormattable)value).TryFormat(Destination, out bytesWritten, default, CultureInfo.InvariantCulture);
+            var success = ((IUtf8SpanFormattable)value).TryFormat(Destination, out bytesWritten, default, _provider);
             Debug.Assert(success, "UTF-8への変換に失敗しました。");
         }
 
@@ -213,16 +214,16 @@ public ref struct TemplateWriter<T>
 
         Span<char> destination = stackalloc char[256];
 
-        if (((ISpanFormattable)value).TryFormat(destination, out var charsWritten, default, CultureInfo.InvariantCulture))
+        if (((ISpanFormattable)value).TryFormat(destination, out var charsWritten, default, _provider))
         {
             WriteString(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(destination), charsWritten));
             return;
         }
 
-        GrowAndWrite(ref this, value, destination.Length);
+        GrowAndWrite(ref this, value, destination.Length, _provider);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static void GrowAndWrite(scoped ref TemplateWriter<T> writer, TValue value, int length)
+        static void GrowAndWrite(scoped ref TemplateWriter<T> writer, TValue value, int length, IFormatProvider? provider)
         {
             Debug.Assert(value is ISpanFormattable, "ISpanFormattableではありません。");
 
@@ -242,7 +243,7 @@ public ref struct TemplateWriter<T>
 
                 try
                 {
-                    if (((ISpanFormattable)value).TryFormat(destination, out var charsWritten, default, CultureInfo.InvariantCulture))
+                    if (((ISpanFormattable)value).TryFormat(destination, out var charsWritten, default, provider))
                     {
                         writer.WriteString(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(destination), charsWritten));
                         return;
