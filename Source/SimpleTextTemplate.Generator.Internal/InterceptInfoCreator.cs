@@ -134,7 +134,7 @@ static class InterceptInfoCreator
 
             var format = identifier.Attributes
                 .FirstOrDefault(static x => x.AttributeClass is { Name: "IdentifierAttribute", ContainingNamespace: { Name: nameof(SimpleTextTemplate), ContainingNamespace.IsGlobalNamespace: true } })
-                ?.ConstructorArguments[0]
+                ?.ConstructorArguments.FirstOrDefault()
                 .Value as string;
 
             if (identifier.Type.TypeKind == TypeKind.Enum)
