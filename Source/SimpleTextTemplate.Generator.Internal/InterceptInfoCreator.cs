@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using SimpleTextTemplate.Generator.Extensions;
 using SimpleTextTemplate.Generator.Specs;
+using static SimpleTextTemplate.Generator.Specs.TemplateWriterWriteType;
 
 namespace SimpleTextTemplate.Generator;
 
@@ -83,7 +84,7 @@ static class InterceptInfoCreator
 
             if (block == BlockType.Raw)
             {
-                infoList.Add(new(TemplateWriterWriteType.WriteConstantLiteral, value));
+                infoList.Add(new(WriteConstantLiteral, value));
                 continue;
             }
 
@@ -117,7 +118,7 @@ static class InterceptInfoCreator
 
             if (block == BlockType.Raw)
             {
-                infoList.Add(new(TemplateWriterWriteType.WriteConstantLiteral, value));
+                infoList.Add(new(WriteConstantLiteral, value));
                 continue;
             }
 
@@ -133,7 +134,7 @@ static class InterceptInfoCreator
 
             if (identifier.Type.TypeKind == TypeKind.Enum)
             {
-                infoList.Add(new(identifier.IsStatic ? TemplateWriterWriteType.WriteStaticEnum : TemplateWriterWriteType.WriteEnum, value));
+                infoList.Add(new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value));
                 continue;
             }
 
@@ -141,7 +142,7 @@ static class InterceptInfoCreator
             // ReadOnlySpan<byte>やbyte[]などが一致
             if (compilation.ClassifyConversion(identifier.Type, readOnlySpanByteSymbol).IsImplicit)
             {
-                infoList.Add(new(identifier.IsStatic ? TemplateWriterWriteType.WriteStaticLiteral : TemplateWriterWriteType.WriteLiteral, value));
+                infoList.Add(new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value));
                 continue;
             }
 
@@ -149,11 +150,11 @@ static class InterceptInfoCreator
             // ReadOnlySpan<char>やstring、char[]などが一致
             if (compilation.ClassifyConversion(identifier.Type, readOnlySpanCharSymbol).IsImplicit)
             {
-                infoList.Add(new(identifier.IsStatic ? TemplateWriterWriteType.WriteStaticString : TemplateWriterWriteType.WriteString, value));
+                infoList.Add(new(identifier.IsStatic ? WriteStaticString : WriteString, value));
                 continue;
             }
 
-            infoList.Add(new(identifier.IsStatic ? TemplateWriterWriteType.WriteStaticValue : TemplateWriterWriteType.WriteValue, value));
+            infoList.Add(new(identifier.IsStatic ? WriteStaticValue : WriteValue, value));
         }
 
 #pragma warning disable IDE0305 // コレクションの初期化を簡略化します
