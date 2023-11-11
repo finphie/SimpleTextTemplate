@@ -40,21 +40,20 @@ using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-var context = new SampleContext("Hello, World");
+var context = new SampleContext("Hello, World", new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
 var bufferWriter = new ArrayPoolBufferWriter<byte>();
 var template = new TemplateWriter<ArrayPoolBufferWriter<byte>>(ref bufferWriter);
 
-template.Write("{{ Identifier }}!!!", context);
+template.Write("{{ DateTime }}_{{ Identifier }}!!!", context);
 template.Dispose();
 
-// Hello, World!!!
+// 2000-01-01T00:00:00.0000000+00:00_Hello, World!!!
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 bufferWriter.Dispose();
 
-readonly record struct SampleContext(string Identifier);
-```
+readonly record struct SampleContext(string Identifier, [property: Identifier("o")] DateTimeOffset DateTime);
 
 [サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
 
