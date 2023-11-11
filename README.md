@@ -40,23 +40,20 @@ using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-var context = new SampleContext("Hello, World!"u8.ToArray());
+var context = new SampleContext("Hello, World", new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
-using var bufferWriter = new ArrayPoolBufferWriter<byte>();
-ZTemplate.Render(bufferWriter, context);
+var bufferWriter = new ArrayPoolBufferWriter<byte>();
+var template = new TemplateWriter<ArrayPoolBufferWriter<byte>>(ref bufferWriter);
 
-// Hello, World!
+template.Write("{{ DateTime }}_{{ Identifier }}!!!", context);
+template.Dispose();
+
+// 2000-01-01T00:00:00.0000000+00:00_Hello, World!!!
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
-readonly record struct SampleContext(byte[] Identifier);
+bufferWriter.Dispose();
 
-static partial class ZTemplate
-{
-    // TemplateAttributeでは、テンプレート文字列を指定してください。
-    // context内にテンプレート変数と同名のプロパティまたはフィールドが存在する必要があります。
-    [Template("{{ Identifier }}")]  
-    public static partial void Render(IBufferWriter<byte> bufferWriter, SampleContext context);
-}
+readonly record struct SampleContext(string Identifier, [property: Identifier("o")] DateTimeOffset DateTime);
 ```
 
 [サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
@@ -89,14 +86,15 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 | Method                      | Mean        | Error      | Ratio  | Gen0   | Gen1   | Allocated |
 |---------------------------- |------------:|-----------:|-------:|-------:|-------:|----------:|
-| SimpleTextTemplate          |    38.20 ns |   0.661 ns |   1.36 | 0.0067 |      - |      56 B |
-| SimpleTextTemplate_SG       |    28.12 ns |   0.115 ns |   1.00 | 0.0067 |      - |      56 B |
-| Scriban                     | 8,526.65 ns | 111.069 ns | 303.22 | 3.6621 | 0.3357 |   30778 B |
-| ScribanLiquid               | 6,871.13 ns |  21.458 ns | 244.31 | 3.9673 | 0.3891 |   33194 B |
-| (Regex.Replace)             |   133.06 ns |   0.212 ns |   4.73 | 0.0105 |      - |      88 B |
-| (InterpolatedStringHandler) |    40.82 ns |   0.328 ns |   1.45 | 0.0105 |      - |      88 B |
-| (string.Format)             |    51.77 ns |   0.365 ns |   1.84 | 0.0105 |      - |      88 B |
-| (CompositeFormat)           |    36.29 ns |   0.430 ns |   1.29 | 0.0105 |      - |      88 B |
+| SimpleTextTemplate          |    38.51 ns |   0.149 ns |   1.95 | 0.0067 |      - |      56 B |
+| SimpleTextTemplate_SG       |    18.83 ns |   0.425 ns |   1.00 | 0.0067 |      - |      56 B |
+| Scriban                     | 8,532.18 ns | 128.391 ns | 434.20 | 3.6621 | 0.3357 |   30778 B |
+| ScribanLiquid               | 6,945.50 ns |  34.946 ns | 352.62 | 3.9673 | 0.3891 |   33194 B |
+| (Utf8.TryWrite)             |    22.42 ns |   0.470 ns |   1.18 | 0.0067 |      - |      56 B |
+| (InterpolatedStringHandler) |    40.12 ns |   0.299 ns |   2.04 | 0.0105 |      - |      88 B |
+| (Regex.Replace)             |   130.70 ns |   0.513 ns |   6.65 | 0.0105 |      - |      88 B |
+| (string.Format)             |    52.18 ns |   1.083 ns |   2.74 | 0.0105 |      - |      88 B |
+| (CompositeFormat)           |    37.80 ns |   0.696 ns |   1.94 | 0.0105 |      - |      88 B |
 
 > [!Note]
 > UTF-8またはUTF-16で出力  

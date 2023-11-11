@@ -6,6 +6,9 @@ namespace SimpleTextTemplate.Benchmarks;
 
 public class ParseBenchmark
 {
+    const string Identifier = nameof(Identifier);
+    const string Source = "abcdef{{ " + Identifier + " }}01234567890";
+
     byte[] _utf8Source = null!;
     string _utf16Source = null!;
 
@@ -14,8 +17,8 @@ public class ParseBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        _utf8Source = Encoding.UTF8.GetBytes(ZTemplate.Source);
-        _utf16Source = ZTemplate.Source;
+        _utf8Source = Encoding.UTF8.GetBytes(Source);
+        _utf16Source = Source;
 
         _format = "abcdef{0}01234567890";
     }

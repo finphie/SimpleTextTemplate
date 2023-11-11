@@ -2,30 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <NoWarn>$(NoWarn);RS1035</NoWarn>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.CodeDom" Version="7.0.0" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="SourceCodeTemplate.tt">
-      <Generator>TextTemplatingFilePreprocessor</Generator>
-      <LastGenOutput>SourceCodeTemplate.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="SourceCodeTemplate.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>SourceCodeTemplate.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
 
 </Project>

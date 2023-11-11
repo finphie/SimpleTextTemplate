@@ -8,23 +8,45 @@ namespace SimpleTextTemplate.Generator;
 static class DiagnosticDescriptors
 {
     /// <summary>
-    /// 未知のエラーの場合に出力する診断情報です。
+    /// テンプレート文字列が定数ではない場合に出力する診断情報です。
     /// </summary>
-    public static readonly DiagnosticDescriptor UnknownError = new(
+    public static readonly DiagnosticDescriptor TemplateStringMustBeConstant = new(
         "STT1000",
-        "テンプレート解析時にエラーが発生しました。",
-        "テンプレート解析時に未知のエラーが発生しました。位置:{0}",
+        "テンプレート文字列が不正な形式です。",
+        "テンプレート文字列は定数にする必要があります。",
         nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);
 
     /// <summary>
-    /// 無効な文字が含まれている場合に出力する診断情報です。
+    /// テンプレート文字列に識別子があり、コンテキストを指定していない場合に出力する診断情報です。
     /// </summary>
-    public static readonly DiagnosticDescriptor InvalidIdentifierError = new(
+    public static readonly DiagnosticDescriptor RequiredContext = new(
         "STT1001",
-        "識別子に無効な文字が含まれています。",
-        "テンプレート解析時にエラーが発生しました。識別子に無効な文字が含まれています。位置:{0}",
+        "テンプレート文字列が不正な形式です。",
+        "テンプレート文字列に変数を埋め込む場合、コンテキストを指定する必要があります。",
+        nameof(SimpleTextTemplate),
+        DiagnosticSeverity.Error,
+        true);
+
+    /// <summary>
+    /// コンテキストに識別子が存在しない場合に出力する診断情報です。
+    /// </summary>
+    public static readonly DiagnosticDescriptor InvalidIdentifier = new(
+        "STT1002",
+        "コンテキストが不正な形式です。",
+        "コンテキストに識別子({0})が存在しません。",
+        nameof(SimpleTextTemplate),
+        DiagnosticSeverity.Error,
+        true);
+
+    /// <summary>
+    /// テンプレート解析に失敗した場合に出力する診断情報です。
+    /// </summary>
+    public static readonly DiagnosticDescriptor ParserError = new(
+        "STT1003",
+        "テンプレート解析時にエラーが発生しました。",
+        "テンプレート解析時にエラーが発生しました。位置:{0}",
         nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);

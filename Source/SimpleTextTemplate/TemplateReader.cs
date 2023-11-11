@@ -201,7 +201,7 @@ public ref struct TemplateReader
         // 識別子と"}}"の間にある連続する空白の位置を取得
         var endIndex = BinaryHelper.LastIndexOfAnyExcept(ref buffer, index, (byte)' ');
 
-        // 識別子と"}}"の間に空白がない場合は、"{{"と"}}"の間の文字は識別子名となる。
+        // 識別子と"}}"の間に空白がない場合は、"{{"と"}}"の間の文字を識別子名とする。
         if (endIndex == -1)
         {
             endIndex = index;
