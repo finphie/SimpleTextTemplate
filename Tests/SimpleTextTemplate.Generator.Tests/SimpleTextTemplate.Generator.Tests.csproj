@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\SimpleTextTemplate.Contexts\SimpleTextTemplate.Contexts.csproj" />
     <ProjectReference Include="..\..\Source\SimpleTextTemplate.Generator.Internal\SimpleTextTemplate.Generator.Internal.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\Source\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" />
   </ItemGroup>
