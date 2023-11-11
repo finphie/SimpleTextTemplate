@@ -104,6 +104,22 @@ public sealed class TemplateWriterWriteTest
             .Be("StringConstantFieldBytesStaticField");
     }
 
+    [Fact]
+    public void Format指定()
+    {
+        var context = new TestContext();
+        var bufferWriter = new ArrayBufferWriter<byte>();
+
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        {
+            writer.Write("{{ Iso8601 }}", context);
+        }
+
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .Should()
+            .Be("2000-01-01T00:00:00.0000000+09:00");
+    }
+
     [SuppressMessage("Design", "CA1051:参照可能なインスタンス フィールドを宣言しません", Justification = "テストに必要")]
     [SuppressMessage("Performance", "CA1802:適切な場所にリテラルを使用します", Justification = "テストに必要")]
     [SuppressMessage("Performance", "CA1819:プロパティは配列を返すことはできません", Justification = "テストに必要")]
@@ -111,6 +127,9 @@ public sealed class TemplateWriterWriteTest
     internal sealed record TestContext()
     {
         public const string StringConstantField = nameof(StringConstantField);
+
+        [Identifier("o")]
+        public static DateTimeOffset Iso8601 = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
 
         public static readonly byte[] BytesStaticField = Encoding.UTF8.GetBytes(nameof(BytesStaticField));
         public static readonly char[] CharsStaticField = nameof(CharsStaticField).ToCharArray();

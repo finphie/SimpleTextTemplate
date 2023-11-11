@@ -54,10 +54,10 @@ static class Emitter
                         {
                 """);
 
-            foreach (var (methodType, value) in template)
+            foreach (var (methodType, value, format) in template)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
-                builder.AppendLine($"            writer.{GetWriteMethodName(methodType)}({GetValue(methodType, value, contextTypeName)});");
+                builder.AppendLine($"            writer.{GetWriteMethodName(methodType)}({GetValue(methodType, value, format, contextTypeName)});");
             }
 
             builder.AppendLine("        }");
@@ -90,17 +90,23 @@ static class Emitter
         };
     }
 
-    static string GetValue(TemplateWriterWriteType type, string value, string? contextTypeName)
+    static string GetValue(TemplateWriterWriteType type, string value, string? format, string? contextTypeName)
     {
         Debug.Assert(
             !(contextTypeName is null && type is WriteStaticLiteral or WriteStaticString or WriteStaticValue),
             $"{nameof(contextTypeName)}がnullかつ静的識別子の場合、コンテキストクラス名が必要となります。");
 
+        var formatArgument = format is null
+            ? string.Empty
+            : $", {format.ToLiteral()}";
+
         return type switch
         {
             WriteConstantLiteral => value.ToUtf8Literal(),
-            WriteLiteral or WriteString or WriteEnum or WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
-            WriteStaticLiteral or WriteStaticString or WriteStaticEnum or WriteStaticValue => $"{contextTypeName}.@{value}",
+            WriteLiteral or WriteString => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
+            WriteEnum or WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}{formatArgument}",
+            WriteStaticLiteral or WriteStaticString => $"{contextTypeName}.@{value}",
+            WriteStaticEnum or WriteStaticValue => $"{contextTypeName}.@{value}{formatArgument}",
             _ => throw new InvalidOperationException()
         };
     }

@@ -108,7 +108,7 @@ static class InterceptInfoCreator
         var readOnlySpanByteSymbol = compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
         var readOnlySpanCharSymbol = compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
 
-        var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(static x => x.Name, static x => (Type: x.GetMemberType(), x.IsStatic));
+        var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(static x => x.Name, static x => (Type: x.GetMemberType(), x.IsStatic, Attributes: x.GetAttributes()));
         var infoList = new List<TemplateWriterWriteInfo>();
 
         foreach (var (block, utf8Value) in template.Blocks)
@@ -132,9 +132,14 @@ static class InterceptInfoCreator
                 return false;
             }
 
+            var format = identifier.Attributes
+                .FirstOrDefault(static x => x.AttributeClass is { Name: "IdentifierAttribute", ContainingNamespace: { Name: nameof(SimpleTextTemplate), ContainingNamespace.IsGlobalNamespace: true } })
+                ?.ConstructorArguments[0]
+                .Value as string;
+
             if (identifier.Type.TypeKind == TypeKind.Enum)
             {
-                infoList.Add(new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value));
+                infoList.Add(new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format));
                 continue;
             }
 
@@ -154,7 +159,7 @@ static class InterceptInfoCreator
                 continue;
             }
 
-            infoList.Add(new(identifier.IsStatic ? WriteStaticValue : WriteValue, value));
+            infoList.Add(new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format));
         }
 
 #pragma warning disable IDE0305 // コレクションの初期化を簡略化します
