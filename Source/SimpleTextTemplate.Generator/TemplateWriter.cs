@@ -25,6 +25,7 @@ public ref struct TemplateWriter<T>
     /// 新しい<see cref="TemplateWriter{T}"/>構造体を初期化します。
     /// </summary>
     /// <param name="bufferWriter">バッファーライター</param>
+    /// <param name="provider">書式設定</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TemplateWriter(ref T bufferWriter, IFormatProvider? provider = null)
     {
