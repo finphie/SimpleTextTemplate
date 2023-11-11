@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -125,4 +126,7 @@ public partial class RenderBenchmark
 
     [GeneratedRegex(Pattern, RegexOptions.CultureInvariant)]
     private static partial Regex RegexInternal();
+
+    [SuppressMessage("Performance", "CA1819:プロパティは配列を返すことはできません", Justification = "ベンチマーク")]
+    internal readonly record struct SampleContext(byte[] Identifier);
 }
