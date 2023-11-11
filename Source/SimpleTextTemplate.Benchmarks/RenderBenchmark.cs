@@ -77,7 +77,7 @@ public partial class RenderBenchmark
     [Benchmark(Baseline = true)]
     public byte[] SimpleTextTemplate_SG()
     {
-        var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref Unsafe.AsRef(in _bufferWriter));
+        var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref Unsafe.AsRef(in _bufferWriter), CultureInfo.InvariantCulture);
         writer.Write(Source, _contextObject);
         writer.Dispose();
 
