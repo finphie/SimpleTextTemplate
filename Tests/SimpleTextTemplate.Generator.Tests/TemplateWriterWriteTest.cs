@@ -17,7 +17,7 @@ public sealed class TemplateWriterWriteTest
     }
 
     [Fact]
-    public void Test()
+    public void Writeメソッドを1回だけ呼び出す()
     {
         var context = new TestContext();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -84,6 +84,23 @@ public sealed class TemplateWriterWriteTest
             EnumProperty
             01/04/2000 00:00:00 +09:00
             """);
+    }
+
+    [Fact]
+    public void Writeメソッドを複数回呼び出す()
+    {
+        var context = new TestContext();
+        var bufferWriter = new ArrayBufferWriter<byte>();
+
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        {
+            writer.Write("{{ StringConstantField }}", context);
+            writer.Write("{{ BytesStaticField }}", context);
+        }
+
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .Should()
+            .Be("StringConstantFieldBytesStaticField");
     }
 
     [SuppressMessage("Design", "CA1051:参照可能なインスタンス フィールドを宣言しません", Justification = "テストに必要")]
