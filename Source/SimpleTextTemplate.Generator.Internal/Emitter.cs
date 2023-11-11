@@ -84,6 +84,7 @@ static class Emitter
         {
             WriteConstantLiteral or WriteLiteral or WriteStaticLiteral => "WriteLiteral",
             WriteString or WriteStaticString => "WriteString",
+            WriteEnum or WriteStaticEnum => "WriteEnum",
             WriteValue or WriteStaticValue => "WriteValue",
             _ => throw new InvalidOperationException()
         };
@@ -98,8 +99,8 @@ static class Emitter
         return type switch
         {
             WriteConstantLiteral => value.ToUtf8Literal(),
-            WriteLiteral or WriteString or WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
-            WriteStaticLiteral or WriteStaticString or WriteStaticValue => $"{contextTypeName}.@{value}",
+            WriteLiteral or WriteString or WriteEnum or WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
+            WriteStaticLiteral or WriteStaticString or WriteStaticEnum or WriteStaticValue => $"{contextTypeName}.@{value}",
             _ => throw new InvalidOperationException()
         };
     }

@@ -131,6 +131,12 @@ static class InterceptInfoCreator
                 return false;
             }
 
+            if (identifier.Type.TypeKind == TypeKind.Enum)
+            {
+                infoList.Add(new(identifier.IsStatic ? TemplateWriterWriteType.WriteStaticEnum : TemplateWriterWriteType.WriteEnum, value));
+                continue;
+            }
+
             // 識別子の型をReadOnlySpan<byte>に暗黙的変換できるどうか
             // ReadOnlySpan<byte>やbyte[]などが一致
             if (compilation.ClassifyConversion(identifier.Type, readOnlySpanByteSymbol).IsImplicit)

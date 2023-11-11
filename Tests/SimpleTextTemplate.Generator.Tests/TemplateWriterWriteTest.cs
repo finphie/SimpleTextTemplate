@@ -8,6 +8,14 @@ namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class TemplateWriterWriteTest
 {
+    public enum TestData
+    {
+        EnumStaticField,
+        EnumStaticProperty,
+        EnumField,
+        EnumProperty
+    }
+
     [Fact]
     public void Test()
     {
@@ -22,22 +30,26 @@ public sealed class TemplateWriterWriteTest
                 {{ BytesStaticField }}
                 {{ CharsStaticField }}
                 {{ StringStaticField }}
+                {{ EnumStaticField }}
                 {{ DateTimeOffsetStaticField }}
                 {{ BytesField }}
                 {{ CharsField }}
                 {{ StringField }}
+                {{ EnumField }}
                 {{ DateTimeOffsetField }}
                 {{ BytesSpanStaticProperty }}
                 {{ BytesStaticProperty }}
                 {{ CharsSpanStaticProperty }}
                 {{ CharsStaticProperty }}
                 {{ StringStaticProperty }}
+                {{ EnumStaticProperty }}
                 {{ DateTimeOffsetStaticProperty }}
                 {{ BytesSpanProperty }}
                 {{ BytesProperty }}
                 {{ CharsSpanProperty }}
                 {{ CharsProperty }}
                 {{ StringProperty }}
+                {{ EnumProperty }}
                 {{ DateTimeOffsetProperty }}
                 """,
                 context);
@@ -50,22 +62,26 @@ public sealed class TemplateWriterWriteTest
             BytesStaticField
             CharsStaticField
             StringStaticField
+            EnumStaticField
             01/01/2000 00:00:00 +09:00
             BytesField
             CharsField
             StringField
+            EnumField
             01/02/2000 00:00:00 +09:00
             BytesSpanStaticProperty
             BytesStaticProperty
             CharsSpanStaticProperty
             CharsStaticProperty
             StringStaticProperty
+            EnumStaticProperty
             01/03/2000 00:00:00 +09:00
             BytesSpanProperty
             BytesProperty
             CharsSpanProperty
             CharsProperty
             StringProperty
+            EnumProperty
             01/04/2000 00:00:00 +09:00
             """);
     }
@@ -81,11 +97,13 @@ public sealed class TemplateWriterWriteTest
         public static readonly byte[] BytesStaticField = Encoding.UTF8.GetBytes(nameof(BytesStaticField));
         public static readonly char[] CharsStaticField = nameof(CharsStaticField).ToCharArray();
         public static readonly string StringStaticField = nameof(StringStaticField);
+        public static TestData EnumStaticField = TestData.EnumStaticField;
         public static DateTimeOffset DateTimeOffsetStaticField = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
 
         public readonly byte[] BytesField = Encoding.UTF8.GetBytes(nameof(BytesField));
         public readonly char[] CharsField = nameof(CharsField).ToCharArray();
         public readonly string StringField = nameof(StringField);
+        public readonly TestData EnumField = TestData.EnumField;
         public DateTimeOffset DateTimeOffsetField = new(2000, 1, 2, 0, 0, 0, TimeSpan.FromHours(9));
 
         public static ReadOnlySpan<byte> BytesSpanStaticProperty => Encoding.UTF8.GetBytes(nameof(BytesSpanStaticProperty));
@@ -98,6 +116,8 @@ public sealed class TemplateWriterWriteTest
 
         public static string StringStaticProperty => nameof(StringStaticProperty);
 
+        public static TestData EnumStaticProperty => TestData.EnumStaticProperty;
+
         public static DateTimeOffset DateTimeOffsetStaticProperty => new(2000, 1, 3, 0, 0, 0, TimeSpan.FromHours(9));
 
         public ReadOnlySpan<byte> BytesSpanProperty => Encoding.UTF8.GetBytes(nameof(BytesSpanProperty));
@@ -109,6 +129,8 @@ public sealed class TemplateWriterWriteTest
         public char[] CharsProperty => nameof(CharsProperty).ToCharArray();
 
         public string StringProperty => nameof(StringProperty);
+
+        public TestData EnumProperty => TestData.EnumProperty;
 
         public DateTimeOffset DateTimeOffsetProperty => new(2000, 1, 4, 0, 0, 0, TimeSpan.FromHours(9));
     }
