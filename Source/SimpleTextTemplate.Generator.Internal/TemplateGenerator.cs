@@ -14,14 +14,14 @@ public sealed class TemplateGenerator : IIncrementalGenerator
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if DEBUG
-        if (!Debugger.IsAttached)
+        if (!System.Diagnostics.Debugger.IsAttached)
         {
-            // Debugger.Launch();
+            // System.Diagnostics.Debugger.Launch();
         }
 #endif
         var provider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                static (node, _) => node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "Write" } },
+                static (node, _) => node is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 or 2, Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "Write" } },
                 static (context, cancellationToken) =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
