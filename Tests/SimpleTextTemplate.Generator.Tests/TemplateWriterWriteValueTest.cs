@@ -84,7 +84,7 @@ public sealed class TemplateWriterWriteValueTest
     [Fact]
     public void ISpanFormattable_バッファーライターに書き込み()
     {
-        var value = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
+        var value = new SpanFormattableRecord(new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9)));
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
@@ -98,13 +98,13 @@ public sealed class TemplateWriterWriteValueTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be(string.Concat(Enumerable.Repeat(value.ToString(CultureInfo.InvariantCulture), 20)));
+            .Be(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
     }
 
     [Fact]
     public void IFormattable_バッファーライターに書き込み()
     {
-        var value = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
+        var value = new FormattableRecord(new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9)));
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
@@ -118,7 +118,7 @@ public sealed class TemplateWriterWriteValueTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be(string.Concat(Enumerable.Repeat(value.ToString(CultureInfo.InvariantCulture), 20)));
+            .Be(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
     }
 
     sealed record FormattableRecord(DateTimeOffset Value) : IFormattable
@@ -127,7 +127,7 @@ public sealed class TemplateWriterWriteValueTest
             => Value.ToString(format, formatProvider);
     }
 
-    sealed record SpanFormattable(DateTimeOffset Value) : ISpanFormattable
+    sealed record SpanFormattableRecord(DateTimeOffset Value) : ISpanFormattable
     {
         public string ToString(string? format, IFormatProvider? formatProvider)
             => Value.ToString(format, formatProvider);
