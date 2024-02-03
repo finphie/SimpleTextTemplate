@@ -101,6 +101,60 @@ public ref struct TemplateWriter<T>
     }
 
     /// <summary>
+    /// バッファーに列挙型の値に対応する名前を書き込みます。
+    /// </summary>
+    /// <typeparam name="TValue">列挙型</typeparam>
+    /// <param name="value">列挙型の値</param>
+    /// <param name="format">カスタム形式</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteEnum<TValue>(TValue value, ReadOnlySpan<char> format = default)
+        where TValue : struct, Enum
+    {
+        Span<char> destination = stackalloc char[256];
+
+        if (Enum.TryFormat(value, destination, out var charsWritten, format))
+        {
+            WriteString(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(destination), charsWritten));
+            return;
+        }
+
+        GrowAndWrite(ref this, value, destination.Length);
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        static void GrowAndWrite(scoped ref TemplateWriter<T> writer, TValue value, int length, ReadOnlySpan<char> format = default)
+        {
+            while (true)
+            {
+                var newLength = length * 2;
+
+                if ((uint)newLength > Array.MaxLength)
+                {
+                    newLength = length == Array.MaxLength
+                        ? Array.MaxLength + 1
+                        : Array.MaxLength;
+                }
+
+                var array = ArrayPool<char>.Shared.Rent(newLength);
+                var destination = MemoryMarshal.CreateSpan(ref MemoryMarshal.GetArrayDataReference(array), array.Length);
+
+                try
+                {
+                    if (Enum.TryFormat(value, array, out var charsWritten, format))
+                    {
+                        writer.WriteString(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(destination), charsWritten));
+                        return;
+                    }
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(array);
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// バッファーに変数の値を書き込みます。
     /// </summary>
     /// <typeparam name="TValue">書き込む変数の型</typeparam>
