@@ -112,12 +112,20 @@ public sealed class TemplateWriterWriteTest
 
         using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
         {
-            writer.Write("{{ Iso8601 }}", context);
+            writer.Write(
+                """
+                {{ Iso8601 }}
+                {{ EnumValue }}
+                """,
+                context);
         }
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("2000-01-01T00:00:00.0000000+09:00");
+            .Be("""
+            2000-01-01T00:00:00.0000000+09:00
+            0
+            """);
     }
 
     [SuppressMessage("Design", "CA1051:参照可能なインスタンス フィールドを宣言しません", Justification = "テストに必要")]
@@ -130,6 +138,9 @@ public sealed class TemplateWriterWriteTest
 
         [Identifier("o")]
         public static DateTimeOffset Iso8601 = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
+
+        [Identifier("d")]
+        public static TestData EnumValue = TestData.EnumStaticField;
 
         public static readonly byte[] BytesStaticField = Encoding.UTF8.GetBytes(nameof(BytesStaticField));
         public static readonly char[] CharsStaticField = nameof(CharsStaticField).ToCharArray();
