@@ -96,8 +96,8 @@ static class InterceptInfoCreator
         }
 
         info = [.. infoList];
-
         descriptor = null;
+
         return true;
     }
 
@@ -160,11 +160,9 @@ static class InterceptInfoCreator
             infoList.Add(new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format));
         }
 
-#pragma warning disable IDE0305 // コレクションの初期化を簡略化します
-        info = infoList.ToArray();
-#pragma warning restore IDE0305 // コレクションの初期化を簡略化します
-
+        info = [.. infoList];
         diagnostic = null;
+
         return true;
     }
 }
