@@ -39,7 +39,6 @@ public readonly struct Template
     /// それ以外の場合は<see langword="false"/>を返します。
     /// </returns>
     /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
-    [SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "https://github.com/dotnet/roslyn/issues/69988")]
     public static bool TryParse(byte[] source, out Template template, out nuint consumed)
     {
 #if NET8_0_OR_GREATER
@@ -60,7 +59,7 @@ public readonly struct Template
             list.Add((type, value.ToArray()));
         }
 
-        template = new(list.ToArray());
+        template = new([.. list]);
         consumed = reader.Consumed;
         return true;
     }
@@ -72,7 +71,6 @@ public readonly struct Template
     /// <returns><see cref="Template"/>構造体のインスタンス</returns>
     /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
     /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
-    [SuppressMessage("Style", "IDE0305:コレクションの初期化を簡略化します", Justification = "https://github.com/dotnet/roslyn/issues/69988")]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template Parse(byte[] source)
     {
@@ -87,7 +85,7 @@ public readonly struct Template
             list.Add((type, value.ToArray()));
         }
 
-        return new(list.ToArray());
+        return new([.. list]);
     }
 
 #if NET8_0_OR_GREATER
