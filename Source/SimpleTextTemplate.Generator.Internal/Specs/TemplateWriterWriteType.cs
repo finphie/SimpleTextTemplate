@@ -31,16 +31,6 @@ enum TemplateWriterWriteType
     WriteStaticString,
 
     /// <summary>
-    /// 列挙型の値に対応する名前
-    /// </summary>
-    WriteEnum,
-
-    /// <summary>
-    /// 列挙型（静的メンバー）の値に対応する名前
-    /// </summary>
-    WriteStaticEnum,
-
-    /// <summary>
     /// 任意型
     /// </summary>
     WriteValue,
