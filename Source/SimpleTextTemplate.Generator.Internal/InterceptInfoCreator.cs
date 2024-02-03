@@ -69,7 +69,7 @@ static class InterceptInfoCreator
         var interceptsLocationInfo = operation.GetInterceptsLocationInfo(cancellationToken);
         var writerType = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, cancellationToken).Symbol!.ContainingType;
 
-        var info = new InterceptInfo(interceptsLocationInfo, writeInfo.ToArray(), writerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), contextTypeName);
+        var info = new InterceptInfo(interceptsLocationInfo, writeInfo, writerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), contextTypeName);
         return new(info);
     }
 
@@ -95,11 +95,9 @@ static class InterceptInfoCreator
             return false;
         }
 
-#pragma warning disable IDE0305 // コレクションの初期化を簡略化します
-        info = infoList.ToArray();
-#pragma warning restore IDE0305 // コレクションの初期化を簡略化します
-
+        info = [.. infoList];
         descriptor = null;
+
         return true;
     }
 
@@ -162,11 +160,9 @@ static class InterceptInfoCreator
             infoList.Add(new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format));
         }
 
-#pragma warning disable IDE0305 // コレクションの初期化を簡略化します
-        info = infoList.ToArray();
-#pragma warning restore IDE0305 // コレクションの初期化を簡略化します
-
+        info = [.. infoList];
         diagnostic = null;
+
         return true;
     }
 }
