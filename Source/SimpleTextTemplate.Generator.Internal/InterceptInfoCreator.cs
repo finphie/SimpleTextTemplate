@@ -106,7 +106,7 @@ static class InterceptInfoCreator
         var readOnlySpanByteSymbol = compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
         var readOnlySpanCharSymbol = compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
 
-        var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(static x => x.Name, static x => (Type: x.GetMemberType(), x.IsStatic, Attributes: x.GetAttributes()));
+        var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(static x => x.Name);
         var infoList = new List<TemplateWriterWriteInfo>();
 
         foreach (var (block, utf8Value) in template.Blocks)
@@ -130,12 +130,37 @@ static class InterceptInfoCreator
                 return false;
             }
 
-            var format = identifier.Attributes
+            // 識別子が文字列定数
+            if ((identifier is IFieldSymbol symbol) && symbol.HasConstantValue && (symbol.ConstantValue is string constantValue))
+            {
+                infoList.Add(new(WriteConstantLiteral, constantValue));
+                continue;
+            }
+
+            var type = identifier.GetMemberType();
+
+            // 識別子の型をReadOnlySpan<byte>に暗黙的変換できるどうか
+            // ReadOnlySpan<byte>やbyte[]などが一致
+            if (compilation.ClassifyConversion(type, readOnlySpanByteSymbol).IsImplicit)
+            {
+                infoList.Add(new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value));
+                continue;
+            }
+
+            // 識別子の型をReadOnlySpan<char>に暗黙的変換できるどうか
+            // ReadOnlySpan<char>やstring、char[]などが一致
+            if (compilation.ClassifyConversion(type, readOnlySpanCharSymbol).IsImplicit)
+            {
+                infoList.Add(new(identifier.IsStatic ? WriteStaticString : WriteString, value));
+                continue;
+            }
+
+            var format = identifier.GetAttributes()
                 .FirstOrDefault(static x => x.AttributeClass is { Name: "IdentifierAttribute", ContainingNamespace: { Name: nameof(SimpleTextTemplate), ContainingNamespace.IsGlobalNamespace: true } })
                 ?.ConstructorArguments.FirstOrDefault()
                 .Value as string;
 
-            if (identifier.Type.TypeKind == TypeKind.Enum)
+            if (type.TypeKind == TypeKind.Enum)
             {
                 if (string.IsNullOrEmpty(format))
                 {
@@ -144,22 +169,6 @@ static class InterceptInfoCreator
                 }
 
                 infoList.Add(new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format));
-                continue;
-            }
-
-            // 識別子の型をReadOnlySpan<byte>に暗黙的変換できるどうか
-            // ReadOnlySpan<byte>やbyte[]などが一致
-            if (compilation.ClassifyConversion(identifier.Type, readOnlySpanByteSymbol).IsImplicit)
-            {
-                infoList.Add(new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value));
-                continue;
-            }
-
-            // 識別子の型をReadOnlySpan<char>に暗黙的変換できるどうか
-            // ReadOnlySpan<char>やstring、char[]などが一致
-            if (compilation.ClassifyConversion(identifier.Type, readOnlySpanCharSymbol).IsImplicit)
-            {
-                infoList.Add(new(identifier.IsStatic ? WriteStaticString : WriteString, value));
                 continue;
             }
 
