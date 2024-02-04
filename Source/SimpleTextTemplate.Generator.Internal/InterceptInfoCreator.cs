@@ -137,7 +137,7 @@ static class InterceptInfoCreator
 
             if (identifier.Type.TypeKind == TypeKind.Enum)
             {
-                if (format is null)
+                if (string.IsNullOrEmpty(format))
                 {
                     infoList.Add(new(WriteConstantLiteral, value));
                     continue;
