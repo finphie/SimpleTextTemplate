@@ -97,7 +97,6 @@ static class InterceptInfoCreator
 
         info = [.. infoList];
         descriptor = null;
-
         return true;
     }
 
@@ -108,6 +107,7 @@ static class InterceptInfoCreator
 
         var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(static x => x.Name);
         var infoList = new List<TemplateWriterWriteInfo>();
+        var isConstant = false;
 
         foreach (var (block, utf8Value) in template.Blocks)
         {
@@ -116,7 +116,7 @@ static class InterceptInfoCreator
 
             if (block == BlockType.Raw)
             {
-                infoList.Add(new(WriteConstantLiteral, value));
+                AddConstant(infoList, ref isConstant, value);
                 continue;
             }
 
@@ -133,7 +133,7 @@ static class InterceptInfoCreator
             // 識別子が文字列定数
             if ((identifier is IFieldSymbol symbol) && symbol.HasConstantValue && (symbol.ConstantValue is string constantValue))
             {
-                infoList.Add(new(WriteConstantLiteral, constantValue));
+                AddConstant(infoList, ref isConstant, constantValue);
                 continue;
             }
 
@@ -143,7 +143,7 @@ static class InterceptInfoCreator
             // ReadOnlySpan<byte>やbyte[]などが一致
             if (compilation.ClassifyConversion(type, readOnlySpanByteSymbol).IsImplicit)
             {
-                infoList.Add(new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value));
+                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value));
                 continue;
             }
 
@@ -151,7 +151,7 @@ static class InterceptInfoCreator
             // ReadOnlySpan<char>やstring、char[]などが一致
             if (compilation.ClassifyConversion(type, readOnlySpanCharSymbol).IsImplicit)
             {
-                infoList.Add(new(identifier.IsStatic ? WriteStaticString : WriteString, value));
+                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticString : WriteString, value));
                 continue;
             }
 
@@ -164,20 +164,37 @@ static class InterceptInfoCreator
             {
                 if (string.IsNullOrEmpty(format))
                 {
-                    infoList.Add(new(WriteConstantLiteral, value));
+                    AddConstant(infoList, ref isConstant, value);
                     continue;
                 }
 
-                infoList.Add(new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format));
+                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format));
                 continue;
             }
 
-            infoList.Add(new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format));
+            AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format));
         }
 
         info = [.. infoList];
         diagnostic = null;
-
         return true;
+
+        static void AddConstant(List<TemplateWriterWriteInfo> infoList, ref bool isConstant, string value)
+        {
+            if (isConstant)
+            {
+                infoList[^1] = new(WriteConstantLiteral, infoList[^1].Value + value);
+                return;
+            }
+
+            infoList.Add(new(WriteConstantLiteral, value));
+            isConstant = true;
+        }
+
+        static void AddValue(List<TemplateWriterWriteInfo> infoList, ref bool isConstant, TemplateWriterWriteInfo info)
+        {
+            infoList.Add(info);
+            isConstant = false;
+        }
     }
 }
