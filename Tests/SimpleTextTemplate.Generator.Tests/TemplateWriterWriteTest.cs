@@ -138,10 +138,10 @@ public sealed class TemplateWriterWriteTest
         public const string StringConstantField = "_" + nameof(StringConstantField);
 
         [Identifier("o")]
-        public static DateTimeOffset Iso8601 = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
+        public static readonly DateTimeOffset Iso8601 = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
 
         [Identifier("d")]
-        public static TestData EnumValue = TestData._EnumStaticField;
+        public static readonly TestData EnumValue = TestData._EnumStaticField;
 
         public static readonly byte[] BytesStaticField = "_BytesStaticField"u8.ToArray();
         public static readonly char[] CharsStaticField = [.. "_CharsStaticField"];
@@ -153,7 +153,7 @@ public sealed class TemplateWriterWriteTest
         public readonly char[] CharsField = [.. "_CharsField"];
         public readonly string StringField = "_StringField";
         public readonly TestData EnumField = TestData._EnumField;
-        public DateTimeOffset DateTimeOffsetField = new(2000, 1, 2, 0, 0, 0, TimeSpan.FromHours(9));
+        public readonly DateTimeOffset DateTimeOffsetField = new(2000, 1, 2, 0, 0, 0, TimeSpan.FromHours(9));
 
         public static ReadOnlySpan<byte> BytesSpanStaticProperty => "_BytesSpanStaticProperty"u8;
         public static byte[] BytesStaticProperty => "_BytesStaticProperty"u8.ToArray();
