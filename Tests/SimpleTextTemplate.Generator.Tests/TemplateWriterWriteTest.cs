@@ -11,10 +11,10 @@ public sealed class TemplateWriterWriteTest
 {
     public enum TestData
     {
-        EnumStaticField,
-        EnumStaticProperty,
-        EnumField,
-        EnumProperty
+        _EnumStaticField,
+        _EnumStaticProperty,
+        _EnumField,
+        _EnumProperty
     }
 
     [Fact]
@@ -59,30 +59,30 @@ public sealed class TemplateWriterWriteTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            StringConstantField
-            BytesStaticField
-            CharsStaticField
-            StringStaticField
-            EnumStaticField
+            _StringConstantField
+            _BytesStaticField
+            _CharsStaticField
+            _StringStaticField
+            _EnumStaticField
             01/01/2000 00:00:00 +09:00
-            BytesField
-            CharsField
-            StringField
-            EnumField
+            _BytesField
+            _CharsField
+            _StringField
+            _EnumField
             01/02/2000 00:00:00 +09:00
-            BytesSpanStaticProperty
-            BytesStaticProperty
-            CharsSpanStaticProperty
-            CharsStaticProperty
-            StringStaticProperty
-            EnumStaticProperty
+            _BytesSpanStaticProperty
+            _BytesStaticProperty
+            _CharsSpanStaticProperty
+            _CharsStaticProperty
+            _StringStaticProperty
+            _EnumStaticProperty
             01/03/2000 00:00:00 +09:00
-            BytesSpanProperty
-            BytesProperty
-            CharsSpanProperty
-            CharsProperty
-            StringProperty
-            EnumProperty
+            _BytesSpanProperty
+            _BytesProperty
+            _CharsSpanProperty
+            _CharsProperty
+            _StringProperty
+            _EnumProperty
             01/04/2000 00:00:00 +09:00
             """);
     }
@@ -101,7 +101,7 @@ public sealed class TemplateWriterWriteTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("StringConstantFieldBytesStaticField");
+            .Be("_StringConstantField_BytesStaticField");
     }
 
     [Fact]
@@ -132,54 +132,43 @@ public sealed class TemplateWriterWriteTest
     [SuppressMessage("Performance", "CA1802:適切な場所にリテラルを使用します", Justification = "テストに必要")]
     [SuppressMessage("Performance", "CA1819:プロパティは配列を返すことはできません", Justification = "テストに必要")]
     [SuppressMessage("Performance", "CA1822:メンバーを static に設定します", Justification = "テストに必要")]
+    [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1516:Elements should be separated by blank line", Justification = "テスト")]
     internal sealed record TestContext()
     {
-        public const string StringConstantField = nameof(StringConstantField);
+        public const string StringConstantField = "_StringConstantField";
 
         [Identifier("o")]
-        public static DateTimeOffset Iso8601 = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
+        public static readonly DateTimeOffset Iso8601 = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
 
         [Identifier("d")]
-        public static TestData EnumValue = TestData.EnumStaticField;
+        public static readonly TestData EnumValue = TestData._EnumStaticField;
 
-        public static readonly byte[] BytesStaticField = Encoding.UTF8.GetBytes(nameof(BytesStaticField));
-        public static readonly char[] CharsStaticField = nameof(CharsStaticField).ToCharArray();
-        public static readonly string StringStaticField = nameof(StringStaticField);
-        public static TestData EnumStaticField = TestData.EnumStaticField;
-        public static DateTimeOffset DateTimeOffsetStaticField = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
+        public static readonly byte[] BytesStaticField = "_BytesStaticField"u8.ToArray();
+        public static readonly char[] CharsStaticField = [.. "_CharsStaticField"];
+        public static readonly string StringStaticField = "_StringStaticField";
+        public static readonly TestData EnumStaticField = TestData._EnumStaticField;
+        public static readonly DateTimeOffset DateTimeOffsetStaticField = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
 
-        public readonly byte[] BytesField = Encoding.UTF8.GetBytes(nameof(BytesField));
-        public readonly char[] CharsField = nameof(CharsField).ToCharArray();
-        public readonly string StringField = nameof(StringField);
-        public readonly TestData EnumField = TestData.EnumField;
-        public DateTimeOffset DateTimeOffsetField = new(2000, 1, 2, 0, 0, 0, TimeSpan.FromHours(9));
+        public readonly byte[] BytesField = "_BytesField"u8.ToArray();
+        public readonly char[] CharsField = [.. "_CharsField"];
+        public readonly string StringField = "_StringField";
+        public readonly TestData EnumField = TestData._EnumField;
+        public readonly DateTimeOffset DateTimeOffsetField = new(2000, 1, 2, 0, 0, 0, TimeSpan.FromHours(9));
 
-        public static ReadOnlySpan<byte> BytesSpanStaticProperty => Encoding.UTF8.GetBytes(nameof(BytesSpanStaticProperty));
-
-        public static byte[] BytesStaticProperty => Encoding.UTF8.GetBytes(nameof(BytesStaticProperty));
-
-        public static ReadOnlySpan<char> CharsSpanStaticProperty => nameof(CharsSpanStaticProperty).ToCharArray();
-
-        public static char[] CharsStaticProperty => nameof(CharsStaticProperty).ToCharArray();
-
-        public static string StringStaticProperty => nameof(StringStaticProperty);
-
-        public static TestData EnumStaticProperty => TestData.EnumStaticProperty;
-
+        public static ReadOnlySpan<byte> BytesSpanStaticProperty => "_BytesSpanStaticProperty"u8;
+        public static byte[] BytesStaticProperty => "_BytesStaticProperty"u8.ToArray();
+        public static ReadOnlySpan<char> CharsSpanStaticProperty => "_CharsSpanStaticProperty";
+        public static char[] CharsStaticProperty => [.. "_CharsStaticProperty"];
+        public static string StringStaticProperty => "_StringStaticProperty";
+        public static TestData EnumStaticProperty => TestData._EnumStaticProperty;
         public static DateTimeOffset DateTimeOffsetStaticProperty => new(2000, 1, 3, 0, 0, 0, TimeSpan.FromHours(9));
 
-        public ReadOnlySpan<byte> BytesSpanProperty => Encoding.UTF8.GetBytes(nameof(BytesSpanProperty));
-
-        public byte[] BytesProperty => Encoding.UTF8.GetBytes(nameof(BytesProperty));
-
-        public ReadOnlySpan<char> CharsSpanProperty => nameof(CharsSpanProperty).ToCharArray();
-
-        public char[] CharsProperty => nameof(CharsProperty).ToCharArray();
-
-        public string StringProperty => nameof(StringProperty);
-
-        public TestData EnumProperty => TestData.EnumProperty;
-
+        public ReadOnlySpan<byte> BytesSpanProperty => "_BytesSpanProperty"u8;
+        public byte[] BytesProperty => "_BytesProperty"u8.ToArray();
+        public ReadOnlySpan<char> CharsSpanProperty => "_CharsSpanProperty";
+        public char[] CharsProperty => [.. "_CharsProperty"];
+        public string StringProperty => "_StringProperty";
+        public TestData EnumProperty => TestData._EnumProperty;
         public DateTimeOffset DateTimeOffsetProperty => new(2000, 1, 4, 0, 0, 0, TimeSpan.FromHours(9));
     }
 }
