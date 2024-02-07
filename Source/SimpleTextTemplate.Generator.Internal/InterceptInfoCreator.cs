@@ -162,12 +162,6 @@ static class InterceptInfoCreator
 
             if (type.TypeKind == TypeKind.Enum)
             {
-                if (string.IsNullOrEmpty(format))
-                {
-                    AddConstant(infoList, ref isConstant, value);
-                    continue;
-                }
-
                 AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format));
                 continue;
             }
