@@ -135,7 +135,7 @@ public sealed class TemplateWriterWriteTest
     [SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1516:Elements should be separated by blank line", Justification = "テスト")]
     internal sealed record TestContext()
     {
-        public const string StringConstantField = "_" + nameof(StringConstantField);
+        public const string StringConstantField = "_StringConstantField";
 
         [Identifier("o")]
         public static readonly DateTimeOffset Iso8601 = new(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
