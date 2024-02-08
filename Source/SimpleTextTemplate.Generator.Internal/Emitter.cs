@@ -82,7 +82,8 @@ static class Emitter
     {
         return type switch
         {
-            WriteConstantLiteral or WriteLiteral or WriteStaticLiteral => "WriteLiteral",
+            WriteConstantLiteral => "WriteConstantLiteral",
+            WriteLiteral or WriteStaticLiteral => "WriteLiteral",
             WriteString or WriteStaticString => "WriteString",
             WriteEnum or WriteStaticEnum => "WriteEnum",
             WriteValue or WriteStaticValue => "WriteValue",

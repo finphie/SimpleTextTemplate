@@ -71,6 +71,68 @@ public ref struct TemplateWriter<T>
     }
 
     /// <summary>
+    /// バッファーにUTF-8文字列定数を書き込みます。
+    /// </summary>
+    /// <param name="value">UTF-8文字列定数</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteConstantLiteral(scoped ReadOnlySpan<byte> value)
+    {
+        Grow(value.Length);
+
+        switch (value.Length)
+        {
+            case 1:
+                _destination = value[0];
+                break;
+            case 2:
+                Unsafe.WriteUnaligned(ref _destination, MemoryMarshal.Read<ushort>(value));
+                break;
+            case 3:
+                Unsafe.AddByteOffset(ref _destination, 2) = value[2];
+                Unsafe.WriteUnaligned(ref _destination, MemoryMarshal.Read<ushort>(value));
+                break;
+            case 4:
+                Unsafe.WriteUnaligned(ref _destination, MemoryMarshal.Read<uint>(value));
+                break;
+            case 5:
+                Unsafe.AddByteOffset(ref _destination, 4) = value[4];
+                Unsafe.WriteUnaligned(ref _destination, MemoryMarshal.Read<uint>(value));
+                break;
+            case 6:
+                Write6(ref _destination, value);
+                break;
+            case 7:
+                Write7(ref _destination, value);
+                break;
+            case 8:
+                Unsafe.WriteUnaligned(ref _destination, MemoryMarshal.Read<ulong>(value));
+                break;
+            default:
+                Unsafe.CopyBlockUnaligned(ref _destination, ref MemoryMarshal.GetReference(value), (uint)value.Length);
+                break;
+        }
+
+        Advance(value.Length);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static void Write6(ref byte destination, ReadOnlySpan<byte> value)
+        {
+            ref var reference = ref MemoryMarshal.GetReference(value);
+            Unsafe.WriteUnaligned(ref Unsafe.AddByteOffset(ref destination, 4), Unsafe.ReadUnaligned<ushort>(ref Unsafe.AddByteOffset(ref reference, 4)));
+            Unsafe.WriteUnaligned(ref destination, Unsafe.ReadUnaligned<uint>(ref reference));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        static void Write7(ref byte destination, ReadOnlySpan<byte> value)
+        {
+            ref var reference = ref MemoryMarshal.GetReference(value);
+            Unsafe.WriteUnaligned(ref Unsafe.AddByteOffset(ref destination, 3), Unsafe.ReadUnaligned<uint>(ref Unsafe.AddByteOffset(ref reference, 3)));
+            Unsafe.WriteUnaligned(ref destination, Unsafe.ReadUnaligned<uint>(ref reference));
+        }
+    }
+
+    /// <summary>
     /// バッファーにUTF-8文字列を書き込みます。
     /// </summary>
     /// <param name="value">UTF-8文字列</param>
