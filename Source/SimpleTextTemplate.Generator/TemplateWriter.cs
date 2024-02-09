@@ -353,7 +353,7 @@ public ref struct TemplateWriter<T>
         GrowCore(length);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl(MethodImplOptions.NoInlining)]
     void GrowCore(int length)
     {
         var writtenCount = Unsafe.ByteOffset(ref Unsafe.AsRef(in _destinationStart), ref _destination);
