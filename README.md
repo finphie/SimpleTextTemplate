@@ -53,7 +53,9 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 bufferWriter.Dispose();
 
-readonly record struct SampleContext(string Identifier, [property: Identifier("o")] DateTimeOffset DateTime);
+readonly record struct SampleContext(
+    string Identifier,
+    [property: Identifier("o")] DateTimeOffset DateTime);
 ```
 
 [サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
@@ -67,9 +69,9 @@ file static class Intercept
     public static void Write0(this ref global::SimpleTextTemplate.TemplateWriter<global::CommunityToolkit.HighPerformance.Buffers.ArrayPoolBufferWriter<byte>> writer, string _, in global::SampleContext context)
     {
         writer.WriteValue(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTime, "o");
-        writer.WriteLiteral("_"u8);
+        writer.WriteConstantLiteral("_"u8);
         writer.WriteString(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@Identifier);
-        writer.WriteLiteral("!!!"u8);
+        writer.WriteConstantLiteral("!!!"u8);
     }
 }
 ```
