@@ -116,10 +116,9 @@ public partial class RenderBenchmark
     [Benchmark(Description = "(Regex.Replace)")]
     public string Regex() => _regex.Replace(_utf16Source, _message);
 
+    [SuppressMessage("Performance", "CA1863:'CompositeFormat' を使用してください")]
     [Benchmark(Description = "(string.Format)")]
-#pragma warning disable CA1863 // 'CompositeFormat' を使用してください
     public string StringFormat() => string.Format(CultureInfo.InvariantCulture, Format, _message);
-#pragma warning restore CA1863 // 'CompositeFormat' を使用してください
 
     [Benchmark(Description = "(CompositeFormat)")]
     public string StringFormat_CF() => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _message);
