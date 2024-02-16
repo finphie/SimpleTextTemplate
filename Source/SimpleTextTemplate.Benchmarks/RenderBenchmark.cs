@@ -23,18 +23,18 @@ public partial class RenderBenchmark
 
     readonly ArrayBufferWriter<byte> _bufferWriter = new();
 
-    string _message = null!;
-    string _utf16Source = null!;
+    string _message;
+    string _utf16Source;
 
-    IContext _context = null!;
+    IContext _context;
     SampleContext _contextObject;
-    Dictionary<string, string> _model = null!;
+    Dictionary<string, string> _model;
 
     Template _template;
-    ScribanTemplate _scribanTemplate = null!;
-    ScribanTemplate _scribanLiquidTemplate = null!;
-    Regex _regex = null!;
-    CompositeFormat _compositeFormat = null!;
+    ScribanTemplate _scribanTemplate;
+    ScribanTemplate _scribanLiquidTemplate;
+    Regex _regex;
+    CompositeFormat _compositeFormat;
 
     [GlobalSetup]
     public void Setup()

@@ -9,10 +9,10 @@ public class ParseBenchmark
     const string Identifier = nameof(Identifier);
     const string Source = "abcdef{{ " + Identifier + " }}01234567890";
 
-    byte[] _utf8Source = null!;
-    string _utf16Source = null!;
+    byte[] _utf8Source;
+    string _utf16Source;
 
-    string _format = null!;
+    string _format;
 
     [GlobalSetup]
     public void Setup()
