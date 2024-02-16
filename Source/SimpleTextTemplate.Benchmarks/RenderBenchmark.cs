@@ -23,18 +23,18 @@ public partial class RenderBenchmark
 
     readonly ArrayBufferWriter<byte> _bufferWriter = new();
 
-    string _message = null!;
-    string _utf16Source = null!;
+    string _message;
+    string _utf16Source;
 
-    IContext _context = null!;
+    IContext _context;
     SampleContext _contextObject;
-    Dictionary<string, string> _model = null!;
+    Dictionary<string, string> _model;
 
     Template _template;
-    ScribanTemplate _scribanTemplate = null!;
-    ScribanTemplate _scribanLiquidTemplate = null!;
-    Regex _regex = null!;
-    CompositeFormat _compositeFormat = null!;
+    ScribanTemplate _scribanTemplate;
+    ScribanTemplate _scribanLiquidTemplate;
+    Regex _regex;
+    CompositeFormat _compositeFormat;
 
     [GlobalSetup]
     public void Setup()
@@ -116,10 +116,9 @@ public partial class RenderBenchmark
     [Benchmark(Description = "(Regex.Replace)")]
     public string Regex() => _regex.Replace(_utf16Source, _message);
 
+    [SuppressMessage("Performance", "CA1863:'CompositeFormat' を使用してください")]
     [Benchmark(Description = "(string.Format)")]
-#pragma warning disable CA1863 // 'CompositeFormat' を使用してください
     public string StringFormat() => string.Format(CultureInfo.InvariantCulture, Format, _message);
-#pragma warning restore CA1863 // 'CompositeFormat' を使用してください
 
     [Benchmark(Description = "(CompositeFormat)")]
     public string StringFormat_CF() => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _message);
