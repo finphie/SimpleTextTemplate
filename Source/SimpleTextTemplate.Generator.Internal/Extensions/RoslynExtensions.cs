@@ -17,7 +17,7 @@ static class RoslynExtensions
     /// <param name="invocation">メソッド呼び出し</param>
     /// <param name="cancellationToken">キャンセル要求を行うためのトークン</param>
     /// <returns>指定されたメソッドからInterceptsLocation属性の情報を生成して返します。</returns>
-    /// <exception cref="ArgumentException"><see cref="InvocationExpressionSyntax"/>ではない場合、この例外をスローします。</exception>
+    /// <exception cref="ArgumentException">引数が<see cref="InvocationExpressionSyntax"/>ではありません。</exception>
     public static InterceptsLocationInfo GetInterceptsLocationInfo(this IInvocationOperation invocation, CancellationToken cancellationToken)
     {
         if (invocation.Syntax is not InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccessorExpressionSyntax })
@@ -61,7 +61,7 @@ static class RoslynExtensions
     /// </summary>
     /// <param name="symbol">シンボル情報</param>
     /// <returns>指定されたシンボル（フィールドやプロパティ、メソッド戻り値、イベント、パラメーター）の型を返します。</returns>
-    /// <exception cref="InvalidOperationException">指定されたシンボルがフィールドやプロパティ、メソッド戻り値、イベント、パラメーターのいずれかではない場合、この例外をスローします。</exception>
+    /// <exception cref="InvalidOperationException">指定されたシンボルがフィールドやプロパティ、メソッド戻り値、イベント、パラメーターのいずれにも該当しません。</exception>
     public static ITypeSymbol GetMemberType(this ISymbol symbol)
     {
         return symbol switch
@@ -81,7 +81,7 @@ static class RoslynExtensions
     /// <param name="compilation">コンパイルオブジェクト</param>
     /// <param name="specialType"><see cref="ReadOnlySpan{T}"/>の型パラメーターの型</param>
     /// <returns>指定された型パラメーターとなる<see cref="ReadOnlySpan{T}"/>の型情報を返します。</returns>
-    /// <exception cref="InvalidOperationException">型情報を取得できなかった場合、この例外をスローします。</exception>
+    /// <exception cref="InvalidOperationException">型情報を取得できませんでした。</exception>
     public static INamedTypeSymbol GetReadOnlySpanTypeSymbol(this Compilation compilation, SpecialType specialType)
     {
         var readOnlySpanSymbol = compilation.GetTypeByMetadataName("System.ReadOnlySpan`1");

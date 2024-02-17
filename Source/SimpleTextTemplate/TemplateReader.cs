@@ -111,7 +111,7 @@ public ref struct TemplateReader
     /// </summary>
     /// <param name="value">文字列または識別子</param>
     /// <returns>ブロックのタイプ</returns>
-    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
+    /// <exception cref="TemplateException">テンプレートの解析に失敗しました。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BlockType Read(out ReadOnlySpan<byte> value)
     {
