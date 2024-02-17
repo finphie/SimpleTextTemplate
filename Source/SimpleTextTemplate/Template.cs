@@ -38,7 +38,7 @@ public readonly struct Template
     /// 解析に成功した場合は<see langword="true"/>を返します。
     /// それ以外の場合は<see langword="false"/>を返します。
     /// </returns>
-    /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
+    /// <exception cref="ArgumentNullException">引数がnullです。</exception>
     public static bool TryParse(byte[] source, out Template template, out nuint consumed)
     {
 #if NET8_0_OR_GREATER
@@ -69,8 +69,8 @@ public readonly struct Template
     /// </summary>
     /// <param name="source">テンプレート文字列</param>
     /// <returns><see cref="Template"/>構造体のインスタンス</returns>
-    /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
-    /// <exception cref="TemplateException">テンプレートの解析に失敗した場合に、この例外をスローします。</exception>
+    /// <exception cref="ArgumentNullException">引数がnullです。</exception>
+    /// <exception cref="TemplateException">テンプレートの解析に失敗しました。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template Parse(byte[] source)
     {
@@ -96,7 +96,7 @@ public readonly struct Template
     /// <typeparam name="TContext">コンテキストの型</typeparam>
     /// <param name="bufferWriter">バッファーライター</param>
     /// <param name="context">コンテキスト</param>
-    /// <exception cref="ArgumentNullException">引数がnullの場合、この例外をスローします。</exception>
+    /// <exception cref="ArgumentNullException">引数がnullです。</exception>
     public void Render<TWriter, TContext>(TWriter bufferWriter, TContext context)
         where TWriter : notnull, IBufferWriter<byte>
         where TContext : notnull, IContext
