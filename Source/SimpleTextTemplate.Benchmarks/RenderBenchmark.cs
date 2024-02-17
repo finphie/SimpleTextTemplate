@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -116,7 +115,6 @@ public partial class RenderBenchmark
     [Benchmark(Description = "(Regex.Replace)")]
     public string Regex() => _regex.Replace(_utf16Source, _message);
 
-    [SuppressMessage("Performance", "CA1863:'CompositeFormat' を使用してください")]
     [Benchmark(Description = "(string.Format)")]
     public string StringFormat() => string.Format(CultureInfo.InvariantCulture, Format, _message);
 
@@ -126,6 +124,5 @@ public partial class RenderBenchmark
     [GeneratedRegex(Pattern, RegexOptions.CultureInvariant)]
     private static partial Regex RegexInternal();
 
-    [SuppressMessage("Performance", "CA1819:プロパティは配列を返すことはできません", Justification = "ベンチマーク")]
     internal readonly record struct SampleContext(byte[] Identifier);
 }
