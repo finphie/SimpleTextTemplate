@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text;
+﻿using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
@@ -20,5 +19,4 @@ bufferWriter.Dispose();
 /// </summary>
 /// <param name="Identifier">文字列</param>
 /// <param name="DateTime">時刻</param>
-[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1649:File name should match first type name", Justification = "サンプルプロジェクト")]
 readonly record struct SampleContext(string Identifier, [property: Identifier("o")] DateTimeOffset DateTime);
