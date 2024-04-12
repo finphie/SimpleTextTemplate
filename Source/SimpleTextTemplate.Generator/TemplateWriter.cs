@@ -17,7 +17,8 @@ public ref struct TemplateWriter<T>
     readonly ref T _bufferWriter;
     readonly IFormatProvider? _provider;
 
-    ref readonly byte _destinationStart;
+    int _bufferLength;
+
     ref byte _destination;
     int _destinationLength;
 
@@ -33,12 +34,25 @@ public ref struct TemplateWriter<T>
         _provider = provider;
 
         var span = _bufferWriter.GetSpan();
-        _destinationStart = ref MemoryMarshal.GetReference(span);
         _destination = ref MemoryMarshal.GetReference(span);
-        _destinationLength = span.Length;
+
+        var length = span.Length;
+        _bufferLength = length;
+        _destinationLength = length;
     }
 
     readonly Span<byte> Destination => MemoryMarshal.CreateSpan(ref _destination, _destinationLength);
+
+    readonly int WrittenCount
+    {
+        get
+        {
+            var writtenCount = _bufferLength - _destinationLength;
+            Debug.Assert(writtenCount >= 0, "書き込みバイト数は0以上の数値である必要があります。");
+
+            return writtenCount;
+        }
+    }
 
     /// <summary>
     /// バッファーに文字列を書き込みます。
@@ -62,12 +76,10 @@ public ref struct TemplateWriter<T>
     /// 書き込み処理を反映します。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Dispose()
+    public readonly void Dispose()
     {
-        var writtenCount = Unsafe.ByteOffset(ref Unsafe.AsRef(in _destinationStart), ref _destination);
-        Debug.Assert(writtenCount >= 0, "書き込みバイト数は0以上の数値である必要があります。");
-
-        _bufferWriter.Advance((int)writtenCount);
+        var writtenCount = WrittenCount;
+        _bufferWriter.Advance(writtenCount);
     }
 
     /// <summary>
@@ -334,7 +346,6 @@ public ref struct TemplateWriter<T>
         _destination = ref Unsafe.AddByteOffset(ref _destination, (nint)(uint)count);
         _destinationLength -= count;
 
-        Debug.Assert(!Unsafe.IsAddressGreaterThan(ref Unsafe.AsRef(in _destinationStart), ref _destination), "出力先範囲の境界を超えました。");
         Debug.Assert(_destinationLength >= 0, "出力先サイズは0以上の数値である必要があります。");
     }
 
@@ -356,17 +367,18 @@ public ref struct TemplateWriter<T>
     [MethodImpl(MethodImplOptions.NoInlining)]
     void GrowCore(int length)
     {
-        var writtenCount = Unsafe.ByteOffset(ref Unsafe.AsRef(in _destinationStart), ref _destination);
-        Debug.Assert(writtenCount >= 0, "書き込みバイト数は0以上の数値である必要があります。");
+        var writtenCount = WrittenCount;
 
         if (writtenCount > 0)
         {
-            _bufferWriter.Advance((int)writtenCount);
+            _bufferWriter.Advance(writtenCount);
         }
 
         var span = _bufferWriter.GetSpan(length);
-        _destinationStart = ref MemoryMarshal.GetReference(span);
         _destination = ref MemoryMarshal.GetReference(span);
-        _destinationLength = span.Length;
+
+        var destinationLength = span.Length;
+        _bufferLength = destinationLength;
+        _destinationLength = destinationLength;
     }
 }
