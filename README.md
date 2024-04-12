@@ -6,6 +6,9 @@
 
 SimpleTextTemplateは、変数の埋め込みのみに対応したテキストテンプレートエンジンです。
 
+> [!CAUTION]
+> SimpleTextTemplate.Generatorを使用する場合、.NET SDK 8.0.300-preview.24203.14や9.0.100-preview.3.24204.13ではインターセプターの不具合により正常に動作しません。8.0.2xxをご使用ください。
+
 ## 説明
 
 - 文字列をUTF-8バイト列として`IBufferWriter<byte>`に出力します。
