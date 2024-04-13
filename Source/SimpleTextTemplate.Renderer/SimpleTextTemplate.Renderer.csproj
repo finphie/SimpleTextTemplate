@@ -13,11 +13,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleTextTemplate.Abstractions\SimpleTextTemplate.Abstractions.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate.Renderer.Core\SimpleTextTemplate.Renderer.Core.csproj" />
     <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="../$(SolutionName).Core/**/*.cs" LinkBase="Core" />
   </ItemGroup>
 
 </Project>

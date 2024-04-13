@@ -54,7 +54,6 @@ public ref struct TemplateWriter<T>
         }
     }
 
-#if Generator
     /// <summary>
     /// バッファーに文字列を書き込みます。
     /// </summary>
@@ -72,7 +71,6 @@ public ref struct TemplateWriter<T>
     public void Write<TContext>(string text, in TContext context)
         where TContext : notnull
         => throw new UnreachableException();
-#endif
 
     /// <summary>
     /// 書き込み処理を反映します。
