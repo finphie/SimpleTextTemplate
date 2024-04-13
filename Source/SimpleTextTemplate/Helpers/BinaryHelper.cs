@@ -12,6 +12,23 @@ namespace SimpleTextTemplate.Helpers;
 static class BinaryHelper
 {
     /// <summary>
+    /// 検索対象空間で指定されたバイト値が最初に出現する位置を取得します。
+    /// </summary>
+    /// <param name="searchSpace">検索対象空間</param>
+    /// <param name="length">検索対象空間の長さ</param>
+    /// <param name="value">検索するバイト値</param>
+    /// <returns>
+    /// 指定されたバイト値が最初に出現した位置を返します。
+    /// 一致しなかった場合は-1を返します。
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int IndexOf(scoped ref readonly byte searchSpace, int length, byte value)
+    {
+        var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
+        return span.IndexOf(value);
+    }
+
+    /// <summary>
     /// 検索対象空間で指定されたバイトシーケンスが最初に出現する位置を取得します。
     /// </summary>
     /// <param name="searchSpace">検索対象空間</param>
