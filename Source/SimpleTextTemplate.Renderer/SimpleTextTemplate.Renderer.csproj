@@ -16,4 +16,8 @@
     <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="../$(SolutionName).Core/**/*.cs" LinkBase="Core" />
+  </ItemGroup>
+
 </Project>
