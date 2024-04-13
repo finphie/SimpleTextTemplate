@@ -1,14 +1,14 @@
-﻿#if NET8_0_OR_GREATER
-using System.Buffers;
+﻿using System.Buffers;
 using System.Text;
 using FluentAssertions;
 using SimpleTextTemplate.Contexts;
+using SimpleTextTemplate.Renderer;
 using Utf8Utility;
 using Xunit;
 
 namespace SimpleTextTemplate.Tests;
 
-public sealed class TemplateRenderTest
+public sealed class TemplateExtensionsRenderTest
 {
     [Theory]
     [InlineData("{{A}}")]
@@ -102,4 +102,3 @@ public sealed class TemplateRenderTest
             .Equal("xTest1123Test2x"u8.ToArray());
     }
 }
-#endif
