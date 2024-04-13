@@ -46,7 +46,7 @@ public partial class RenderBenchmark
         var utf8Message = (Utf8Array)_message;
 
         _template = Template.Parse(source);
-        var utf8Dict = new Utf8ArrayDictionary<Utf8Array>();
+        var utf8Dict = new Utf8ArrayDictionary<object>();
         utf8Dict.TryAdd((Utf8Array)Identifier, utf8Message);
         _context = Context.Create(utf8Dict);
 
