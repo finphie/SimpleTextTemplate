@@ -5,7 +5,7 @@ using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using Xunit;
 
-namespace SimpleTextTemplate.Tests;
+namespace SimpleTextTemplate.Renderer.Tests;
 
 public sealed class TemplateExtensionsRenderTest
 {
