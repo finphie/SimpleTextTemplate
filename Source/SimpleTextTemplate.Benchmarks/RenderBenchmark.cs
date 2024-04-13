@@ -1,4 +1,5 @@
-﻿extern alias Generator;
+﻿extern alias Core;
+extern alias Renderer;
 
 using System.Buffers;
 using System.Globalization;
@@ -31,7 +32,7 @@ public partial class RenderBenchmark
     SampleContext _contextObject;
     Dictionary<string, string> _model;
 
-    Template _template;
+    Core::SimpleTextTemplate.Template _template;
     ScribanTemplate _scribanTemplate;
     ScribanTemplate _scribanLiquidTemplate;
     Regex _regex;
@@ -47,7 +48,7 @@ public partial class RenderBenchmark
 
         var utf8Message = (Utf8Array)_message;
 
-        _template = Template.Parse(source);
+        _template = Core::SimpleTextTemplate.Template.Parse(source);
         var utf8Dict = new Utf8ArrayDictionary<object>();
         utf8Dict.TryAdd((Utf8Array)Identifier, utf8Message);
         _context = Context.Create(utf8Dict);
@@ -68,7 +69,7 @@ public partial class RenderBenchmark
     [Benchmark]
     public byte[] SimpleTextTemplate()
     {
-        _template.Render(_bufferWriter, _context);
+        Renderer::SimpleTextTemplate.TemplateExtensions.Render(in _template, _bufferWriter, _context);
 
         var result = _bufferWriter.WrittenSpan.ToArray();
         _bufferWriter.ResetWrittenCount();
@@ -79,7 +80,7 @@ public partial class RenderBenchmark
     [Benchmark(Baseline = true)]
     public byte[] SimpleTextTemplate_SG()
     {
-        var writer = new Generator::SimpleTextTemplate.TemplateWriter<ArrayBufferWriter<byte>>(ref Unsafe.AsRef(in _bufferWriter), CultureInfo.InvariantCulture);
+        var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref Unsafe.AsRef(in _bufferWriter), CultureInfo.InvariantCulture);
         writer.Write(Source, _contextObject);
         writer.Dispose();
 
