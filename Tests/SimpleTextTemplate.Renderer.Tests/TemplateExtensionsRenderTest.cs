@@ -2,7 +2,6 @@
 using System.Text;
 using FluentAssertions;
 using SimpleTextTemplate.Contexts;
-using SimpleTextTemplate.Renderer;
 using Utf8Utility;
 using Xunit;
 

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Utf8Utility;
 
-namespace SimpleTextTemplate.Renderer;
+namespace SimpleTextTemplate;
 
 public static class TemplateExtensions
 {
