@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using SimpleTextTemplate.Extensions;
 
 using Block = (SimpleTextTemplate.BlockType Type, byte[] Value, byte[]? Format, byte[]? Culture);
 
