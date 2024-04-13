@@ -1,5 +1,4 @@
-﻿#if NET8_0_OR_GREATER
-using System.Buffers;
+﻿using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -383,4 +382,3 @@ public ref struct TemplateWriter<T>
         _destinationLength = destinationLength;
     }
 }
-#endif
