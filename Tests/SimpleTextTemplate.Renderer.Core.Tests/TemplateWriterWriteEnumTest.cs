@@ -3,7 +3,7 @@ using System.Text;
 using FluentAssertions;
 using Xunit;
 
-namespace SimpleTextTemplate.Renderer.Tests;
+namespace SimpleTextTemplate.Renderer.Core.Tests;
 
 public sealed class TemplateWriterWriteEnumTest
 {
