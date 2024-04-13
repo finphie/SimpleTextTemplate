@@ -1,8 +1,5 @@
-﻿extern alias Core;
-
-using System.Text;
+﻿using System.Text;
 using BenchmarkDotNet.Attributes;
-using Core::SimpleTextTemplate;
 using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;

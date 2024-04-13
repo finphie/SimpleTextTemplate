@@ -1,7 +1,4 @@
-﻿extern alias Core;
-extern alias Renderer;
-
-using System.Buffers;
+﻿using System.Buffers;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -32,7 +29,7 @@ public partial class RenderBenchmark
     SampleContext _contextObject;
     Dictionary<string, string> _model;
 
-    Core::SimpleTextTemplate.Template _template;
+    Template _template;
     ScribanTemplate _scribanTemplate;
     ScribanTemplate _scribanLiquidTemplate;
     Regex _regex;
@@ -48,7 +45,7 @@ public partial class RenderBenchmark
 
         var utf8Message = (Utf8Array)_message;
 
-        _template = Core::SimpleTextTemplate.Template.Parse(source);
+        _template = Template.Parse(source);
         var utf8Dict = new Utf8ArrayDictionary<object>();
         utf8Dict.TryAdd((Utf8Array)Identifier, utf8Message);
         _context = Context.Create(utf8Dict);
@@ -69,7 +66,7 @@ public partial class RenderBenchmark
     [Benchmark]
     public byte[] SimpleTextTemplate()
     {
-        Renderer::SimpleTextTemplate.TemplateExtensions.Render(in _template, _bufferWriter, _context);
+        _template.Render(_bufferWriter, _context);
 
         var result = _bufferWriter.WrittenSpan.ToArray();
         _bufferWriter.ResetWrittenCount();
