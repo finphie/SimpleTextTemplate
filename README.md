@@ -1,4 +1,5 @@
 # SimpleTextTemplate
+<!-- markdownlint-disable MD033 -->
 
 [![Build(.NET)](https://github.com/finphie/SimpleTextTemplate/actions/workflows/build-dotnet.yml/badge.svg)](https://github.com/finphie/SimpleTextTemplate/actions/workflows/build-dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/v/SimpleTextTemplate.Generator?color=0078d4&label=NuGet)](https://www.nuget.org/packages/SimpleTextTemplate.Generator/)
@@ -79,9 +80,12 @@ file static class Intercept
 }
 ```
 
-### SimpleTextTemplate（非推奨）
+<details>
+<summary>SimpleTextTemplate.Renderer（非推奨）</summary>
 
-[SimpleTextTemplate](https://www.nuget.org/packages/SimpleTextTemplate/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)への参照が必要です。
+### SimpleTextTemplate.Renderer（非推奨）
+
+[SimpleTextTemplate.Renderer](https://www.nuget.org/packages/SimpleTextTemplate.Renderer/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)への参照が必要です。
 
 ```csharp
 using System;
@@ -92,7 +96,7 @@ using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 
 var symbols = new Utf8ArrayDictionary<Utf8Array>();
-symbols.TryAdd((Utf8Array)"Identifier"u8.ToArray(), (Utf8Array)"Hello, World!"u8.ToArray());
+symbols.TryAdd((Utf8Array)"Identifier"u8.ToArray(), "Hello, World!"u8.ToArray());
 
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
 var source = "{{ Identifier }}"u8.ToArray();
@@ -102,6 +106,8 @@ template.Render(bufferWriter, Context.Create(symbols));
 // Hello, World!
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 ```
+
+</details>
 
 ## ベンチマーク
 
