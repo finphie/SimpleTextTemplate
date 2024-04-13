@@ -5,6 +5,9 @@ using Utf8Utility;
 
 namespace SimpleTextTemplate;
 
+/// <summary>
+/// <see cref="Template"/>構造体の拡張メソッド集です。
+/// </summary>
 public static class TemplateExtensions
 {
     /// <summary>
@@ -12,6 +15,7 @@ public static class TemplateExtensions
     /// </summary>
     /// <typeparam name="TWriter">使用するバッファーライターの型</typeparam>
     /// <typeparam name="TContext">コンテキストの型</typeparam>
+    /// <param name="template">テンプレート構造</param>
     /// <param name="bufferWriter">バッファーライター</param>
     /// <param name="context">コンテキスト</param>
     /// <exception cref="ArgumentNullException">引数がnullです。</exception>
