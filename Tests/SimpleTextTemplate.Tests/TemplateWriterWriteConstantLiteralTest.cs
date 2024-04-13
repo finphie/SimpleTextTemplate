@@ -3,7 +3,7 @@ using System.Text;
 using FluentAssertions;
 using Xunit;
 
-namespace SimpleTextTemplate.Generator.Tests;
+namespace SimpleTextTemplate.Tests;
 
 public sealed class TemplateWriterWriteConstantLiteralTest
 {
