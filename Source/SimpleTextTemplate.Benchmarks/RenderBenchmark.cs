@@ -1,10 +1,13 @@
-﻿using System.Buffers;
+﻿extern alias Core;
+
+using System.Buffers;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
 using BenchmarkDotNet.Attributes;
+using Core::SimpleTextTemplate;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using ScribanTemplate = Scriban.Template;
