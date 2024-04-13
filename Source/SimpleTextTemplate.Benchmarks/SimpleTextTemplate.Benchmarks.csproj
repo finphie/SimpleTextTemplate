@@ -13,9 +13,8 @@
   <ItemGroup>
     <ProjectReference Include="..\SimpleTextTemplate.Contexts\SimpleTextTemplate.Contexts.csproj" />
     <ProjectReference Include="..\SimpleTextTemplate.Generator.Internal\SimpleTextTemplate.Generator.Internal.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    <ProjectReference Include="..\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" Aliases="Generator" />
     <ProjectReference Include="..\SimpleTextTemplate.Renderer\SimpleTextTemplate.Renderer.csproj" />
-    <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" Aliases="Core" />
   </ItemGroup>
 
 </Project>

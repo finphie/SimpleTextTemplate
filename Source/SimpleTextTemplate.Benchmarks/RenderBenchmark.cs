@@ -1,4 +1,4 @@
-﻿extern alias Core;
+﻿extern alias Generator;
 
 using System.Buffers;
 using System.Globalization;
@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Text.Unicode;
 using BenchmarkDotNet.Attributes;
-using Core::SimpleTextTemplate;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using ScribanTemplate = Scriban.Template;
@@ -80,7 +79,7 @@ public partial class RenderBenchmark
     [Benchmark(Baseline = true)]
     public byte[] SimpleTextTemplate_SG()
     {
-        var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref Unsafe.AsRef(in _bufferWriter), CultureInfo.InvariantCulture);
+        var writer = new Generator::SimpleTextTemplate.TemplateWriter<ArrayBufferWriter<byte>>(ref Unsafe.AsRef(in _bufferWriter), CultureInfo.InvariantCulture);
         writer.Write(Source, _contextObject);
         writer.Dispose();
 
