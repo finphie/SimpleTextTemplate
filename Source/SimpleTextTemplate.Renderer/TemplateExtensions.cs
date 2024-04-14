@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using Utf8Utility;
 
@@ -18,14 +19,16 @@ public static class TemplateExtensions
     /// <param name="template">テンプレート構造</param>
     /// <param name="bufferWriter">バッファーライター</param>
     /// <param name="context">コンテキスト</param>
+    /// <param name="provider">カルチャー指定</param>
     /// <exception cref="ArgumentNullException">引数がnullです。</exception>
-    public static void Render<TWriter, TContext>(this in Template template, TWriter bufferWriter, TContext context)
+    public static void Render<TWriter, TContext>(this in Template template, TWriter bufferWriter, TContext context, IFormatProvider? provider = null)
         where TWriter : notnull, IBufferWriter<byte>
         where TContext : notnull, IContext
     {
         ArgumentNullException.ThrowIfNull(bufferWriter);
         ArgumentNullException.ThrowIfNull(context);
 
+        provider ??= CultureInfo.InvariantCulture;
         using var writer = new TemplateWriter<TWriter>(ref bufferWriter);
 
         foreach (var (type, stringOrIdentifier, format, culture) in template.Blocks)
@@ -55,7 +58,8 @@ public static class TemplateExtensions
                     }
                     else
                     {
-                        writer.WriteValue(value);
+                        var cultureInfo = culture is null ? provider : culture;
+                        writer.WriteValue(value, format, cultureInfo);
                     }
 
                     break;
