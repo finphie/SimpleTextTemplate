@@ -8,11 +8,6 @@ namespace SimpleTextTemplate.Renderer.Core.Tests;
 
 public sealed class TemplateWriterWriteValueTest
 {
-    enum Test
-    {
-        A
-    }
-
     [Fact]
     public void Int32_バッファーライターに書き込み()
     {
