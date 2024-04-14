@@ -90,7 +90,7 @@ public ref struct TemplateIdentifierReader
         if (Buffer == (byte)':')
         {
             value = default;
-            format = default;
+            format = null;
             culture = null;
             return false;
         }
@@ -100,7 +100,7 @@ public ref struct TemplateIdentifierReader
         if (formatIndex <= 0)
         {
             value = BinaryHelper.CreateReadOnlySpan(ref Buffer, Length);
-            format = default;
+            format = null;
             culture = null;
             return true;
         }
