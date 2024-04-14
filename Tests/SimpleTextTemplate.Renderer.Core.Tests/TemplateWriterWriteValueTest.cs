@@ -22,13 +22,13 @@ public sealed class TemplateWriterWriteValueTest
         using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "C", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "C", new CultureInfo("ja-JP"));
+            writer.WriteValue(value, "N3", CultureInfo.InvariantCulture);
+            writer.WriteValue(value, "N3", new CultureInfo("es-ES"));
         }
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
-            .Equal("1234¤1,234.00￥1,234"u8.ToArray());
+            .Equal("12341,234.0001.234,000"u8.ToArray());
     }
 
     [Fact]
@@ -59,12 +59,12 @@ public sealed class TemplateWriterWriteValueTest
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "d", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, default, new CultureInfo("ja-JP"));
+            writer.WriteValue(value, "D", new CultureInfo("ja-JP"));
         }
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("01/01/2000 00:00:00 +09:0001/01/20002000/01/01 0:00:00 +09:00");
+            .Be("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日");
     }
 
     [Fact]
