@@ -23,7 +23,7 @@ public sealed class TemplateWriterWriteTest
         var context = new TestContext();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
             writer.Write(
                 """
@@ -93,7 +93,7 @@ public sealed class TemplateWriterWriteTest
         var context = new TestContext();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
             writer.Write("{{ StringConstantField }}", context);
             writer.Write("{{ BytesStaticField }}", context);
@@ -110,7 +110,7 @@ public sealed class TemplateWriterWriteTest
         var context = new TestContext();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
             writer.Write(
                 """

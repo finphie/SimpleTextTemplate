@@ -16,33 +16,37 @@ public sealed class TemplateWriterWriteValueTest
     [Fact]
     public void Int32_バッファーライターに書き込み()
     {
-        var value = 123;
+        var value = 1234;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
-            writer.WriteValue(value);
+            writer.WriteValue(value, default, CultureInfo.InvariantCulture);
+            writer.WriteValue(value, "C", CultureInfo.InvariantCulture);
+            writer.WriteValue(value, "C", new CultureInfo("ja-JP"));
         }
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
-            .Equal(Encoding.UTF8.GetBytes(value.ToString(CultureInfo.InvariantCulture)));
+            .Equal("1234¤1,234.00￥1,234"u8.ToArray());
     }
 
     [Fact]
     public void Double_バッファーライターに書き込み()
     {
-        var value = 1.23;
+        var value = 1234.567;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
-            writer.WriteValue(value);
+            writer.WriteValue(value, default, CultureInfo.InvariantCulture);
+            writer.WriteValue(value, "F2", CultureInfo.InvariantCulture);
+            writer.WriteValue(value, "F3", new CultureInfo("es-ES"));
         }
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
-            .Equal(Encoding.UTF8.GetBytes(value.ToString(CultureInfo.InvariantCulture)));
+            .Equal("1234.5671234.571234,567"u8.ToArray());
     }
 
     [Fact]
@@ -51,14 +55,16 @@ public sealed class TemplateWriterWriteValueTest
         var value = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
-            writer.WriteValue(value);
+            writer.WriteValue(value, default, CultureInfo.InvariantCulture);
+            writer.WriteValue(value, "d", CultureInfo.InvariantCulture);
+            writer.WriteValue(value, default, new CultureInfo("ja-JP"));
         }
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be(value.ToString(CultureInfo.InvariantCulture));
+            .Be("01/01/2000 00:00:00 +09:0001/01/20002000/01/01 0:00:00 +09:00");
     }
 
     [Fact]
@@ -68,11 +74,11 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
             for (; count < 20; count++)
             {
-                writer.WriteValue(value);
+                writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             }
         }
 
@@ -88,11 +94,11 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
             for (; count < 20; count++)
             {
-                writer.WriteValue(value);
+                writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             }
         }
 
@@ -108,11 +114,11 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter, CultureInfo.InvariantCulture))
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
         {
             for (; count < 20; count++)
             {
-                writer.WriteValue(value);
+                writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             }
         }
 
