@@ -117,7 +117,7 @@ public ref struct TemplateIdentifierReader
             return true;
         }
 
-        format = Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), cultureIndex);
+        format = cultureIndex != 0 ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), cultureIndex) : null;
         Advance(cultureIndex + 1);
 
         culture = Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length);
