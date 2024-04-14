@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Globalization;
 using System.Text;
 using FluentAssertions;
 using SimpleTextTemplate.Contexts;
@@ -19,7 +20,7 @@ public sealed class TemplateExtensionsRenderTest
 
         var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), new Utf8Array("Test1"u8));
+        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
         bufferWriter.WrittenSpan.ToArray()
@@ -36,10 +37,10 @@ public sealed class TemplateExtensionsRenderTest
 
         var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), new Utf8Array("Test1"u8));
-        dic.TryAdd(new("AAA"u8), new Utf8Array("Test1"u8));
-        dic.TryAdd(new("B"u8), new Utf8Array("Test2"u8));
-        dic.TryAdd(new("BBB"u8), new Utf8Array("Test2"u8));
+        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
+        dic.TryAdd(new("AAA"u8), "Test1"u8.ToArray());
+        dic.TryAdd(new("B"u8), "Test2"u8.ToArray());
+        dic.TryAdd(new("BBB"u8), "Test2"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
         bufferWriter.WrittenSpan.ToArray()
@@ -56,7 +57,7 @@ public sealed class TemplateExtensionsRenderTest
 
         var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), new Utf8Array("Test1"u8));
+        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
         bufferWriter.WrittenSpan.ToArray()
@@ -73,10 +74,10 @@ public sealed class TemplateExtensionsRenderTest
 
         var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), new Utf8Array("Test1"u8));
-        dic.TryAdd(new("AAA"u8), new Utf8Array("Test1"u8));
-        dic.TryAdd(new("B"u8), new Utf8Array("Test2"u8));
-        dic.TryAdd(new("BBB"u8), new Utf8Array("Test2"u8));
+        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
+        dic.TryAdd(new("AAA"u8), "Test1"u8.ToArray());
+        dic.TryAdd(new("B"u8), "Test2"u8.ToArray());
+        dic.TryAdd(new("BBB"u8), "Test2"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
         bufferWriter.WrittenSpan.ToArray()
@@ -92,12 +93,104 @@ public sealed class TemplateExtensionsRenderTest
 
         var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), new Utf8Array("Test1"u8));
-        dic.TryAdd(new("B"u8), new Utf8Array("Test2"u8));
+        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
+        dic.TryAdd(new("B"u8), "Test2"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
         bufferWriter.WrittenSpan.ToArray()
             .Should()
             .Equal("xTest1123Test2x"u8.ToArray());
+    }
+
+    [Fact]
+    public void Utf8Array_識別子を置換()
+    {
+        var value = new Utf8Array("abc"u8);
+
+        Execute("{{ A }}"u8, value, "abc"u8);
+        Execute("{{ A: }}"u8, value, "abc"u8);
+        Execute("{{ A:: }}"u8, value, "abc"u8);
+    }
+
+    [Fact]
+    public void Byte配列_識別子を置換()
+    {
+        var value = "abc"u8.ToArray();
+
+        Execute("{{ A }}"u8, value, "abc"u8);
+        Execute("{{ A: }}"u8, value, "abc"u8);
+        Execute("{{ A:: }}"u8, value, "abc"u8);
+    }
+
+    [Fact]
+    public void String_識別子を置換()
+    {
+        var value = "abc";
+
+        Execute("{{ A }}"u8, value, "abc"u8);
+        Execute("{{ A: }}"u8, value, "abc"u8);
+        Execute("{{ A:: }}"u8, value, "abc"u8);
+    }
+
+    [Fact]
+    public void Char配列_識別子を置換()
+    {
+        var value = "abc".ToArray();
+
+        Execute("{{ A }}"u8, value, "abc"u8);
+        Execute("{{ A: }}"u8, value, "abc"u8);
+        Execute("{{ A:: }}"u8, value, "abc"u8);
+    }
+
+    [Fact]
+    public void Int32_識別子を置換()
+    {
+        var value = 1234;
+
+        Execute("{{ A }}"u8, value, "1234"u8);
+        Execute("{{ A: }}"u8, value, "1234"u8);
+        Execute("{{ A:: }}"u8, value, "1234"u8);
+        Execute("{{ A:N3 }}"u8, value, "1,234.000"u8);
+        Execute("{{ A:N3:es-ES }}"u8, value, "1.234,000"u8, new("ja-JP"));
+        Execute("{{ A:N3 }}"u8, value, "1.234,000"u8, new("es-ES"));
+    }
+
+    [Fact]
+    public void Double_識別子を置換()
+    {
+        var value = 1234.567;
+
+        Execute("{{ A }}"u8, value, "1234.567"u8);
+        Execute("{{ A: }}"u8, value, "1234.567"u8);
+        Execute("{{ A:: }}"u8, value, "1234.567"u8);
+        Execute("{{ A:F2 }}"u8, value, "1234.57"u8);
+        Execute("{{ A:F3:es-ES }}"u8, value, "1234,567"u8, new("ja-JP"));
+        Execute("{{ A:F3 }}"u8, value, "1234,567"u8, new("es-ES"));
+    }
+
+    [Fact]
+    public void DateTimeOffset_識別子を置換()
+    {
+        var value = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
+
+        Execute("{{ A }}"u8, value, "01/01/2000 00:00:00 +09:00"u8);
+        Execute("{{ A: }}"u8, value, "01/01/2000 00:00:00 +09:00"u8);
+        Execute("{{ A:: }}"u8, value, "01/01/2000 00:00:00 +09:00"u8);
+        Execute("{{ A:d }}"u8, value, "01/01/2000"u8);
+        Execute("{{ A:D:ja-JP }}"u8, value, "2000年1月1日"u8, new("en-US"));
+    }
+
+    static void Execute<T>(ReadOnlySpan<byte> source, T value, ReadOnlySpan<byte> expectedValue, CultureInfo? provider = null)
+        where T : notnull
+    {
+        var template = Template.Parse(source.ToArray());
+        var bufferWriter = new ArrayBufferWriter<byte>();
+        var dic = new Utf8ArrayDictionary<object>();
+        dic.TryAdd(new("A"u8), value);
+
+        template.Render(bufferWriter, Context.Create(dic), provider);
+        bufferWriter.WrittenSpan.ToArray()
+            .Should()
+            .Equal(expectedValue.ToArray());
     }
 }
