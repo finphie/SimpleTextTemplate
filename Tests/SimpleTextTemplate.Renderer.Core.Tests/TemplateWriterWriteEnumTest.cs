@@ -18,7 +18,7 @@ public sealed class TemplateWriterWriteEnumTest
     }
 
     [Fact]
-    public void Enum_バッファーライターに書き込み()
+    public void 書式指定なし_バッファーライターに書き込み()
     {
         var value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -31,6 +31,22 @@ public sealed class TemplateWriterWriteEnumTest
         bufferWriter.WrittenSpan.ToArray()
             .Should()
             .Equal(Encoding.UTF8.GetBytes(value.ToString()));
+    }
+
+    [Fact]
+    public void 書式指定_バッファーライターに書き込み()
+    {
+        var value = Test1.A;
+        var bufferWriter = new ArrayBufferWriter<byte>();
+
+        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        {
+            writer.WriteEnum(value, "G");
+        }
+
+        bufferWriter.WrittenSpan.ToArray()
+            .Should()
+            .Equal(Encoding.UTF8.GetBytes(value.ToString("G")));
     }
 
     [Fact]
