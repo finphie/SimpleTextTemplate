@@ -15,7 +15,6 @@ public ref struct TemplateWriter<T>
     where T : notnull, IBufferWriter<byte>
 {
     readonly ref T _bufferWriter;
-    readonly IFormatProvider? _provider;
 
     int _bufferLength;
 
@@ -26,12 +25,10 @@ public ref struct TemplateWriter<T>
     /// 新しい<see cref="TemplateWriter{T}"/>構造体を初期化します。
     /// </summary>
     /// <param name="bufferWriter">バッファーライター</param>
-    /// <param name="provider">書式設定</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TemplateWriter(ref T bufferWriter, IFormatProvider? provider = null)
+    public TemplateWriter(ref T bufferWriter)
     {
         _bufferWriter = ref bufferWriter;
-        _provider = provider;
 
         var span = _bufferWriter.GetSpan();
         _destination = ref MemoryMarshal.GetReference(span);
@@ -193,10 +190,10 @@ public ref struct TemplateWriter<T>
             return;
         }
 
-        GrowAndWrite(ref this, value, destination.Length);
+        GrowAndWrite(ref this, value, destination.Length, format);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        static void GrowAndWrite(scoped ref TemplateWriter<T> writer, TValue value, int length, ReadOnlySpan<char> format = default)
+        static void GrowAndWrite(scoped ref TemplateWriter<T> writer, TValue value, int length, ReadOnlySpan<char> format)
         {
             while (true)
             {
@@ -234,25 +231,26 @@ public ref struct TemplateWriter<T>
     /// <typeparam name="TValue">書き込む変数の型</typeparam>
     /// <param name="value">変数の値</param>
     /// <param name="format">カスタム形式</param>
+    /// <param name="provider">カルチャー指定</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void WriteValue<TValue>(TValue value, ReadOnlySpan<char> format = default)
+    public void WriteValue<TValue>(TValue value, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
         if (value is IUtf8SpanFormattable)
         {
-            WriteUtf8SpanFormattable(value, format);
+            WriteUtf8SpanFormattable(value, format, provider);
             return;
         }
 
         if (value is ISpanFormattable)
         {
-            WriteSpanFormattable(value, format);
+            WriteSpanFormattable(value, format, provider);
             return;
         }
 
         if (value is IFormattable formattableValue)
         {
-            WriteString(formattableValue.ToString(format.ToString(), _provider));
+            WriteString(formattableValue.ToString(format.ToString(), provider));
             return;
         }
 
@@ -260,11 +258,11 @@ public ref struct TemplateWriter<T>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void WriteUtf8SpanFormattable<TValue>(TValue value, ReadOnlySpan<char> format)
+    void WriteUtf8SpanFormattable<TValue>(TValue value, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
         Debug.Assert(value is IUtf8SpanFormattable, "IUtf8SpanFormattableではありません。");
 
-        if (!((IUtf8SpanFormattable)value).TryFormat(Destination, out var bytesWritten, format, _provider))
+        if (!((IUtf8SpanFormattable)value).TryFormat(Destination, out var bytesWritten, format, provider))
         {
             var newLength = _destinationLength * 2;
 
@@ -277,7 +275,7 @@ public ref struct TemplateWriter<T>
 
             GrowCore(newLength);
 
-            var success = ((IUtf8SpanFormattable)value).TryFormat(Destination, out bytesWritten, format, _provider);
+            var success = ((IUtf8SpanFormattable)value).TryFormat(Destination, out bytesWritten, format, provider);
             Debug.Assert(success, "UTF-8への変換に失敗しました。");
         }
 
@@ -285,19 +283,19 @@ public ref struct TemplateWriter<T>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void WriteSpanFormattable<TValue>(TValue value, ReadOnlySpan<char> format)
+    void WriteSpanFormattable<TValue>(TValue value, ReadOnlySpan<char> format, IFormatProvider? provider)
     {
         Debug.Assert(value is ISpanFormattable, "ISpanFormattableではありません。");
 
         Span<char> destination = stackalloc char[256];
 
-        if (((ISpanFormattable)value).TryFormat(destination, out var charsWritten, format, _provider))
+        if (((ISpanFormattable)value).TryFormat(destination, out var charsWritten, format, provider))
         {
             WriteString(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(destination), charsWritten));
             return;
         }
 
-        GrowAndWrite(ref this, value, destination.Length, format, _provider);
+        GrowAndWrite(ref this, value, destination.Length, format, provider);
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         static void GrowAndWrite(scoped ref TemplateWriter<T> writer, TValue value, int length, ReadOnlySpan<char> format, IFormatProvider? provider)
