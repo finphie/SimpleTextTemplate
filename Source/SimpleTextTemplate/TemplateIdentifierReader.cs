@@ -83,7 +83,7 @@ public ref struct TemplateIdentifierReader
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryRead(out ReadOnlySpan<byte> value, out string? format, out string? culture)
+    public unsafe bool TryRead(out ReadOnlySpan<byte> value, out string? format, out string? culture)
     {
         Debug.Assert(Length > 0, "バッファーの長さは0より大きい値である必要があります。");
 
@@ -112,15 +112,15 @@ public ref struct TemplateIdentifierReader
 
         if (cultureIndex < 0)
         {
-            format = Encoding.UTF8.GetString(BinaryHelper.CreateReadOnlySpan(ref Buffer, Length));
+            format = Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length);
             culture = null;
             return true;
         }
 
-        format = Encoding.UTF8.GetString(BinaryHelper.CreateReadOnlySpan(ref Buffer, cultureIndex));
+        format = Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), cultureIndex);
         Advance(cultureIndex + 1);
 
-        culture = Encoding.UTF8.GetString(BinaryHelper.CreateReadOnlySpan(ref Buffer, Length));
+        culture = Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length);
         return true;
     }
 
