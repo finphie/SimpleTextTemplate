@@ -17,8 +17,8 @@ public sealed class TemplateIdentifierReaderReadTest
         reader.Read(out var value, out var format, out var culture);
 
         value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.ToArray().Should().BeEmpty();
-        culture.ToArray().Should().BeEmpty();
+        format.Should().BeNull();
+        culture.Should().BeNull();
     }
 
     [Theory]
@@ -35,8 +35,8 @@ public sealed class TemplateIdentifierReaderReadTest
         reader.Read(out var value, out var format, out var culture);
 
         value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedFormat));
-        culture.ToArray().Should().BeEmpty();
+        format.Should().Be(expectedFormat);
+        culture.Should().BeNull();
     }
 
     [Theory]
@@ -54,8 +54,8 @@ public sealed class TemplateIdentifierReaderReadTest
         reader.Read(out var value, out var format, out var culture);
 
         value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.ToArray().Should().BeEmpty();
-        culture.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedCulture));
+        format.Should().BeNull();
+        culture.Should().Be(expectedCulture);
     }
 
     [Theory]
@@ -72,8 +72,8 @@ public sealed class TemplateIdentifierReaderReadTest
         reader.Read(out var value, out var format, out var culture);
 
         value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedFormat));
-        culture.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedCulture));
+        format.Should().Be(expectedFormat);
+        culture.Should().Be(expectedCulture);
     }
 
     [Fact]

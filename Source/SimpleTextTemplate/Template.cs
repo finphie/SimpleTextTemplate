@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
-using Block = (SimpleTextTemplate.BlockType Type, byte[] Value, byte[]? Format, byte[]? Culture);
+using Block = (SimpleTextTemplate.BlockType Type, byte[] Value, string? Format, System.IFormatProvider? Culture);
 
 namespace SimpleTextTemplate;
 
@@ -60,7 +61,8 @@ public readonly struct Template
             var identifierReader = new TemplateIdentifierReader(value);
             identifierReader.Read(out var identifier, out var format, out var culture);
 
-            list.Add((type, identifier.ToArray(), format.ToArray(), culture.ToArray()));
+            var cultureInfo = culture is null ? null : new CultureInfo(culture);
+            list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 
         template = new([.. list]);
@@ -95,7 +97,8 @@ public readonly struct Template
             var identifierReader = new TemplateIdentifierReader(value);
             identifierReader.Read(out var identifier, out var format, out var culture);
 
-            list.Add((type, identifier.ToArray(), format.ToArray(), culture.ToArray()));
+            var cultureInfo = culture is null ? null : new CultureInfo(culture);
+            list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 
         return new([.. list]);

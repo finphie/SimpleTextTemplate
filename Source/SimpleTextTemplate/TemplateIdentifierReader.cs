@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using SimpleTextTemplate.Helpers;
 
 #if NET8_0_OR_GREATER
@@ -63,7 +64,7 @@ public ref struct TemplateIdentifierReader
     /// <param name="culture">カルチャー指定</param>
     /// <exception cref="TemplateException">識別子名の取得に失敗しました。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Read(out ReadOnlySpan<byte> value, out ReadOnlySpan<byte> format, out ReadOnlySpan<byte> culture)
+    public void Read(out ReadOnlySpan<byte> value, out string? format, out string? culture)
     {
         if (!TryRead(out value, out format, out culture))
         {
@@ -82,7 +83,7 @@ public ref struct TemplateIdentifierReader
     /// それ以外の場合は<see langword="false"/>。
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryRead(out ReadOnlySpan<byte> value, out ReadOnlySpan<byte> format, out ReadOnlySpan<byte> culture)
+    public bool TryRead(out ReadOnlySpan<byte> value, out string? format, out string? culture)
     {
         Debug.Assert(Length > 0, "バッファーの長さは0より大きい値である必要があります。");
 
@@ -90,7 +91,7 @@ public ref struct TemplateIdentifierReader
         {
             value = default;
             format = default;
-            culture = default;
+            culture = null;
             return false;
         }
 
@@ -100,7 +101,7 @@ public ref struct TemplateIdentifierReader
         {
             value = BinaryHelper.CreateReadOnlySpan(ref Buffer, Length);
             format = default;
-            culture = default;
+            culture = null;
             return true;
         }
 
@@ -111,15 +112,15 @@ public ref struct TemplateIdentifierReader
 
         if (cultureIndex < 0)
         {
-            format = BinaryHelper.CreateReadOnlySpan(ref Buffer, Length);
-            culture = default;
+            format = Encoding.UTF8.GetString(BinaryHelper.CreateReadOnlySpan(ref Buffer, Length));
+            culture = null;
             return true;
         }
 
-        format = BinaryHelper.CreateReadOnlySpan(ref Buffer, cultureIndex);
+        format = Encoding.UTF8.GetString(BinaryHelper.CreateReadOnlySpan(ref Buffer, cultureIndex));
         Advance(cultureIndex + 1);
 
-        culture = BinaryHelper.CreateReadOnlySpan(ref Buffer, Length);
+        culture = Encoding.UTF8.GetString(BinaryHelper.CreateReadOnlySpan(ref Buffer, Length));
         return true;
     }
 
