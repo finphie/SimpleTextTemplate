@@ -52,14 +52,14 @@ public ref struct TemplateWriter<T>
     }
 
     /// <summary>
-    /// バッファーに文字列を書き込みます。
+    /// バッファーに文字列を書き込みます。SimpleTextTemplate.Generatorへの参照が必要です。
     /// </summary>
     /// <param name="text">テンプレート文字列</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(string text) => throw new UnreachableException();
 
     /// <summary>
-    /// バッファーにコンテキストを書き込みます。
+    /// バッファーにコンテキストを書き込みます。SimpleTextTemplate.Generatorへの参照が必要です。
     /// </summary>
     /// <typeparam name="TContext">コンテキストの型</typeparam>
     /// <param name="text">テンプレート文字列</param>
