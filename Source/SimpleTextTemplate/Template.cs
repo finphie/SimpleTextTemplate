@@ -59,7 +59,13 @@ public readonly struct Template
             }
 
             var identifierReader = new TemplateIdentifierReader(value);
-            identifierReader.Read(out var identifier, out var format, out var culture);
+
+            if (!identifierReader.TryRead(out var identifier, out var format, out var culture))
+            {
+                template = new([]);
+                consumed = reader.Consumed;
+                return false;
+            }
 
             var cultureInfo = culture is null ? null : new CultureInfo(culture);
             list.Add((type, identifier.ToArray(), format, cultureInfo));

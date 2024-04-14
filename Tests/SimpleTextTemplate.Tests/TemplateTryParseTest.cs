@@ -36,6 +36,17 @@ public sealed class TemplateTryParseTest
     public void 文字列_識別子_文字列_識別子_文字列_trueを返す(string input) => Execute(input);
 
     [Theory]
+    [InlineData("{{ 1::ja-JP }}")]
+    [InlineData("{{ 1:N:ja-JP }}")]
+    public void カルチャー指定あり_trueを返す(string input) => Execute(input);
+
+    [Theory]
+    [InlineData("{{ A: }}")]
+    [InlineData("{{ A:: }}")]
+    [InlineData("{{ A:N: }}")]
+    public void 書式指定またはカルチャー指定が空_trueを返す(string input) => Execute(input);
+
+    [Theory]
     [InlineData("{{", 2)]
     [InlineData("{{ ", 3)]
     [InlineData("{{ }", 3)]
@@ -43,6 +54,15 @@ public sealed class TemplateTryParseTest
     {
         Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).Should().BeFalse();
         ((int)consumed).Should().Be(expectedConsumed);
+    }
+
+    [Theory]
+    [InlineData("{{ : }}")]
+    [InlineData("{{ :: }}")]
+    public void 識別子が空_falseを返す(string input)
+    {
+        Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).Should().BeFalse();
+        ((int)consumed).Should().Be(input.Length);
     }
 
     static void Execute(string input)
