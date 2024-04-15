@@ -67,7 +67,7 @@ public readonly struct Template
                 return false;
             }
 
-            var cultureInfo = culture is null ? null : new CultureInfo(culture);
+            var cultureInfo = culture is null ? null : CultureInfo.GetCultureInfo(culture);
             list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 
@@ -103,7 +103,7 @@ public readonly struct Template
             var identifierReader = new TemplateIdentifierReader(value);
             identifierReader.Read(out var identifier, out var format, out var culture);
 
-            var cultureInfo = culture is null ? null : new CultureInfo(culture);
+            var cultureInfo = culture is null ? null : CultureInfo.GetCultureInfo(culture);
             list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 

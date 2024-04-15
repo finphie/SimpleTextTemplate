@@ -151,8 +151,8 @@ public sealed class TemplateExtensionsRenderTest
         Execute("{{ A: }}"u8, value, "1234"u8);
         Execute("{{ A:: }}"u8, value, "1234"u8);
         Execute("{{ A:N3 }}"u8, value, "1,234.000"u8);
-        Execute("{{ A:N3:es-ES }}"u8, value, "1.234,000"u8, new("ja-JP"));
-        Execute("{{ A:N3 }}"u8, value, "1.234,000"u8, new("es-ES"));
+        Execute("{{ A:N3:es-ES }}"u8, value, "1.234,000"u8, CultureInfo.GetCultureInfo("ja-JP"));
+        Execute("{{ A:N3 }}"u8, value, "1.234,000"u8, CultureInfo.GetCultureInfo("es-ES"));
     }
 
     [Fact]
@@ -164,8 +164,8 @@ public sealed class TemplateExtensionsRenderTest
         Execute("{{ A: }}"u8, value, "1234.567"u8);
         Execute("{{ A:: }}"u8, value, "1234.567"u8);
         Execute("{{ A:F2 }}"u8, value, "1234.57"u8);
-        Execute("{{ A:F3:es-ES }}"u8, value, "1234,567"u8, new("ja-JP"));
-        Execute("{{ A:F3 }}"u8, value, "1234,567"u8, new("es-ES"));
+        Execute("{{ A:F3:es-ES }}"u8, value, "1234,567"u8, CultureInfo.GetCultureInfo("ja-JP"));
+        Execute("{{ A:F3 }}"u8, value, "1234,567"u8, CultureInfo.GetCultureInfo("es-ES"));
     }
 
     [Fact]
@@ -177,7 +177,7 @@ public sealed class TemplateExtensionsRenderTest
         Execute("{{ A: }}"u8, value, "01/01/2000 00:00:00 +09:00"u8);
         Execute("{{ A:: }}"u8, value, "01/01/2000 00:00:00 +09:00"u8);
         Execute("{{ A:d }}"u8, value, "01/01/2000"u8);
-        Execute("{{ A:D:ja-JP }}"u8, value, "2000年1月1日"u8, new("en-US"));
+        Execute("{{ A:D:ja-JP }}"u8, value, "2000年1月1日土曜日"u8, CultureInfo.GetCultureInfo("en-US"));
     }
 
     static void Execute<T>(ReadOnlySpan<byte> source, T value, ReadOnlySpan<byte> expectedValue, CultureInfo? provider = null)

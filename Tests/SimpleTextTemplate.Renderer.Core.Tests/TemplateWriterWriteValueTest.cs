@@ -18,7 +18,7 @@ public sealed class TemplateWriterWriteValueTest
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "N3", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "N3", new CultureInfo("es-ES"));
+            writer.WriteValue(value, "N3", CultureInfo.GetCultureInfo("es-ES"));
         }
 
         bufferWriter.WrittenSpan.ToArray()
@@ -36,7 +36,7 @@ public sealed class TemplateWriterWriteValueTest
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "F2", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "F3", new CultureInfo("es-ES"));
+            writer.WriteValue(value, "F3", CultureInfo.GetCultureInfo("es-ES"));
         }
 
         bufferWriter.WrittenSpan.ToArray()
@@ -54,12 +54,12 @@ public sealed class TemplateWriterWriteValueTest
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "d", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "D", new CultureInfo("ja-JP"));
+            writer.WriteValue(value, "D", CultureInfo.GetCultureInfo("ja-JP"));
         }
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日");
+            .Be("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日土曜日");
     }
 
     [Fact]
