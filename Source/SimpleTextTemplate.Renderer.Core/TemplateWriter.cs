@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -52,20 +53,28 @@ public ref struct TemplateWriter<T>
     }
 
     /// <summary>
-    /// バッファーに文字列を書き込みます。SimpleTextTemplate.Generatorへの参照が必要です。
+    /// バッファーに文字列を書き込みます。
     /// </summary>
+    /// <remarks>
+    /// <para>SimpleTextTemplate.Generatorへの参照が必要です。</para>
+    /// </remarks>
     /// <param name="text">テンプレート文字列</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Write(string text) => throw new UnreachableException();
 
     /// <summary>
-    /// バッファーにコンテキストを書き込みます。SimpleTextTemplate.Generatorへの参照が必要です。
+    /// バッファーにコンテキストを書き込みます。
+    /// <paramref name="provider"/>のデフォルトは、<see cref="CultureInfo.InvariantCulture"/>です。
     /// </summary>
+    /// <remarks>
+    /// <para>SimpleTextTemplate.Generatorへの参照が必要です。</para>
+    /// </remarks>
     /// <typeparam name="TContext">コンテキストの型</typeparam>
     /// <param name="text">テンプレート文字列</param>
     /// <param name="context">コンテキスト</param>
+    /// <param name="provider">カルチャー指定</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Write<TContext>(string text, in TContext context)
+    public void Write<TContext>(string text, in TContext context, IFormatProvider? provider = null)
         where TContext : notnull
         => throw new UnreachableException();
 
