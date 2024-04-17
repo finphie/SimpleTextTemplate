@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -42,42 +43,72 @@ static class InterceptInfoCreator
             return new(Diagnostic: Diagnostic.Create(DiagnosticDescriptors.ParserError, templateArgument.GetLocation(), consumed + 1));
         }
 
-        TemplateWriterWriteInfo[]? writeInfo;
-        string? contextTypeName = null;
-
-        if (arguments.Count == 1)
-        {
-            if (!TryGetTemplateWriterWriteInfo(in template, out writeInfo, out var descriptor, cancellationToken))
-            {
-                return new(Diagnostic: Diagnostic.Create(descriptor, invocationExpression.GetLocation()));
-            }
-        }
-        else
-        {
-            var contextArgument = arguments[1].Expression;
-            var contextType = context.SemanticModel.GetTypeInfo(contextArgument, cancellationToken).Type!;
-
-            if (!TryGetTemplateWriterWriteInfo(in template, context.SemanticModel.Compilation, contextType, out writeInfo, out var diagnostic, cancellationToken))
-            {
-                var (descriptor, value) = diagnostic.Value;
-                return new(Diagnostic: Diagnostic.Create(descriptor, contextArgument.GetLocation(), value));
-            }
-
-            contextTypeName = contextType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-        }
-
         var interceptsLocationInfo = operation.GetInterceptsLocationInfo(cancellationToken);
         var writerType = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, cancellationToken).Symbol!.ContainingType;
 
-        var info = new InterceptInfo(interceptsLocationInfo, writeInfo, writerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), contextTypeName);
-        return new(info);
+        if (arguments.Count == 1)
+        {
+            return !TryGetTemplateWriterWriteInfo(in template, out var writeInfo, out var descriptor, cancellationToken)
+                ? new(Diagnostic: Diagnostic.Create(descriptor, invocationExpression.GetLocation()))
+                : new(CreateInterceptInfo(interceptsLocationInfo, writeInfo, writerType));
+        }
+
+        var isInvariantCulture = IsInvariantCulture(context, arguments, cancellationToken);
+
+        var contextArgument = arguments[1].Expression;
+        var contextType = context.SemanticModel.GetTypeInfo(contextArgument, cancellationToken).Type!;
+
+        if (!TryGetTemplateWriterWriteInfo(in template, context.SemanticModel.Compilation, contextType, isInvariantCulture, out var writeIdentifierInfo, out var diagnostic, cancellationToken))
+        {
+            var (descriptor, value) = diagnostic.Value;
+            return new(Diagnostic: Diagnostic.Create(descriptor, contextArgument.GetLocation(), value));
+        }
+
+        return new(CreateInterceptInfo(interceptsLocationInfo, writeIdentifierInfo, writerType, contextType));
+    }
+
+    static bool IsInvariantCulture(GeneratorSyntaxContext context, SeparatedSyntaxList<ArgumentSyntax> arguments, CancellationToken cancellationToken)
+    {
+        Debug.Assert(arguments.Count is 2 or 3, "TemplateWriter.Writeのコンテキスト指定オーバーロードの引数は、2個または3個である必要があります。");
+
+        // IFormatProvider指定なしの場合、InvariantCultureとする。
+        if (arguments.Count == 2)
+        {
+            return true;
+        }
+
+        var providerExpression = arguments[2].Expression;
+
+        // IFormatProviderがnullの場合、InvariantCultureとする。
+        if (context.SemanticModel.GetConstantValue(providerExpression, cancellationToken) is { HasValue: true, Value: var constantProvider } && constantProvider is null)
+        {
+            return true;
+        }
+
+        if (providerExpression is not MemberAccessExpressionSyntax { Name.Identifier.ValueText: "InvariantCulture" } providerArgument)
+        {
+            return false;
+        }
+
+        var symbolInfo = context.SemanticModel.GetSymbolInfo(providerArgument, cancellationToken);
+        var providerTypeName = symbolInfo.Symbol?.ContainingType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        return providerTypeName == "global::System.Globalization.CultureInfo";
+    }
+
+    static InterceptInfo CreateInterceptInfo(InterceptsLocationInfo interceptsLocationInfo, IReadOnlyList<TemplateWriterWriteInfo> writeInfo, INamedTypeSymbol writerTypeSymbol, ITypeSymbol? contextTypeSymbol = null)
+    {
+        var writerTypeDisplayString = writerTypeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        var contextTypeName = contextTypeSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+
+        return new(interceptsLocationInfo, writeInfo, writerTypeDisplayString, contextTypeName);
     }
 
     static bool TryGetTemplateWriterWriteInfo(in Template template, [NotNullWhen(true)] out TemplateWriterWriteInfo[]? info, [NotNullWhen(false)] out DiagnosticDescriptor? descriptor, CancellationToken cancellationToken)
     {
         var infoList = new List<TemplateWriterWriteInfo>();
 
-        foreach (var (block, utf8Value) in template.Blocks)
+        foreach (var (block, utf8Value, _, _) in template.Blocks)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var value = Encoding.UTF8.GetString(utf8Value);
@@ -100,7 +131,7 @@ static class InterceptInfoCreator
         return true;
     }
 
-    static bool TryGetTemplateWriterWriteInfo(in Template template, Compilation compilation, ITypeSymbol contextType, [NotNullWhen(true)] out TemplateWriterWriteInfo[]? info, [NotNullWhen(false)] out (DiagnosticDescriptor Descriptor, string Value)? diagnostic, CancellationToken cancellationToken)
+    static bool TryGetTemplateWriterWriteInfo(in Template template, Compilation compilation, ITypeSymbol contextType, bool isInvariantCulture, [NotNullWhen(true)] out TemplateWriterWriteInfo[]? info, [NotNullWhen(false)] out (DiagnosticDescriptor Descriptor, string Value)? diagnostic, CancellationToken cancellationToken)
     {
         var readOnlySpanByteSymbol = compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
         var readOnlySpanCharSymbol = compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
@@ -109,14 +140,16 @@ static class InterceptInfoCreator
         var infoList = new List<TemplateWriterWriteInfo>();
         var isConstant = false;
 
-        foreach (var (block, utf8Value) in template.Blocks)
+        foreach (var (block, utf8Value, format, identifierProvider) in template.Blocks)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
             var value = Encoding.UTF8.GetString(utf8Value);
+            var provider = GetFormatProvider(identifierProvider, isInvariantCulture);
 
             if (block == BlockType.Raw)
             {
-                AddConstant(infoList, ref isConstant, value);
+                AddConstantString(infoList, ref isConstant, value);
                 continue;
             }
 
@@ -130,10 +163,9 @@ static class InterceptInfoCreator
                 return false;
             }
 
-            // 識別子が文字列定数
-            if ((identifier is IFieldSymbol symbol) && symbol.HasConstantValue && (symbol.ConstantValue is string constantValue))
+            // 識別子が定数かつIFormatProviderの指定がある場合は、定数書き込み
+            if (identifier is IFieldSymbol { HasConstantValue: true, ConstantValue: var constantValue } && TryAddConstantValue(infoList, ref isConstant, constantValue, format, provider))
             {
-                AddConstant(infoList, ref isConstant, constantValue);
                 continue;
             }
 
@@ -143,7 +175,7 @@ static class InterceptInfoCreator
             // ReadOnlySpan<byte>やbyte[]などが一致
             if (compilation.ClassifyConversion(type, readOnlySpanByteSymbol).IsImplicit)
             {
-                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value));
+                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value, format, provider));
                 continue;
             }
 
@@ -151,29 +183,32 @@ static class InterceptInfoCreator
             // ReadOnlySpan<char>やstring、char[]などが一致
             if (compilation.ClassifyConversion(type, readOnlySpanCharSymbol).IsImplicit)
             {
-                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticString : WriteString, value));
+                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticString : WriteString, value, format, provider));
                 continue;
             }
-
-            var format = identifier.GetAttributes()
-                .FirstOrDefault(static x => x.AttributeClass is { Name: "IdentifierAttribute", ContainingNamespace: { Name: nameof(SimpleTextTemplate), ContainingNamespace.IsGlobalNamespace: true } })
-                ?.ConstructorArguments.FirstOrDefault()
-                .Value as string;
 
             if (type.TypeKind == TypeKind.Enum)
             {
-                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format));
+                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format, provider));
                 continue;
             }
 
-            AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format));
+            AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format, provider));
         }
 
         info = [.. infoList];
         diagnostic = null;
         return true;
 
-        static void AddConstant(List<TemplateWriterWriteInfo> infoList, ref bool isConstant, string value)
+        static IFormatProvider? GetFormatProvider(IFormatProvider? provider, bool isDefaultInvariantCulture)
+        {
+            return provider is not null ? provider : GetDefaultFormatProvider(isDefaultInvariantCulture);
+
+            static IFormatProvider? GetDefaultFormatProvider(bool isDefaultInvariantCulture)
+                => isDefaultInvariantCulture ? CultureInfo.InvariantCulture : null;
+        }
+
+        static void AddConstantString(List<TemplateWriterWriteInfo> infoList, ref bool isConstant, string value)
         {
             if (isConstant)
             {
@@ -189,6 +224,23 @@ static class InterceptInfoCreator
         {
             infoList.Add(info);
             isConstant = false;
+        }
+
+        static bool TryAddConstantValue(List<TemplateWriterWriteInfo> infoList, ref bool isConstant, object value, string? format, IFormatProvider? provider)
+        {
+            if (value is string valueString)
+            {
+                AddConstantString(infoList, ref isConstant, valueString);
+                return true;
+            }
+
+            if (provider is not null && value is IFormattable formattableValue)
+            {
+                AddConstantString(infoList, ref isConstant, formattableValue.ToString(format, provider));
+                return true;
+            }
+
+            return false;
         }
     }
 }
