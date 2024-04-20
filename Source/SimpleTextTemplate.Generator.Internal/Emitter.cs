@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -50,14 +51,14 @@ static class Emitter
 
             builder.AppendLine($$"""
                         [global::System.Runtime.CompilerServices.InterceptsLocation(@"{{interceptsLocationInfo.FilePath}}", {{interceptsLocationInfo.Line}}, {{interceptsLocationInfo.Column}})]
-                        public static void Write{{i}}(this ref {{writerType}} writer, string _{{(string.IsNullOrEmpty(contextTypeName) ? string.Empty : $", in {contextTypeName} context")}})
+                        public static void Write{{i}}(this ref {{writerType}} writer, string _{{(string.IsNullOrEmpty(contextTypeName) ? string.Empty : $", in {contextTypeName} context, global::System.IFormatProvider? provider = null")}})
                         {
                 """);
 
-            foreach (var (methodType, value, format) in template)
+            foreach (var (methodType, value, format, provider) in template)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
-                builder.AppendLine($"            writer.{GetWriteMethodName(methodType)}({GetValue(methodType, value, format, contextTypeName)});");
+                builder.AppendLine($"            writer.{GetWriteMethodName(methodType)}({GetValue(methodType, value, format, provider, contextTypeName)});");
             }
 
             builder.AppendLine("        }");
@@ -91,7 +92,7 @@ static class Emitter
         };
     }
 
-    static string GetValue(TemplateWriterWriteType type, string value, string? format, string? contextTypeName)
+    static string GetValue(TemplateWriterWriteType type, string value, string? format, IFormatProvider? provider, string? contextTypeName)
     {
         Debug.Assert(
             !(contextTypeName is null && type is WriteStaticLiteral or WriteStaticString or WriteStaticValue),
@@ -101,14 +102,25 @@ static class Emitter
             ? string.Empty
             : $", {format.ToLiteral()}";
 
+        var providerArgument = GetProviderArgument(provider);
+
         return type switch
         {
             WriteConstantLiteral => value.ToUtf8Literal(),
             WriteLiteral or WriteString => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
-            WriteEnum or WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}{formatArgument}",
+            WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}{formatArgument}, {providerArgument}",
+            WriteEnum => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}{formatArgument}",
             WriteStaticLiteral or WriteStaticString => $"{contextTypeName}.@{value}",
-            WriteStaticEnum or WriteStaticValue => $"{contextTypeName}.@{value}{formatArgument}",
+            WriteStaticValue => $"{contextTypeName}.@{value}{formatArgument}, {providerArgument}",
+            WriteStaticEnum => $"{contextTypeName}.@{value}{formatArgument}",
             _ => throw new InvalidOperationException()
         };
+
+        static string GetProviderArgument(IFormatProvider? provider)
+        {
+            return provider is not CultureInfo culture ? "provider"
+                : culture.IsSpecialCulture(out var cultureName) ? cultureName
+                : throw new InvalidOperationException("未対応のカルチャーです。");
+        }
     }
 }
