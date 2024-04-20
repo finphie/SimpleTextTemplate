@@ -64,7 +64,7 @@ ref struct InterceptInfoCreator
 
         _arguments = _invocationExpression.ArgumentList.Arguments;
 
-        if (_arguments.Count is >= 1 and <= 3)
+        if (_arguments.Count is < 1 or > 3)
         {
             throw new ArgumentException("TemplateWriter.Writeのコンテキスト指定オーバーロードの引数は、1～3個である必要があります。");
         }
