@@ -16,7 +16,7 @@ public sealed class TemplateWriterWriteStringTest
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteString(value);
         }
@@ -32,7 +32,7 @@ public sealed class TemplateWriterWriteStringTest
         var value = new string('a', 1024);
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteString(value);
         }
@@ -49,7 +49,7 @@ public sealed class TemplateWriterWriteStringTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             for (; count < 10; count++)
             {

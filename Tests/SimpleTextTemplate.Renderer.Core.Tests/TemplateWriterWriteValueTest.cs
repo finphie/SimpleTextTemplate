@@ -14,7 +14,7 @@ public sealed class TemplateWriterWriteValueTest
         var value = 1234;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "N3", CultureInfo.InvariantCulture);
@@ -32,7 +32,7 @@ public sealed class TemplateWriterWriteValueTest
         var value = 1234.567;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "F2", CultureInfo.InvariantCulture);
@@ -50,7 +50,7 @@ public sealed class TemplateWriterWriteValueTest
         var value = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "d", CultureInfo.InvariantCulture);
@@ -69,7 +69,7 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             for (; count < 20; count++)
             {
@@ -89,7 +89,7 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             for (; count < 20; count++)
             {
@@ -109,7 +109,7 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             for (; count < 20; count++)
             {

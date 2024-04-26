@@ -29,7 +29,7 @@ public static class TemplateExtensions
         ArgumentNullException.ThrowIfNull(context);
 
         provider ??= CultureInfo.InvariantCulture;
-        using var writer = new TemplateWriter<TWriter>(ref bufferWriter);
+        using var writer = TemplateWriter.Create(bufferWriter);
 
         foreach (var (type, stringOrIdentifier, format, culture) in template.Blocks)
         {

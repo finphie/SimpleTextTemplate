@@ -16,7 +16,7 @@ public sealed class TemplateWriterWriteLiteralTest
         var utf8Value = Encoding.UTF8.GetBytes(value);
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteLiteral(utf8Value);
         }
@@ -33,7 +33,7 @@ public sealed class TemplateWriterWriteLiteralTest
         var utf8Value = Encoding.UTF8.GetBytes(value);
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteLiteral(utf8Value);
         }
@@ -51,7 +51,7 @@ public sealed class TemplateWriterWriteLiteralTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             for (; count < 10; count++)
             {

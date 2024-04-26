@@ -23,7 +23,7 @@ public sealed class TemplateWriterWriteEnumTest
         var value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteEnum(value);
         }
@@ -39,7 +39,7 @@ public sealed class TemplateWriterWriteEnumTest
         var value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             writer.WriteEnum(value, "G");
         }
@@ -56,7 +56,7 @@ public sealed class TemplateWriterWriteEnumTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref bufferWriter))
+        using (var writer = TemplateWriter.Create(bufferWriter))
         {
             for (; count < 10; count++)
             {
