@@ -18,7 +18,7 @@ public sealed class TemplateWriterWriteValueTest
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "N3", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "N3", CultureInfo.GetCultureInfo("es-ES"));
+            writer.WriteValue(value, "N3", CultureInfo.GetCultureInfo("es-ES", true));
         }
 
         bufferWriter.WrittenSpan.ToArray()
@@ -36,7 +36,7 @@ public sealed class TemplateWriterWriteValueTest
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "F2", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "F3", CultureInfo.GetCultureInfo("es-ES"));
+            writer.WriteValue(value, "F3", CultureInfo.GetCultureInfo("es-ES", true));
         }
 
         bufferWriter.WrittenSpan.ToArray()
@@ -54,7 +54,7 @@ public sealed class TemplateWriterWriteValueTest
         {
             writer.WriteValue(value, default, CultureInfo.InvariantCulture);
             writer.WriteValue(value, "d", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "D", CultureInfo.GetCultureInfo("ja-JP"));
+            writer.WriteValue(value, "D", CultureInfo.GetCultureInfo("ja-JP", true));
         }
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)

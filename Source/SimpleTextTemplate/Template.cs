@@ -47,9 +47,7 @@ public readonly struct Template
         {
             if (type == BlockType.None)
             {
-                template = new([]);
-                consumed = reader.Consumed;
-                return false;
+                goto Error;
             }
 
             if (type != BlockType.Identifier)
@@ -62,18 +60,34 @@ public readonly struct Template
 
             if (!identifierReader.TryRead(out var identifier, out var format, out var culture))
             {
-                template = new([]);
-                consumed = reader.Consumed;
-                return false;
+                goto Error;
             }
 
-            var cultureInfo = culture is null ? null : CultureInfo.GetCultureInfo(culture);
+            CultureInfo? cultureInfo = null;
+
+            try
+            {
+                if (culture is not null)
+                {
+                    cultureInfo = CultureInfo.GetCultureInfo(culture, true);
+                }
+            }
+            catch (CultureNotFoundException)
+            {
+                goto Error;
+            }
+
             list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 
         template = new([.. list]);
         consumed = reader.Consumed;
         return true;
+
+    Error:
+        template = new([]);
+        consumed = reader.Consumed;
+        return false;
     }
 
     /// <summary>
@@ -82,6 +96,7 @@ public readonly struct Template
     /// <param name="source">テンプレート文字列</param>
     /// <returns><see cref="Template"/>構造体のインスタンス</returns>
     /// <exception cref="ArgumentNullException">引数がnullです。</exception>
+    /// <exception cref="CultureNotFoundException">カルチャーが見つかりません。</exception>
     /// <exception cref="TemplateException">テンプレートの解析に失敗しました。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Template Parse(byte[] source)
@@ -103,7 +118,7 @@ public readonly struct Template
             var identifierReader = new TemplateIdentifierReader(value);
             identifierReader.Read(out var identifier, out var format, out var culture);
 
-            var cultureInfo = culture is null ? null : CultureInfo.GetCultureInfo(culture);
+            var cultureInfo = culture is null ? null : CultureInfo.GetCultureInfo(culture, true);
             list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 
