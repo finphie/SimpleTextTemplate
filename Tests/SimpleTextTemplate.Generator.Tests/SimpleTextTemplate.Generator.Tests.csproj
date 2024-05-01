@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Source\SimpleTextTemplate.Generator.Internal\SimpleTextTemplate.Generator.Internal.csproj" />
     <ProjectReference Include="..\..\Source\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate.Generator.Tests.Core\SimpleTextTemplate.Generator.Tests.Core.csproj" />
   </ItemGroup>
 
 </Project>
