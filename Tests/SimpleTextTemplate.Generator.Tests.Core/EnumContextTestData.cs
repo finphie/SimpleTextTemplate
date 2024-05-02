@@ -3,9 +3,9 @@
 public sealed record EnumContextTestData
 {
     public static readonly EnumTestData EnumStaticField = EnumTestData.A;
-    public readonly EnumTestData EnumField = EnumTestData.B;
+    public readonly EnumTestData EnumField = EnumTestData.A;
 
-    public static EnumTestData EnumStaticProperty => EnumTestData.C;
+    public static EnumTestData EnumStaticProperty => EnumTestData.A;
 
-    public EnumTestData EnumProperty => EnumTestData.D;
+    public EnumTestData EnumProperty => EnumTestData.A;
 }

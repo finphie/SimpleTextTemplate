@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.Text;
 using FluentAssertions;
 using Xunit;
 
@@ -30,7 +29,7 @@ public sealed class TemplateWriterWriteEnumTest
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
-            .Equal(Encoding.UTF8.GetBytes(value.ToString()));
+            .Equal("A"u8.ToArray());
     }
 
     [Fact]
@@ -41,12 +40,12 @@ public sealed class TemplateWriterWriteEnumTest
 
         using (var writer = TemplateWriter.Create(bufferWriter))
         {
-            writer.WriteEnum(value, "G");
+            writer.WriteEnum(value, "D");
         }
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
-            .Equal(Encoding.UTF8.GetBytes(value.ToString("G")));
+            .Equal("0"u8.ToArray());
     }
 
     [Fact]
