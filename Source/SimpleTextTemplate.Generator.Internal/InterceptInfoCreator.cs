@@ -273,12 +273,18 @@ ref struct InterceptInfoCreator
             return true;
         }
 
-        if (provider is not null && value is IFormattable formattableValue)
+        if (value is IFormattable formattableValue)
         {
+            if (provider is null)
+            {
+                return false;
+            }
+
             AddConstantString(formattableValue.ToString(format, provider));
             return true;
         }
 
-        return false;
+        AddConstantString(value.ToString());
+        return true;
     }
 }
