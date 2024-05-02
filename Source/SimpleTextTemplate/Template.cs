@@ -69,7 +69,11 @@ public readonly struct Template
             {
                 if (culture is not null)
                 {
+#if NET8_0_OR_GREATER
                     cultureInfo = CultureInfo.GetCultureInfo(culture, true);
+#else
+                    cultureInfo = CultureInfo.GetCultureInfo(culture);
+#endif
                 }
             }
             catch (CultureNotFoundException)
@@ -118,7 +122,14 @@ public readonly struct Template
             var identifierReader = new TemplateIdentifierReader(value);
             identifierReader.Read(out var identifier, out var format, out var culture);
 
-            var cultureInfo = culture is null ? null : CultureInfo.GetCultureInfo(culture, true);
+            var cultureInfo = culture is null
+                ? null
+#if NET8_0_OR_GREATER
+                : CultureInfo.GetCultureInfo(culture, true);
+#else
+                : CultureInfo.GetCultureInfo(culture);
+#endif
+
             list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 
