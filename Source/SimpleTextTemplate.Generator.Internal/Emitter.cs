@@ -1,6 +1,5 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -38,6 +37,43 @@ static class Emitter
                 file static class Intercept
                 {
             """);
+
+        var cultures = infoList.SelectMany(static x => x.WriteInfoList.Select(static x => x.Provider))
+            .Distinct()
+            .Select(static x => x?.GetName())
+            .Where(static x => !string.IsNullOrEmpty(x))
+            .ToArray();
+
+        foreach (var culture in cultures)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            builder.AppendLine($"""
+                        static global::System.Globalization.CultureInfo {culture!.Replace("-", string.Empty)};
+                """);
+        }
+
+        if (cultures.Length > 0)
+        {
+            builder.AppendLine("""
+
+                        [global::System.Runtime.CompilerServices.ModuleInitializer]
+                        public static void Initialize()
+                        {
+                """);
+
+            foreach (var culture in cultures)
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+                builder.AppendLine($$"""
+                                {{culture!.Replace("-", string.Empty)}} = global::System.Globalization.CultureInfo.GetCultureInfo("{{culture}}", true);               
+                    """);
+            }
+
+            builder.AppendLine("""
+                        }
+
+                """);
+        }
 
         for (var i = 0; i < infoList.Length; i++)
         {
@@ -99,8 +135,8 @@ static class Emitter
             $"{nameof(contextTypeName)}がnullかつ静的識別子の場合、コンテキストクラス名が必要となります。");
 
         var formatArgument = format is null
-            ? string.Empty
-            : $", {format.ToLiteral()}";
+            ? "default"
+            : format.ToLiteral();
 
         var providerArgument = GetProviderArgument(provider);
 
@@ -108,19 +144,15 @@ static class Emitter
         {
             WriteConstantLiteral => value.ToUtf8Literal(),
             WriteLiteral or WriteString => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
-            WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}{formatArgument}, {providerArgument}",
-            WriteEnum => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}{formatArgument}",
+            WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}, {providerArgument}",
+            WriteEnum => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}",
             WriteStaticLiteral or WriteStaticString => $"{contextTypeName}.@{value}",
-            WriteStaticValue => $"{contextTypeName}.@{value}{formatArgument}, {providerArgument}",
-            WriteStaticEnum => $"{contextTypeName}.@{value}{formatArgument}",
+            WriteStaticValue => $"{contextTypeName}.@{value}, {formatArgument}, {providerArgument}",
+            WriteStaticEnum => $"{contextTypeName}.@{value}, {formatArgument}",
             _ => throw new InvalidOperationException()
         };
 
         static string GetProviderArgument(IFormatProvider? provider)
-        {
-            return provider is not CultureInfo culture ? "provider"
-                : culture.IsSpecialCulture(out var cultureName) ? cultureName
-                : throw new InvalidOperationException("未対応のカルチャーです。");
-        }
+            => provider is null ? "provider" : provider.ToFullString();
     }
 }
