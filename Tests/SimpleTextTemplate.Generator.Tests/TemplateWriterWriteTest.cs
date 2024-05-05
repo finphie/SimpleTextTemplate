@@ -1,0 +1,194 @@
+﻿using System.Buffers;
+using FluentAssertions;
+using SimpleTextTemplate.Generator.Tests.Core;
+using Xunit;
+using static SimpleTextTemplate.Generator.Tests.Constants;
+
+namespace SimpleTextTemplate.Generator.Tests;
+
+public sealed class TemplateWriterWriteTest
+{
+    [Fact]
+    public void Byte配列()
+    {
+        var sourceCode = SourceCode.Get(
+            [
+                "{{ BytesStaticField }}{{ BytesField }}{{ BytesSpanStaticProperty }}{{ BytesSpanProperty }}{{ BytesStaticProperty }}{{ BytesProperty }}",
+                "{{ BytesStaticField }}{{ BytesField }}{{ BytesSpanStaticProperty }}{{ BytesSpanProperty }}{{ BytesStaticProperty }}{{ BytesProperty }}"
+            ],
+            nameof(ByteArrayContextTestData));
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+
+        // BytesStaticField
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteLiteral);
+
+        // BytesField
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[1].Name.Should().Be(WriteLiteral);
+
+        // BytesSpanStaticProperty
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[2].Name.Should().Be(WriteLiteral);
+
+        // BytesSpanProperty
+        interceptInfoList[0].Methods[3].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[3].Name.Should().Be(WriteLiteral);
+
+        // BytesStaticProperty
+        interceptInfoList[0].Methods[4].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[4].Name.Should().Be(WriteLiteral);
+
+        // BytesProperty
+        interceptInfoList[0].Methods[5].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[5].Name.Should().Be(WriteLiteral);
+    }
+
+    [Fact]
+    public void Char配列()
+    {
+        var sourceCode = SourceCode.Get(
+            [
+                "{{ CharsStaticField }}{{ CharsField }}{{ CharsSpanStaticProperty }}{{ CharsSpanProperty }}{{ CharsStaticProperty }}{{ CharsProperty }}",
+                "{{ CharsStaticField }}{{ CharsField }}{{ CharsSpanStaticProperty }}{{ CharsSpanProperty }}{{ CharsStaticProperty }}{{ CharsProperty }}"
+            ],
+            nameof(CharArrayContextTestData));
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+
+        // BytesStaticField
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteString);
+
+        // BytesField
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[1].Name.Should().Be(WriteString);
+
+        // BytesSpanStaticProperty
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[2].Name.Should().Be(WriteString);
+
+        // BytesSpanProperty
+        interceptInfoList[0].Methods[3].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[3].Name.Should().Be(WriteString);
+
+        // BytesStaticProperty
+        interceptInfoList[0].Methods[4].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[4].Name.Should().Be(WriteString);
+
+        // BytesProperty
+        interceptInfoList[0].Methods[5].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[5].Name.Should().Be(WriteString);
+    }
+
+    [Fact]
+    public void 文字列()
+    {
+        var sourceCode = SourceCode.Get(
+            [
+                "{{ StringConstantField }}{{ StringStaticField }}{{ StringField }}{{ StringStaticProperty }}{{ StringProperty }}",
+                "{{ StringConstantField }}{{ StringStaticField }}{{ StringField }}{{ StringStaticProperty }}{{ StringProperty }}"
+            ],
+            nameof(StringContextTestData));
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+
+        // StringConstantField
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
+
+        // StringStaticField
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[1].Name.Should().Be(WriteString);
+
+        // StringField
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[2].Name.Should().Be(WriteString);
+
+        // StringStaticProperty
+        interceptInfoList[0].Methods[3].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[3].Name.Should().Be(WriteString);
+
+        // StringProperty
+        interceptInfoList[0].Methods[4].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[4].Name.Should().Be(WriteString);
+    }
+
+    [Fact]
+    public void Enum()
+    {
+        var sourceCode = SourceCode.Get(
+            [
+                "{{ EnumStaticField }}{{ EnumField }}{{ EnumStaticProperty }}{{ EnumProperty }}",
+                "{{ EnumStaticField:D }}{{ EnumField:D }}{{ EnumStaticProperty:D }}{{ EnumProperty:D }}"
+            ],
+            nameof(EnumContextTestData));
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+
+        // EnumStaticField
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteEnum);
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteEnum);
+
+        // EnumField
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteEnum);
+        interceptInfoList[1].Methods[1].Name.Should().Be(WriteEnum);
+
+        // EnumStaticProperty
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteEnum);
+        interceptInfoList[1].Methods[2].Name.Should().Be(WriteEnum);
+
+        // EnumProperty
+        interceptInfoList[0].Methods[3].Name.Should().Be(WriteEnum);
+        interceptInfoList[1].Methods[3].Name.Should().Be(WriteEnum);
+    }
+
+    [Fact]
+    public void DateTimeOffset()
+    {
+        var sourceCode = SourceCode.Get(
+            [
+                "{{ DateTimeOffsetStaticField }}{{ DateTimeOffsetField }}{{ DateTimeOffsetStaticProperty }}{{ DateTimeOffsetProperty }}",
+                "{{ DateTimeOffsetStaticField:o }}{{ DateTimeOffsetField:D:ja-JP }}{{ DateTimeOffsetStaticProperty::ja-JP }}{{ DateTimeOffsetProperty }}"
+            ],
+            nameof(DateTimeOffsetContextTestData));
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+
+        // DateTimeOffsetStaticField
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteValue);
+
+        // DateTimeOffsetField
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[1].Name.Should().Be(WriteValue);
+
+        // DateTimeOffsetStaticProperty
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[2].Name.Should().Be(WriteValue);
+
+        // DateTimeOffsetProperty
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[2].Name.Should().Be(WriteValue);
+    }
+}
+
+file static class Constants
+{
+    public const string WriteConstantLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.WriteConstantLiteral);
+    public const string WriteLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.WriteLiteral);
+    public const string WriteString = nameof(TemplateWriter<IBufferWriter<byte>>.WriteString);
+    public const string WriteEnum = nameof(TemplateWriter<IBufferWriter<byte>>.WriteEnum);
+    public const string WriteValue = nameof(TemplateWriter<IBufferWriter<byte>>.WriteValue);
+}
