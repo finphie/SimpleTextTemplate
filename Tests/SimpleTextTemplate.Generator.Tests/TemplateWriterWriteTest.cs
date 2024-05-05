@@ -153,6 +153,43 @@ public sealed class TemplateWriterWriteTest
     }
 
     [Fact]
+    public void 数字()
+    {
+        var sourceCode = SourceCode.Get(
+            [
+                "{{ IntConstantField }}{{ IntStaticField }}{{ IntField }}{{ IntStaticProperty }}{{ IntProperty }}",
+                "{{ IntConstantField:N3 }}{{ IntStaticField:N3 }}{{ IntField:N3 }}{{ IntStaticProperty:N3 }}{{ IntProperty:N3:es-ES }}",
+                "{{ IntConstantField:N3:es-ES }}"
+            ],
+            nameof(IntContextTestData));
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+
+        // IntConstantField
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[2].Methods[0].Name.Should().Be(WriteConstantLiteral);
+
+        // IntStaticField
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[1].Name.Should().Be(WriteValue);
+
+        // IntField
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[2].Name.Should().Be(WriteValue);
+
+        // IntStaticProperty
+        interceptInfoList[0].Methods[3].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[3].Name.Should().Be(WriteValue);
+
+        // IntProperty
+        interceptInfoList[0].Methods[4].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[4].Name.Should().Be(WriteValue);
+    }
+
+    [Fact]
     public void DateTimeOffset()
     {
         var sourceCode = SourceCode.Get(
