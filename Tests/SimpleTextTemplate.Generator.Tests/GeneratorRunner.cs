@@ -35,8 +35,7 @@ static class GeneratorRunner
 
         _baseCompilation = CSharpCompilation.Create(
             "test",
-            references: references,
-            options: new(OutputKind.DynamicallyLinkedLibrary));
+            references: references);
     }
 
     /// <summary>

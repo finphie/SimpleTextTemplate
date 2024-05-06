@@ -262,6 +262,28 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteValue);
         interceptInfoList[1].Methods[2].Name.Should().Be(WriteValue);
     }
+
+    [Fact]
+    public void トップレベルステートメント()
+    {
+        var sourceCode = $$$"""
+            using System.Buffers;
+            using SimpleTextTemplate;
+            using SimpleTextTemplate.Generator.Tests.Core;
+            
+            var bufferWriter = new ArrayBufferWriter<byte>();
+            var writer = TemplateWriter.Create(bufferWriter);
+            var context = new {{{nameof(ByteArrayContextTestData)}}}();
+            writer.Write("{{ BytesStaticField }}", in context);
+            """;
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(1);
+        interceptInfoList[0].Methods.Should().HaveCount(1);
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteLiteral);
+    }
 }
 
 file static class Constants
