@@ -9,6 +9,27 @@ namespace SimpleTextTemplate.Generator.Tests;
 public sealed class TemplateWriterWriteTest
 {
     [Fact]
+    public void 定数()
+    {
+        var sourceCode = SourceCode.Get(
+            [
+                "A{{ StringStaticField }}B",
+                "A{{ StringConstantField }}B"
+            ],
+            nameof(StringContextTestData));
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Text.Should().Be($"\"A{StringContextTestData.StringConstantField}B\"u8");
+    }
+
+    [Fact]
     public void Byte配列()
     {
         var sourceCode = SourceCode.Get(
