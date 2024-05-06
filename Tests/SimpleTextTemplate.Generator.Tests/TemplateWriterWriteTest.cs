@@ -34,7 +34,7 @@ public sealed class TemplateWriterWriteTest
         var sourceCode = SourceCode.Get(
             [
                 "A{{ StringStaticField }}B",
-                "A{{ StringConstantField }}B"
+                "A{{ StringConstantField }}{{ StringConstantField }}B"
             ],
             nameof(StringContextTestData));
         var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
@@ -49,7 +49,7 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteString);
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteConstantLiteral);
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
-        interceptInfoList[1].Methods[0].Text.Should().Be($"\"A{StringContextTestData.StringConstantField}B\"u8");
+        interceptInfoList[1].Methods[0].Text.Should().Be($"\"A{StringContextTestData.StringConstantField}{StringContextTestData.StringConstantField}B\"u8");
     }
 
     [Fact]
