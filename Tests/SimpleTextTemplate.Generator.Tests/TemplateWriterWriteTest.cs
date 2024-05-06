@@ -21,6 +21,9 @@ public sealed class TemplateWriterWriteTest
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(3);
+        interceptInfoList[1].Methods.Should().HaveCount(1);
 
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteString);
@@ -42,6 +45,9 @@ public sealed class TemplateWriterWriteTest
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(6);
+        interceptInfoList[1].Methods.Should().HaveCount(6);
 
         // BytesStaticField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteLiteral);
@@ -81,6 +87,9 @@ public sealed class TemplateWriterWriteTest
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(6);
+        interceptInfoList[1].Methods.Should().HaveCount(6);
 
         // BytesStaticField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteString);
@@ -120,6 +129,9 @@ public sealed class TemplateWriterWriteTest
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(5);
+        interceptInfoList[1].Methods.Should().HaveCount(5);
 
         // StringConstantField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
@@ -155,6 +167,9 @@ public sealed class TemplateWriterWriteTest
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(4);
+        interceptInfoList[1].Methods.Should().HaveCount(4);
 
         // EnumStaticField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteEnum);
@@ -187,6 +202,10 @@ public sealed class TemplateWriterWriteTest
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(3);
+        interceptInfoList[0].Methods.Should().HaveCount(5);
+        interceptInfoList[1].Methods.Should().HaveCount(5);
+        interceptInfoList[2].Methods.Should().HaveCount(1);
 
         // IntConstantField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
@@ -223,6 +242,9 @@ public sealed class TemplateWriterWriteTest
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(4);
+        interceptInfoList[1].Methods.Should().HaveCount(4);
 
         // DateTimeOffsetStaticField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
