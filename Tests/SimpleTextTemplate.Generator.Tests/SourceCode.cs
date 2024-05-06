@@ -20,7 +20,6 @@ static class SourceCode
         builder.AppendLine(value: $$"""
             using System.Buffers;
             using SimpleTextTemplate;
-            using SimpleTextTemplate.Generator.Tests.Core;
             
             namespace MyCode;
             
@@ -34,7 +33,7 @@ static class SourceCode
 
         if (context is not null)
         {
-            builder.AppendLine(value: $"""        var context = new {context}();""");
+            builder.AppendLine(value: $"""        var context = new SimpleTextTemplate.Generator.Tests.Core.{context}();""");
         }
 
         foreach (var templateText in templateTextList)

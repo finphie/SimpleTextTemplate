@@ -9,6 +9,26 @@ namespace SimpleTextTemplate.Generator.Tests;
 public sealed class TemplateWriterWriteTest
 {
     [Fact]
+    public void 識別子なし()
+    {
+        var sourceCode = SourceCode.Get(
+            [
+                "A",
+                "B"
+            ]);
+        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(1);
+        interceptInfoList[1].Methods.Should().HaveCount(1);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
+    }
+
+    [Fact]
     public void 定数()
     {
         var sourceCode = SourceCode.Get(
