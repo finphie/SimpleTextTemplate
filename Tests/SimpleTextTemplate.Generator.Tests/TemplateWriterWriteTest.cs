@@ -3,6 +3,8 @@ using FluentAssertions;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
 using static SimpleTextTemplate.Generator.Tests.Constants;
+using static SimpleTextTemplate.Generator.Tests.GeneratorRunner;
+using static SimpleTextTemplate.Generator.Tests.SourceCode;
 
 namespace SimpleTextTemplate.Generator.Tests;
 
@@ -11,12 +13,12 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void 識別子なし()
     {
-        var sourceCode = SourceCode.Get(
+        var sourceCode = Get(
             [
                 "A",
                 "B"
             ]);
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
@@ -31,13 +33,13 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void 定数()
     {
-        var sourceCode = SourceCode.Get(
+        var sourceCode = Get(
             [
                 "A{{ StringStaticField }}B",
                 "A{{ StringConstantField }}{{ StringConstantField }}B"
             ],
             nameof(StringContextTestData));
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
@@ -55,13 +57,13 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void Byte配列()
     {
-        var sourceCode = SourceCode.Get(
+        var sourceCode = Get(
             [
                 "{{ BytesStaticField }}{{ BytesField }}{{ BytesSpanStaticProperty }}{{ BytesSpanProperty }}{{ BytesStaticProperty }}{{ BytesProperty }}",
                 "{{ BytesStaticField }}{{ BytesField }}{{ BytesSpanStaticProperty }}{{ BytesSpanProperty }}{{ BytesStaticProperty }}{{ BytesProperty }}"
             ],
             nameof(ByteArrayContextTestData));
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
@@ -97,13 +99,13 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void Char配列()
     {
-        var sourceCode = SourceCode.Get(
+        var sourceCode = Get(
             [
                 "{{ CharsStaticField }}{{ CharsField }}{{ CharsSpanStaticProperty }}{{ CharsSpanProperty }}{{ CharsStaticProperty }}{{ CharsProperty }}",
                 "{{ CharsStaticField }}{{ CharsField }}{{ CharsSpanStaticProperty }}{{ CharsSpanProperty }}{{ CharsStaticProperty }}{{ CharsProperty }}"
             ],
             nameof(CharArrayContextTestData));
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
@@ -139,13 +141,13 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void 文字列()
     {
-        var sourceCode = SourceCode.Get(
+        var sourceCode = Get(
             [
                 "{{ StringConstantField }}{{ StringStaticField }}{{ StringField }}{{ StringStaticProperty }}{{ StringProperty }}",
                 "{{ StringConstantField }}{{ StringStaticField }}{{ StringField }}{{ StringStaticProperty }}{{ StringProperty }}"
             ],
             nameof(StringContextTestData));
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
@@ -177,13 +179,13 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void Enum()
     {
-        var sourceCode = SourceCode.Get(
+        var sourceCode = Get(
             [
                 "{{ EnumStaticField }}{{ EnumField }}{{ EnumStaticProperty }}{{ EnumProperty }}",
                 "{{ EnumStaticField:D }}{{ EnumField:D }}{{ EnumStaticProperty:D }}{{ EnumProperty:D }}"
             ],
             nameof(EnumContextTestData));
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
@@ -211,14 +213,14 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void 数字()
     {
-        var sourceCode = SourceCode.Get(
+        var sourceCode = Get(
             [
                 "{{ IntConstantField }}{{ IntStaticField }}{{ IntField }}{{ IntStaticProperty }}{{ IntProperty }}",
                 "{{ IntConstantField:N3 }}{{ IntStaticField:N3 }}{{ IntField:N3 }}{{ IntStaticProperty:N3 }}{{ IntProperty:N3:es-ES }}",
                 "{{ IntConstantField:N3:es-ES }}"
             ],
             nameof(IntContextTestData));
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
@@ -252,13 +254,13 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void DateTimeOffset()
     {
-        var sourceCode = SourceCode.Get(
+        var sourceCode = Get(
             [
                 "{{ DateTimeOffsetStaticField }}{{ DateTimeOffsetField }}{{ DateTimeOffsetStaticProperty }}{{ DateTimeOffsetProperty }}",
                 "{{ DateTimeOffsetStaticField:o }}{{ DateTimeOffsetField:D:ja-JP }}{{ DateTimeOffsetStaticProperty::ja-JP }}{{ DateTimeOffsetProperty }}"
             ],
             nameof(DateTimeOffsetContextTestData));
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
@@ -296,7 +298,7 @@ public sealed class TemplateWriterWriteTest
             var context = new {{{nameof(ByteArrayContextTestData)}}}();
             writer.Write("{{ BytesStaticField }}", in context);
             """;
-        var (compilation, diagnostics) = GeneratorRunner.Run(sourceCode);
+        var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
