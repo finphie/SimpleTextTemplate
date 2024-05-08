@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace SimpleTextTemplate.Generator.Tests;
+namespace SimpleTextTemplate.Generator.Tests.Extensions;
 
 /// <summary>
 /// <see cref="Compilation"/>クラス関連の拡張メソッド集です。
