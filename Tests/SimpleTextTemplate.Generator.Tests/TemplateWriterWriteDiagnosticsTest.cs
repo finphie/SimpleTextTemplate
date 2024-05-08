@@ -32,6 +32,19 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     }
 
     [Fact]
+    public void テンプレート文字列がnull_STT1000()
+    {
+        var sourceCode = Get(templateText: null);
+        var (_, diagnostics) = Run(sourceCode);
+
+        diagnostics.Should().HaveCount(1);
+
+        diagnostics[0].Id.Should().Be("STT1000");
+        diagnostics[0].Severity.Should().Be(Error);
+        diagnostics[0].GetText().Should().Be("null");
+    }
+
+    [Fact]
     public void テンプレート文字列に識別子がありコンテキストの指定がない_STT1001()
     {
         var sourceCode = """

@@ -14,7 +14,7 @@ static class SourceCode
     /// <param name="templateText">テンプレート文字列</param>
     /// <param name="context">コンテキスト名</param>
     /// <returns>ソースコードを返します。</returns>
-    public static string Get(string templateText, string? context = null)
+    public static string Get(string? templateText, string? context = null)
         => Get([templateText], context);
 
     /// <summary>
@@ -23,7 +23,7 @@ static class SourceCode
     /// <param name="templateTextList">テンプレート文字列のリスト</param>
     /// <param name="context">コンテキスト名</param>
     /// <returns>ソースコードを返します。</returns>
-    public static string Get(string[] templateTextList, string? context = null)
+    public static string Get(string?[] templateTextList, string? context = null)
     {
         var builder = new StringBuilder();
         builder.AppendLine(value: $$"""

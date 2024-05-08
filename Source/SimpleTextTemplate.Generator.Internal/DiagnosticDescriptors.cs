@@ -13,7 +13,7 @@ static class DiagnosticDescriptors
     public static readonly DiagnosticDescriptor TemplateStringMustBeConstant = new(
         "STT1000",
         "テンプレート文字列が不正な形式です。",
-        "テンプレート文字列は定数にする必要があります。",
+        "テンプレート文字列はnull以外の定数にする必要があります。",
         nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);
