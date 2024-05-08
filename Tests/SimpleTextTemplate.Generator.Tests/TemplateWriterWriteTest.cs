@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using FluentAssertions;
 using SimpleTextTemplate.Generator.Tests.Core;
+using SimpleTextTemplate.Generator.Tests.Extensions;
 using Xunit;
 using static SimpleTextTemplate.Generator.Tests.Constants;
 using static SimpleTextTemplate.Generator.Tests.GeneratorRunner;
