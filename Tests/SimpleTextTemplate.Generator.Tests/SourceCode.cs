@@ -63,7 +63,13 @@ static class SourceCode
                 continue;
             }
 
-            builder.AppendLine(value: $"""        writer.Write({source}, in context, System.Globalization.{provider});""");
+            if (provider.StartsWith("CultureInfo", StringComparison.Ordinal))
+            {
+                builder.AppendLine(value: $"""        writer.Write({source}, in context, System.Globalization.{provider});""");
+                continue;
+            }
+
+            builder.AppendLine(value: $"""        writer.Write({source}, in context, {provider});""");
         }
 
         builder.AppendLine($$"""

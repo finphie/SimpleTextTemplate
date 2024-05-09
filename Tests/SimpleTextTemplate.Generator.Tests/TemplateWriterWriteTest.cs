@@ -621,6 +621,24 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
         interceptInfoList[0].Methods[1].Provider.Should().Be("jaJP");
     }
+
+    [Fact]
+    public void カルチャーにnullを指定()
+    {
+        var sourceCode = Get("{{ DateTimeOffsetStaticField }}{{ DateTimeOffsetStaticField::ja-JP }}", nameof(DateTimeOffsetContextTestData), "null");
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(1);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Provider.Should().Be("jaJP");
+    }
 }
 
 file static class Constants
