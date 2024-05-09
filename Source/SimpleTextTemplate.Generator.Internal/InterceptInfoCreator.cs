@@ -145,15 +145,15 @@ ref struct InterceptInfoCreator
             return true;
         }
 
-        if (providerExpression is not MemberAccessExpressionSyntax { Name.Identifier.ValueText: "InvariantCulture" } providerArgument)
-        {
-            return false;
-        }
+        var operation = _semanticModel.GetOperation(providerExpression, _cancellationToken);
 
-        var symbolInfo = _semanticModel.GetSymbolInfo(providerArgument, _cancellationToken);
-        var providerTypeName = symbolInfo.Symbol?.ContainingType.ToDisplayString(FullyQualifiedFormat);
-
-        return providerTypeName == "global::System.Globalization.CultureInfo";
+        return operation is IPropertyReferenceOperation { Property.ContainingNamespace: { Name: nameof(System.Globalization), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } } providerOperation &&
+            providerOperation switch
+            {
+                { Property: { Name: nameof(CultureInfo.InvariantCulture), ContainingType.Name: nameof(CultureInfo) } } or
+                { Property: { Name: nameof(DateTimeFormatInfo.InvariantInfo), ContainingType.Name: nameof(DateTimeFormatInfo) } } => true,
+                _ => false
+            };
     }
 
     void AnalyzeTemplate(in Template template)

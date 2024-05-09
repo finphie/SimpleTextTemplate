@@ -605,6 +605,42 @@ public sealed class TemplateWriterWriteTest
     }
 
     [Fact]
+    public void InvariantInfo()
+    {
+        var sourceCode = Get("{{ DateTimeOffsetStaticField }}{{ DateTimeOffsetStaticField::ja-JP }}", nameof(DateTimeOffsetContextTestData), DateTimeFormatInfo.InvariantInfo.ToExpressionString());
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(1);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Provider.Should().Be("jaJP");
+    }
+
+    [Fact]
+    public void CurrentCulture()
+    {
+        var sourceCode = Get("{{ DateTimeOffsetStaticField }}{{ DateTimeOffsetStaticField::ja-JP }}", nameof(DateTimeOffsetContextTestData), CultureInfo.CurrentCulture.ToExpressionString());
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(1);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Provider.Should().Be("provider");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Provider.Should().Be("jaJP");
+    }
+
+    [Fact]
     public void 特定カルチャー指定()
     {
         var sourceCode = Get("{{ DateTimeOffsetStaticField }}{{ DateTimeOffsetStaticField::ja-JP }}", nameof(DateTimeOffsetContextTestData), CultureInfo.GetCultureInfo("en-US", true).ToExpressionString());

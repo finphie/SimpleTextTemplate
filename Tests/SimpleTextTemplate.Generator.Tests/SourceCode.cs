@@ -63,7 +63,7 @@ static class SourceCode
                 continue;
             }
 
-            if (provider.StartsWith("CultureInfo", StringComparison.Ordinal))
+            if (provider.StartsWith("CultureInfo", StringComparison.Ordinal) || provider.StartsWith("DateTimeFormatInfo", StringComparison.Ordinal))
             {
                 builder.AppendLine(value: $"""        writer.Write({source}, in context, System.Globalization.{provider});""");
                 continue;
