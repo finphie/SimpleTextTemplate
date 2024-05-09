@@ -13,17 +13,19 @@ static class SourceCode
     /// </summary>
     /// <param name="templateText">テンプレート文字列</param>
     /// <param name="context">コンテキスト名</param>
+    /// <param name="provider">カルチャー指定</param>
     /// <returns>ソースコードを返します。</returns>
-    public static string Get(string? templateText, string? context = null)
-        => Get([templateText], context);
+    public static string Get(string? templateText, string? context = null, string? provider = null)
+        => Get([templateText], context, provider);
 
     /// <summary>
     /// ソースコードを取得します。
     /// </summary>
     /// <param name="templateTextList">テンプレート文字列のリスト</param>
     /// <param name="context">コンテキスト名</param>
+    /// <param name="provider">カルチャー指定</param>
     /// <returns>ソースコードを返します。</returns>
-    public static string Get(string?[] templateTextList, string? context = null)
+    public static string Get(string?[] templateTextList, string? context = null, string? provider = null)
     {
         var builder = new StringBuilder();
         builder.AppendLine(value: $$"""
@@ -55,7 +57,13 @@ static class SourceCode
                 continue;
             }
 
-            builder.AppendLine(value: $"""        writer.Write({source}, in context);""");
+            if (provider is null)
+            {
+                builder.AppendLine(value: $"""        writer.Write({source}, in context);""");
+                continue;
+            }
+
+            builder.AppendLine(value: $"""        writer.Write({source}, in context, System.Globalization.{provider});""");
         }
 
         builder.AppendLine($$"""

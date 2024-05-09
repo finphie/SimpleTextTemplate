@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Globalization;
 using FluentAssertions;
 using SimpleTextTemplate.Generator.Tests.Core;
 using SimpleTextTemplate.Generator.Tests.Extensions;
@@ -70,7 +71,14 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[1].Methods.Should().HaveCount(1);
 
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[0].Methods[0].Text.Should().Be("\"A\"u8");
+        interceptInfoList[0].Methods[0].Format.Should().BeNull();
+        interceptInfoList[0].Methods[0].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Text.Should().Be("\"B\"u8");
+        interceptInfoList[1].Methods[0].Format.Should().BeNull();
+        interceptInfoList[1].Methods[0].Provider.Should().BeNull();
     }
 
     [Fact]
@@ -91,10 +99,24 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[1].Methods.Should().HaveCount(1);
 
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[0].Methods[0].Text.Should().Be("\"A\"u8");
+        interceptInfoList[0].Methods[0].Format.Should().BeNull();
+        interceptInfoList[0].Methods[0].Provider.Should().BeNull();
+
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticField");
+        interceptInfoList[0].Methods[1].Format.Should().BeNull();
+        interceptInfoList[0].Methods[1].Provider.Should().BeNull();
+
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[0].Methods[2].Text.Should().Be("\"B\"u8");
+        interceptInfoList[0].Methods[2].Format.Should().BeNull();
+        interceptInfoList[0].Methods[2].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
         interceptInfoList[1].Methods[0].Text.Should().Be($"\"A{StringContextTestData.StringConstantField}{StringContextTestData.StringConstantField}B\"u8");
+        interceptInfoList[1].Methods[0].Format.Should().BeNull();
+        interceptInfoList[1].Methods[0].Provider.Should().BeNull();
     }
 
     [Fact]
@@ -116,27 +138,69 @@ public sealed class TemplateWriterWriteTest
 
         // BytesStaticField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteLiteral);
+        interceptInfoList[0].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticField");
+        interceptInfoList[0].Methods[0].Format.Should().BeNull();
+        interceptInfoList[0].Methods[0].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticField");
+        interceptInfoList[1].Methods[0].Format.Should().BeNull();
+        interceptInfoList[1].Methods[0].Provider.Should().BeNull();
 
         // BytesField
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteLiteral);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesField");
+        interceptInfoList[0].Methods[1].Format.Should().BeNull();
+        interceptInfoList[0].Methods[1].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[1].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesField");
+        interceptInfoList[1].Methods[1].Format.Should().BeNull();
+        interceptInfoList[1].Methods[1].Provider.Should().BeNull();
 
         // BytesSpanStaticProperty
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteLiteral);
+        interceptInfoList[0].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesSpanStaticProperty");
+        interceptInfoList[0].Methods[2].Format.Should().BeNull();
+        interceptInfoList[0].Methods[2].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[2].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesSpanStaticProperty");
+        interceptInfoList[1].Methods[2].Format.Should().BeNull();
+        interceptInfoList[1].Methods[2].Provider.Should().BeNull();
 
         // BytesSpanProperty
         interceptInfoList[0].Methods[3].Name.Should().Be(WriteLiteral);
+        interceptInfoList[0].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesSpanProperty");
+        interceptInfoList[0].Methods[3].Format.Should().BeNull();
+        interceptInfoList[0].Methods[3].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[3].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesSpanProperty");
+        interceptInfoList[1].Methods[3].Format.Should().BeNull();
+        interceptInfoList[1].Methods[3].Provider.Should().BeNull();
 
         // BytesStaticProperty
         interceptInfoList[0].Methods[4].Name.Should().Be(WriteLiteral);
+        interceptInfoList[0].Methods[4].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticProperty");
+        interceptInfoList[0].Methods[4].Format.Should().BeNull();
+        interceptInfoList[0].Methods[4].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[4].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[4].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticProperty");
+        interceptInfoList[1].Methods[4].Format.Should().BeNull();
+        interceptInfoList[1].Methods[4].Provider.Should().BeNull();
 
         // BytesProperty
         interceptInfoList[0].Methods[5].Name.Should().Be(WriteLiteral);
+        interceptInfoList[0].Methods[5].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesProperty");
+        interceptInfoList[0].Methods[5].Format.Should().BeNull();
+        interceptInfoList[0].Methods[5].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[5].Name.Should().Be(WriteLiteral);
+        interceptInfoList[1].Methods[5].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesProperty");
+        interceptInfoList[1].Methods[5].Format.Should().BeNull();
+        interceptInfoList[1].Methods[5].Provider.Should().BeNull();
     }
 
     [Fact]
@@ -156,29 +220,71 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[0].Methods.Should().HaveCount(6);
         interceptInfoList[1].Methods.Should().HaveCount(6);
 
-        // BytesStaticField
+        // CharsStaticField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticField");
+        interceptInfoList[0].Methods[0].Format.Should().BeNull();
+        interceptInfoList[0].Methods[0].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticField");
+        interceptInfoList[1].Methods[0].Format.Should().BeNull();
+        interceptInfoList[1].Methods[0].Provider.Should().BeNull();
 
-        // BytesField
+        // CharsField
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsField");
+        interceptInfoList[0].Methods[1].Format.Should().BeNull();
+        interceptInfoList[0].Methods[1].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[1].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsField");
+        interceptInfoList[1].Methods[1].Format.Should().BeNull();
+        interceptInfoList[1].Methods[1].Provider.Should().BeNull();
 
-        // BytesSpanStaticProperty
+        // CharsSpanStaticProperty
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsSpanStaticProperty");
+        interceptInfoList[0].Methods[2].Format.Should().BeNull();
+        interceptInfoList[0].Methods[2].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[2].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsSpanStaticProperty");
+        interceptInfoList[1].Methods[2].Format.Should().BeNull();
+        interceptInfoList[1].Methods[2].Provider.Should().BeNull();
 
-        // BytesSpanProperty
+        // CharsSpanProperty
         interceptInfoList[0].Methods[3].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsSpanProperty");
+        interceptInfoList[0].Methods[3].Format.Should().BeNull();
+        interceptInfoList[0].Methods[3].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[3].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsSpanProperty");
+        interceptInfoList[1].Methods[3].Format.Should().BeNull();
+        interceptInfoList[1].Methods[3].Provider.Should().BeNull();
 
-        // BytesStaticProperty
+        // CharsStaticProperty
         interceptInfoList[0].Methods[4].Name.Should().Be(WriteString);
-        interceptInfoList[1].Methods[4].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[4].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticProperty");
+        interceptInfoList[0].Methods[4].Format.Should().BeNull();
+        interceptInfoList[0].Methods[4].Provider.Should().BeNull();
 
-        // BytesProperty
+        interceptInfoList[1].Methods[4].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[4].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticProperty");
+        interceptInfoList[1].Methods[4].Format.Should().BeNull();
+        interceptInfoList[1].Methods[4].Provider.Should().BeNull();
+
+        // CharsProperty
         interceptInfoList[0].Methods[5].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[5].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsProperty");
+        interceptInfoList[0].Methods[5].Format.Should().BeNull();
+        interceptInfoList[0].Methods[5].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[5].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[5].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsProperty");
+        interceptInfoList[1].Methods[5].Format.Should().BeNull();
+        interceptInfoList[1].Methods[5].Provider.Should().BeNull();
     }
 
     [Fact]
@@ -200,23 +306,58 @@ public sealed class TemplateWriterWriteTest
 
         // StringConstantField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[0].Methods[0].Text.Should().Be("\"_StringConstantField\"u8");
+        interceptInfoList[0].Methods[0].Format.Should().BeNull();
+        interceptInfoList[0].Methods[0].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Text.Should().Be("\"_StringConstantField\"u8");
+        interceptInfoList[1].Methods[0].Format.Should().BeNull();
+        interceptInfoList[1].Methods[0].Provider.Should().BeNull();
 
         // StringStaticField
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticField");
+        interceptInfoList[0].Methods[1].Format.Should().BeNull();
+        interceptInfoList[0].Methods[1].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[1].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[1].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticField");
+        interceptInfoList[1].Methods[1].Format.Should().BeNull();
+        interceptInfoList[1].Methods[1].Provider.Should().BeNull();
 
         // StringField
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[2].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringField");
+        interceptInfoList[0].Methods[2].Format.Should().BeNull();
+        interceptInfoList[0].Methods[2].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[2].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[2].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringField");
+        interceptInfoList[1].Methods[2].Format.Should().BeNull();
+        interceptInfoList[1].Methods[2].Provider.Should().BeNull();
 
         // StringStaticProperty
         interceptInfoList[0].Methods[3].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[3].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticProperty");
+        interceptInfoList[0].Methods[3].Format.Should().BeNull();
+        interceptInfoList[0].Methods[3].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[3].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[3].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticProperty");
+        interceptInfoList[1].Methods[3].Format.Should().BeNull();
+        interceptInfoList[1].Methods[3].Provider.Should().BeNull();
 
         // StringProperty
         interceptInfoList[0].Methods[4].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[4].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringProperty");
+        interceptInfoList[0].Methods[4].Format.Should().BeNull();
+        interceptInfoList[0].Methods[4].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[4].Name.Should().Be(WriteString);
+        interceptInfoList[1].Methods[4].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringProperty");
+        interceptInfoList[1].Methods[4].Format.Should().BeNull();
+        interceptInfoList[1].Methods[4].Provider.Should().BeNull();
     }
 
     [Fact]
@@ -238,19 +379,47 @@ public sealed class TemplateWriterWriteTest
 
         // EnumStaticField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteEnum);
+        interceptInfoList[0].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.EnumContextTestData.@EnumStaticField");
+        interceptInfoList[0].Methods[0].Format.Should().Be("default");
+        interceptInfoList[0].Methods[0].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteEnum);
+        interceptInfoList[1].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.EnumContextTestData.@EnumStaticField");
+        interceptInfoList[1].Methods[0].Format.Should().Be("\"D\"");
+        interceptInfoList[1].Methods[0].Provider.Should().BeNull();
 
         // EnumField
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteEnum);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@EnumField");
+        interceptInfoList[0].Methods[1].Format.Should().Be("default");
+        interceptInfoList[0].Methods[1].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[1].Name.Should().Be(WriteEnum);
+        interceptInfoList[1].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@EnumField");
+        interceptInfoList[1].Methods[1].Format.Should().Be("\"D\"");
+        interceptInfoList[1].Methods[1].Provider.Should().BeNull();
 
         // EnumStaticProperty
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteEnum);
+        interceptInfoList[0].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.EnumContextTestData.@EnumStaticProperty");
+        interceptInfoList[0].Methods[2].Format.Should().Be("default");
+        interceptInfoList[0].Methods[2].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[2].Name.Should().Be(WriteEnum);
+        interceptInfoList[1].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.EnumContextTestData.@EnumStaticProperty");
+        interceptInfoList[1].Methods[2].Format.Should().Be("\"D\"");
+        interceptInfoList[1].Methods[2].Provider.Should().BeNull();
 
         // EnumProperty
         interceptInfoList[0].Methods[3].Name.Should().Be(WriteEnum);
+        interceptInfoList[0].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@EnumProperty");
+        interceptInfoList[0].Methods[3].Format.Should().Be("default");
+        interceptInfoList[0].Methods[3].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[3].Name.Should().Be(WriteEnum);
+        interceptInfoList[1].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@EnumProperty");
+        interceptInfoList[1].Methods[3].Format.Should().Be("\"D\"");
+        interceptInfoList[1].Methods[3].Provider.Should().BeNull();
     }
 
     [Fact]
@@ -274,24 +443,63 @@ public sealed class TemplateWriterWriteTest
 
         // IntConstantField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[0].Methods[0].Text.Should().Be("\"1234\"u8");
+        interceptInfoList[0].Methods[0].Format.Should().BeNull();
+        interceptInfoList[0].Methods[0].Provider.Should().BeNull();
+
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Text.Should().Be("\"1,234.000\"u8");
+        interceptInfoList[1].Methods[0].Format.Should().BeNull();
+        interceptInfoList[1].Methods[0].Provider.Should().BeNull();
+
         interceptInfoList[2].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[2].Methods[0].Text.Should().Be("\"1.234,000\"u8");
+        interceptInfoList[2].Methods[0].Format.Should().BeNull();
+        interceptInfoList[2].Methods[0].Provider.Should().BeNull();
 
         // IntStaticField
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.IntContextTestData.@IntStaticField");
+        interceptInfoList[0].Methods[1].Format.Should().Be("default");
+        interceptInfoList[0].Methods[1].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
         interceptInfoList[1].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[1].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.IntContextTestData.@IntStaticField");
+        interceptInfoList[1].Methods[1].Format.Should().Be("\"N3\"");
+        interceptInfoList[1].Methods[1].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
 
         // IntField
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[2].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@IntField");
+        interceptInfoList[0].Methods[2].Format.Should().Be("default");
+        interceptInfoList[0].Methods[2].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
         interceptInfoList[1].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[2].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@IntField");
+        interceptInfoList[1].Methods[2].Format.Should().Be("\"N3\"");
+        interceptInfoList[1].Methods[2].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
 
         // IntStaticProperty
         interceptInfoList[0].Methods[3].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[3].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.IntContextTestData.@IntStaticProperty");
+        interceptInfoList[0].Methods[3].Format.Should().Be("default");
+        interceptInfoList[0].Methods[3].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
         interceptInfoList[1].Methods[3].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[3].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.IntContextTestData.@IntStaticProperty");
+        interceptInfoList[1].Methods[3].Format.Should().Be("\"N3\"");
+        interceptInfoList[1].Methods[3].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
 
         // IntProperty
         interceptInfoList[0].Methods[4].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[4].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@IntProperty");
+        interceptInfoList[0].Methods[4].Format.Should().Be("default");
+        interceptInfoList[0].Methods[4].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
         interceptInfoList[1].Methods[4].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[4].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@IntProperty");
+        interceptInfoList[1].Methods[4].Format.Should().Be("\"N3\"");
+        interceptInfoList[1].Methods[4].Provider.Should().Be("esES");
     }
 
     [Fact]
@@ -313,19 +521,47 @@ public sealed class TemplateWriterWriteTest
 
         // DateTimeOffsetStaticField
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.DateTimeOffsetContextTestData.@DateTimeOffsetStaticField");
+        interceptInfoList[0].Methods[0].Format.Should().Be("default");
+        interceptInfoList[0].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
         interceptInfoList[1].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.DateTimeOffsetContextTestData.@DateTimeOffsetStaticField");
+        interceptInfoList[1].Methods[0].Format.Should().Be("\"o\"");
+        interceptInfoList[1].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
 
         // DateTimeOffsetField
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTimeOffsetField");
+        interceptInfoList[0].Methods[1].Format.Should().Be("default");
+        interceptInfoList[0].Methods[1].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
         interceptInfoList[1].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTimeOffsetField");
+        interceptInfoList[1].Methods[1].Format.Should().Be("\"D\"");
+        interceptInfoList[1].Methods[1].Provider.Should().Be("jaJP");
 
         // DateTimeOffsetStaticProperty
         interceptInfoList[0].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.DateTimeOffsetContextTestData.@DateTimeOffsetStaticProperty");
+        interceptInfoList[0].Methods[2].Format.Should().Be("default");
+        interceptInfoList[0].Methods[2].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
         interceptInfoList[1].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.DateTimeOffsetContextTestData.@DateTimeOffsetStaticProperty");
+        interceptInfoList[1].Methods[2].Format.Should().Be("default");
+        interceptInfoList[1].Methods[2].Provider.Should().Be("jaJP");
 
         // DateTimeOffsetProperty
-        interceptInfoList[0].Methods[2].Name.Should().Be(WriteValue);
-        interceptInfoList[1].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[3].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTimeOffsetProperty");
+        interceptInfoList[0].Methods[3].Format.Should().Be("default");
+        interceptInfoList[0].Methods[3].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[1].Methods[3].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTimeOffsetProperty");
+        interceptInfoList[1].Methods[3].Format.Should().Be("default");
+        interceptInfoList[1].Methods[3].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
     }
 
     [Fact]
@@ -348,6 +584,42 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList.Should().HaveCount(1);
         interceptInfoList[0].Methods.Should().HaveCount(1);
         interceptInfoList[0].Methods[0].Name.Should().Be(WriteLiteral);
+    }
+
+    [Fact]
+    public void InvariantCulture()
+    {
+        var sourceCode = Get("{{ DateTimeOffsetStaticField }}{{ DateTimeOffsetStaticField::ja-JP }}", nameof(DateTimeOffsetContextTestData), CultureInfo.InvariantCulture.ToExpressionString());
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(1);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Provider.Should().Be("jaJP");
+    }
+
+    [Fact]
+    public void 特定カルチャー指定()
+    {
+        var sourceCode = Get("{{ DateTimeOffsetStaticField }}{{ DateTimeOffsetStaticField::ja-JP }}", nameof(DateTimeOffsetContextTestData), CultureInfo.GetCultureInfo("en-US", true).ToExpressionString());
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(1);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Provider.Should().Be("provider");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Provider.Should().Be("jaJP");
     }
 }
 
