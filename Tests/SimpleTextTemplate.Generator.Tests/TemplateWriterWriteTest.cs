@@ -82,7 +82,7 @@ public sealed class TemplateWriterWriteTest
     }
 
     [Fact]
-    public void 定数()
+    public void 文字列定数()
     {
         var sourceCode = Get(
             [
@@ -423,7 +423,7 @@ public sealed class TemplateWriterWriteTest
     }
 
     [Fact]
-    public void 数字()
+    public void Int型()
     {
         var sourceCode = Get(
             [
@@ -503,7 +503,43 @@ public sealed class TemplateWriterWriteTest
     }
 
     [Fact]
-    public void DateTimeOffset()
+    public void 定数Int型_特定カルチャー指定()
+    {
+        var sourceCode = Get(
+            [
+                "{{ IntConstantField }}",
+                "{{ IntConstantField:N3 }}",
+                "{{ IntConstantField:N3:es-ES }}"
+            ],
+            nameof(IntContextTestData),
+            CultureInfo.GetCultureInfo("ja-JP").ToExpressionString());
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(3);
+        interceptInfoList[0].Methods.Should().HaveCount(1);
+        interceptInfoList[1].Methods.Should().HaveCount(1);
+        interceptInfoList[2].Methods.Should().HaveCount(1);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.IntContextTestData.@IntConstantField");
+        interceptInfoList[0].Methods[0].Format.Should().Be("default");
+        interceptInfoList[0].Methods[0].Provider.Should().Be("provider");
+
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.IntContextTestData.@IntConstantField");
+        interceptInfoList[1].Methods[0].Format.Should().Be("\"N3\"");
+        interceptInfoList[1].Methods[0].Provider.Should().Be("provider");
+
+        interceptInfoList[2].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[2].Methods[0].Text.Should().Be("\"1.234,000\"u8");
+        interceptInfoList[2].Methods[0].Format.Should().BeNull();
+        interceptInfoList[2].Methods[0].Provider.Should().BeNull();
+    }
+
+    [Fact]
+    public void DateTimeOffset型()
     {
         var sourceCode = Get(
             [
