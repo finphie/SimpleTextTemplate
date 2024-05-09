@@ -104,8 +104,14 @@ ref struct InterceptInfoCreator
     {
         if (_semanticModel.GetConstantValue(_templateArgument, _cancellationToken).Value is not string templateString)
         {
-            _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.TemplateStringMustBeConstant, _templateArgument.GetLocation()));
-            return;
+            // string.Emptyは定数として扱う。
+            if (_semanticModel.GetOperation(_templateArgument, _cancellationToken) is not IFieldReferenceOperation { Field: { Name: nameof(string.Empty), ContainingType.SpecialType: SpecialType.System_String } })
+            {
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.TemplateStringMustBeConstant, _templateArgument.GetLocation()));
+                return;
+            }
+
+            templateString = string.Empty;
         }
 
         if (!Template.TryParse(Encoding.UTF8.GetBytes(templateString), out var template, out var consumed))

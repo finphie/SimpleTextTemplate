@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using FluentAssertions;
 using Xunit;
@@ -7,6 +8,23 @@ namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateWriterWriteTest
 {
+    [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1122:Use string.Empty for empty strings", Justification = "テスト")]
+    [Fact]
+    public void 空白_出力なし()
+    {
+        var bufferWriter = new ArrayBufferWriter<byte>();
+
+        using (var writer = TemplateWriter.Create(bufferWriter))
+        {
+            writer.Write("");
+            writer.Write(string.Empty);
+        }
+
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .Should()
+            .Be(string.Empty);
+    }
+
     [Fact]
     public void 短い文字列_そのまま出力()
     {

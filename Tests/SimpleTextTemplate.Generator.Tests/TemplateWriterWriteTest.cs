@@ -12,6 +12,48 @@ namespace SimpleTextTemplate.Generator.Tests;
 public sealed class TemplateWriterWriteTest
 {
     [Fact]
+    public void 空白()
+    {
+        var sourceCode = Get(string.Empty);
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(1);
+        interceptInfoList[0].Methods.Should().HaveCount(0);
+    }
+
+    [Fact]
+    public void StringEmpty()
+    {
+        var sourceCode = $$$"""
+            using System.Buffers;
+            using SimpleTextTemplate;
+            using static System.String;
+            using S = System.String;
+            
+            var bufferWriter = new ArrayBufferWriter<byte>();
+            var writer = TemplateWriter.Create(bufferWriter);
+            writer.Write(string.Empty);
+            writer.Write(System.String.Empty);
+            writer.Write(global::System.String.Empty);
+            writer.Write(S.Empty);
+            writer.Write(Empty);
+            """;
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(5);
+
+        interceptInfoList[0].Methods.Should().HaveCount(0);
+        interceptInfoList[1].Methods.Should().HaveCount(0);
+        interceptInfoList[2].Methods.Should().HaveCount(0);
+        interceptInfoList[3].Methods.Should().HaveCount(0);
+        interceptInfoList[4].Methods.Should().HaveCount(0);
+    }
+
+    [Fact]
     public void 識別子なし()
     {
         var sourceCode = Get(
