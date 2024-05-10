@@ -2,6 +2,10 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
+#if NET8_0_OR_GREATER
+using System.Runtime.InteropServices;
+#endif
+
 using Block = (SimpleTextTemplate.BlockType Type, byte[] Value, string? Format, System.IFormatProvider? Culture);
 
 namespace SimpleTextTemplate;
@@ -22,7 +26,12 @@ public readonly struct Template
     /// <value>
     /// ブロック単位のバッファ
     /// </value>
-    public ReadOnlySpan<Block> Blocks => _blocks.AsSpan();
+    public ReadOnlySpan<Block> Blocks
+#if NET8_0_OR_GREATER
+        => MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(_blocks), _blocks.Length);
+#else
+        => _blocks.AsSpan();
+#endif
 
     /// <summary>
     /// テンプレート文字列を解析します。
