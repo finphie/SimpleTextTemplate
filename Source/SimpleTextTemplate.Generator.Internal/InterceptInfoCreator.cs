@@ -185,7 +185,9 @@ ref struct InterceptInfoCreator
         }
 
         var isInvariantCulture = IsInvariantCulture();
-        var contextMembers = _contextType.GetFieldsAndProperties().ToDictionary(static x => x.Name);
+        var contextMembers = _contextType.GetFieldsAndProperties().ToDictionary(
+            static x => x.Name,
+            static x => (Symbol: x, Formattable: x.GetFieldOrPropertyType().Interfaces.GetFormattableType()));
 
         foreach (var (block, utf8Value, format, identifierProvider) in template.Blocks)
         {
@@ -206,22 +208,45 @@ ref struct InterceptInfoCreator
             if (!contextMembers.TryGetValue(value, out var identifier))
             {
                 _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifier, _contextArgument.GetLocation(), value));
-                return;
-            }
-
-            // 識別子が定数かつIFormatProviderの指定がある場合は、定数書き込み
-            if (identifier is IFieldSymbol { HasConstantValue: true, ConstantValue: var constantValue } && TryAddConstantValue(constantValue, format, provider))
-            {
                 continue;
             }
 
-            var type = identifier.GetMemberType();
+            // 識別子が定数かつIFormatProviderの指定がある場合は、定数書き込み
+            if (identifier.Symbol is IFieldSymbol { HasConstantValue: true, ConstantValue: var constantValue } && TryAddConstantValue(constantValue, format, provider))
+            {
+                // IFormattableを実装していない識別子で、formatまたはproviderが設定されている場合
+                if (!identifier.Formattable.HasFlag(FormattableType.IFormattable) && (format is not null || identifierProvider is not null))
+                {
+                    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidConstantIdentifierFormatProvider, _templateArgument.GetLocation()));
+                }
+
+                continue;
+            }
+
+            var type = identifier.Symbol.GetFieldOrPropertyType();
+
+            if (type.TypeKind == TypeKind.Enum)
+            {
+                if (identifierProvider is not null)
+                {
+                    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidEnumIdentifierFormatProvider, _templateArgument.GetLocation()));
+                }
+
+                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticEnum : WriteEnum, value, format, provider));
+                continue;
+            }
+
+            // IFormattable/ISpanFormattable/IUtf8Formattableを実装していない識別子で、formatまたはproviderが設定されている場合
+            if (identifier.Formattable == FormattableType.None && (format is not null || identifierProvider is not null))
+            {
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifierFormatProvider, _templateArgument.GetLocation()));
+            }
 
             // 識別子の型をReadOnlySpan<byte>に暗黙的変換できるどうか
             // ReadOnlySpan<byte>やbyte[]などが一致
             if (_compilation.ClassifyConversion(type, _readOnlySpanByteSymbol).IsImplicit)
             {
-                AddValue(new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value, format, provider));
+                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticLiteral : WriteLiteral, value, format, provider));
                 continue;
             }
 
@@ -229,17 +254,11 @@ ref struct InterceptInfoCreator
             // ReadOnlySpan<char>やstring、char[]などが一致
             if (_compilation.ClassifyConversion(type, _readOnlySpanCharSymbol).IsImplicit)
             {
-                AddValue(new(identifier.IsStatic ? WriteStaticString : WriteString, value, format, provider));
+                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticString : WriteString, value, format, provider));
                 continue;
             }
 
-            if (type.TypeKind == TypeKind.Enum)
-            {
-                AddValue(new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format, provider));
-                continue;
-            }
-
-            AddValue(new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format, provider));
+            AddValue(new(identifier.Symbol.IsStatic ? WriteStaticValue : WriteValue, value, format, provider));
         }
 
         _success = true;
@@ -273,12 +292,6 @@ ref struct InterceptInfoCreator
 
     bool TryAddConstantValue(object value, string? format, IFormatProvider? provider)
     {
-        if (value is string valueString)
-        {
-            AddConstantString(valueString);
-            return true;
-        }
-
         if (value is IFormattable formattableValue)
         {
             if (provider is null)
@@ -287,6 +300,12 @@ ref struct InterceptInfoCreator
             }
 
             AddConstantString(formattableValue.ToString(format, provider));
+            return true;
+        }
+
+        if (value is string valueString)
+        {
+            AddConstantString(valueString);
             return true;
         }
 

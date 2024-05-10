@@ -50,4 +50,37 @@ static class DiagnosticDescriptors
         nameof(SimpleTextTemplate),
         DiagnosticSeverity.Error,
         true);
+
+    /// <summary>
+    /// <see cref="IFormattable"/>を実装していない定数識別子に対して、書式指定や<see cref="IFormatProvider"/>の指定がされている場合に出力する診断情報です。
+    /// </summary>
+    public static readonly DiagnosticDescriptor InvalidConstantIdentifierFormatProvider = new(
+        "STT1004",
+        "IFormattableが実装されていない識別子に、formatまたはproviderが指定されています。",
+        "IFormattableが実装されていない識別子には、formatやproviderの指定は無効です。",
+        nameof(SimpleTextTemplate),
+        DiagnosticSeverity.Error,
+        true);
+
+    /// <summary>
+    /// <see cref="Enum"/>に<see cref="IFormatProvider"/>の指定がされている場合に出力する診断情報です。
+    /// </summary>
+    public static readonly DiagnosticDescriptor InvalidEnumIdentifierFormatProvider = new(
+        "STT1005",
+        "列挙型識別子にproviderが指定されています。",
+        "列挙型識別子には、providerの指定は無効です。",
+        nameof(SimpleTextTemplate),
+        DiagnosticSeverity.Error,
+        true);
+
+    /// <summary>
+    /// <see cref="IFormattable"/>/ISpanFormattable/IUtf8Formattableのいずれかのインターフェイスを実装していない識別子に対して、書式指定や<see cref="IFormatProvider"/>の指定がされている場合に出力する診断情報です。
+    /// </summary>
+    public static readonly DiagnosticDescriptor InvalidIdentifierFormatProvider = new(
+        "STT1006",
+        "IFormattable/ISpanFormattable/IUtf8Formattableのいずれかのインターフェイスを実装していない識別子に、formatまたはproviderが指定されています。",
+        "IFormattable/ISpanFormattable/IUtf8Formattableのいずれかのインターフェイスを実装していない識別子には、formatやproviderの指定は無効です。",
+        nameof(SimpleTextTemplate),
+        DiagnosticSeverity.Error,
+        true);
 }
