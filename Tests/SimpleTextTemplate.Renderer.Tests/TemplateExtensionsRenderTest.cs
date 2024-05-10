@@ -183,7 +183,7 @@ public sealed class TemplateExtensionsRenderTest
     static void Execute<T>(ReadOnlySpan<byte> source, T value, ReadOnlySpan<byte> expectedValue, CultureInfo? provider = null)
         where T : notnull
     {
-        var template = Template.Parse(source.ToArray());
+        var template = Template.Parse(source);
         var bufferWriter = new ArrayBufferWriter<byte>();
         var dic = new Utf8ArrayDictionary<object>();
         dic.TryAdd(new("A"u8), value);

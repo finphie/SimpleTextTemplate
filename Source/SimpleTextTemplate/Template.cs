@@ -35,11 +35,8 @@ public readonly struct Template
     /// それ以外の場合は<see langword="false"/>を返します。
     /// </returns>
     /// <exception cref="ArgumentNullException">引数がnullです。</exception>
-    public static bool TryParse(byte[] source, out Template template, out nuint consumed)
+    public static bool TryParse(ReadOnlySpan<byte> source, out Template template, out nuint consumed)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(source);
-#endif
         var reader = new TemplateReader(source);
         var list = new List<Block>();
 
@@ -103,11 +100,8 @@ public readonly struct Template
     /// <exception cref="CultureNotFoundException">カルチャーが見つかりません。</exception>
     /// <exception cref="TemplateException">テンプレートの解析に失敗しました。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Template Parse(byte[] source)
+    public static Template Parse(ReadOnlySpan<byte> source)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(source);
-#endif
         var reader = new TemplateReader(source);
         var list = new List<Block>();
 
