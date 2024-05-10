@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using FluentAssertions;
 using Xunit;
 
@@ -81,7 +82,7 @@ public sealed class TemplateParseTest
     {
         FluentActions.Invoking(() => Template.Parse("{{ A::B }}"u8))
             .Should()
-            .Throw<TemplateException>();
+            .Throw<CultureNotFoundException>();
     }
 
     static void Execute(string input) => Template.Parse(Encoding.UTF8.GetBytes(input));
