@@ -1,116 +1,58 @@
 ﻿using System.Buffers;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Unicode;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
-using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;
 
+[GroupBenchmarksBy(BenchmarkLogicalGroupRule.ByCategory)]
+[CategoriesColumn]
 public partial class RenderBenchmark
 {
-    const string Identifier = nameof(Identifier);
-    const string Source = "abcdef{{ " + Identifier + " }}01234567890";
-    const string Format = "abcdef{0}01234567890";
+    const string DescriptionSimpleTextTemplate = "SimpleTextTemplate";
+    const string DescriptionSimpleTextTemplateGenerator = "SimpleTextTemplate.Generator";
+    const string DescriptionScriban = "Scriban";
+    const string DescriptionScribanLiquid = "Liquid";
+    const string DescriptionUtf8TryWrite = "(Utf8.TryWrite)";
+    const string DescriptionInterpolatedStringHandler = "(InterpolatedStringHandler)";
+    const string DescriptionCompositeFormat = "(CompositeFormat)";
+    const string Format = "abcdef{0}abcdef";
 
     readonly ArrayBufferWriter<byte> _bufferWriter = new();
 
-    string _message;
-    string _utf16Source;
-
-    IContext _context;
-    SampleContext _contextObject;
-    Dictionary<string, string> _model;
-
-    Template _template;
-    ScribanTemplate _scribanTemplate;
-    ScribanTemplate _scribanLiquidTemplate;
     CompositeFormat _compositeFormat;
+
+    SampleContext _generatorContext;
+    IContext _context;
+    Dictionary<string, object> _scribanContext;
 
     [GlobalSetup]
     public void Setup()
     {
-        _message = "Hello, World!";
+        SetupString();
+        SetupInt();
+        _compositeFormat = CompositeFormat.Parse(Format);
 
-        var source = Encoding.UTF8.GetBytes(Source);
-        _utf16Source = Encoding.UTF8.GetString(source);
+        _generatorContext = new("_StringValue", 567890);
 
-        var utf8Message = Encoding.UTF8.GetBytes(_message);
-
-        _template = Template.Parse(source);
         var utf8Dict = new Utf8ArrayDictionary<object>();
-        utf8Dict.TryAdd((Utf8Array)Identifier, utf8Message);
+        utf8Dict.TryAdd(new("StringValue"), _generatorContext.StringValue);
+        utf8Dict.TryAdd(new("IntValue"), _generatorContext.IntValue);
+
         _context = Context.Create(utf8Dict);
 
-        _contextObject = new(utf8Message);
-
-        _scribanTemplate = ScribanTemplate.Parse(_utf16Source);
-        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(_utf16Source);
-        _model = new()
+        _scribanContext = new()
         {
-            { Identifier, _message }
+            { "StringValue", _generatorContext.StringValue },
+            { "IntValue", _generatorContext.IntValue }
         };
-
-        _compositeFormat = CompositeFormat.Parse(Format);
     }
 
-    [Benchmark]
-    public byte[] SimpleTextTemplate()
+    internal readonly record struct SampleContext(string StringValue, int IntValue)
     {
-        _template.Render(_bufferWriter, _context);
-
-        var result = _bufferWriter.WrittenSpan.ToArray();
-        _bufferWriter.ResetWrittenCount();
-
-        return result;
+        public const string ConstantStringValue = "_ConstantStringValue";
+        public const int ConstantIntValue = 1234;
     }
-
-    [Benchmark(Baseline = true)]
-    public byte[] SimpleTextTemplate_SG()
-    {
-        var writer = TemplateWriter.Create(_bufferWriter);
-        writer.Write(Source, in _contextObject);
-        writer.Dispose();
-
-        var result = _bufferWriter.WrittenSpan.ToArray();
-        _bufferWriter.ResetWrittenCount();
-
-        return result;
-    }
-
-    [Benchmark]
-    public string Scriban() => _scribanTemplate.Render(_model);
-
-    [Benchmark]
-    public string ScribanLiquid() => _scribanLiquidTemplate.Render(_model);
-
-    [Benchmark(Description = "(Utf8.TryWrite)")]
-    public byte[] Utf8TryWrite()
-    {
-        Utf8.TryWrite(_bufferWriter.GetSpan(), $"abcdef{_message}01234567890", out var bytesWritten);
-        _bufferWriter.Advance(bytesWritten);
-
-        var result = _bufferWriter.WrittenSpan.ToArray();
-        _bufferWriter.ResetWrittenCount();
-
-        return result;
-    }
-
-    [Benchmark(Description = "(InterpolatedStringHandler)")]
-    public string InterpolatedStringHandler()
-    {
-        DefaultInterpolatedStringHandler handler = $"abcdef{_message}01234567890";
-        return handler.ToStringAndClear();
-    }
-
-    [Benchmark(Description = "(string.Format)")]
-    public string StringFormat() => string.Format(CultureInfo.InvariantCulture, Format, _message);
-
-    [Benchmark(Description = "(CompositeFormat)")]
-    public string StringFormat_CF() => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _message);
-
-    internal readonly record struct SampleContext(byte[] Identifier);
 }
