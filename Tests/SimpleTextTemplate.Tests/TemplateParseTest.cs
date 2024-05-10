@@ -60,7 +60,7 @@ public sealed class TemplateParseTest
         // そのため、int型をあらかじめUIntPtr型でキャストしておく。
         var positionPtr = (UIntPtr)position;
 
-        Encoding.UTF8.GetBytes(input).Invoking(Template.Parse)
+        Encoding.UTF8.GetBytes(input).Invoking(static x => Template.Parse(x))
             .Should()
             .Throw<TemplateException>()
             .Where(x => x.Position == positionPtr);
@@ -71,7 +71,15 @@ public sealed class TemplateParseTest
     [InlineData("{{ :: }}")]
     public void 識別子が空_TemplateException(string input)
     {
-        Encoding.UTF8.GetBytes(input).Invoking(Template.Parse)
+        Encoding.UTF8.GetBytes(input).Invoking(static x => Template.Parse(x))
+            .Should()
+            .Throw<TemplateException>();
+    }
+
+    [Fact]
+    public void 無効なカルチャー_TemplateException()
+    {
+        FluentActions.Invoking(() => Template.Parse("{{ A::B }}"u8))
             .Should()
             .Throw<TemplateException>();
     }

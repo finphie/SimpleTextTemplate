@@ -65,6 +65,14 @@ public sealed class TemplateTryParseTest
         ((int)consumed).Should().Be(input.Length);
     }
 
+    [Fact]
+    public void 無効なカルチャー_falseを返す()
+    {
+        var input = "{{ A::B }}"u8;
+        Template.TryParse(input, out _, out var consumed).Should().BeFalse();
+        ((int)consumed).Should().Be(input.Length);
+    }
+
     static void Execute(string input)
     {
         Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).Should().BeTrue();
