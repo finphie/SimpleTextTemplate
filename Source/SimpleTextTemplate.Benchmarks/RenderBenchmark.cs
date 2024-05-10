@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Text.Unicode;
 using BenchmarkDotNet.Attributes;
 using SimpleTextTemplate.Contexts;
@@ -17,9 +16,6 @@ public partial class RenderBenchmark
     const string Source = "abcdef{{ " + Identifier + " }}01234567890";
     const string Format = "abcdef{0}01234567890";
 
-    // lang=regex
-    const string Pattern = "{{ *" + Identifier + " *}}";
-
     readonly ArrayBufferWriter<byte> _bufferWriter = new();
 
     string _message;
@@ -32,7 +28,6 @@ public partial class RenderBenchmark
     Template _template;
     ScribanTemplate _scribanTemplate;
     ScribanTemplate _scribanLiquidTemplate;
-    Regex _regex;
     CompositeFormat _compositeFormat;
 
     [GlobalSetup]
@@ -43,14 +38,14 @@ public partial class RenderBenchmark
         var source = Encoding.UTF8.GetBytes(Source);
         _utf16Source = Encoding.UTF8.GetString(source);
 
-        var utf8Message = (Utf8Array)_message;
+        var utf8Message = Encoding.UTF8.GetBytes(_message);
 
         _template = Template.Parse(source);
         var utf8Dict = new Utf8ArrayDictionary<object>();
         utf8Dict.TryAdd((Utf8Array)Identifier, utf8Message);
         _context = Context.Create(utf8Dict);
 
-        _contextObject = new(utf8Message.DangerousAsByteArray());
+        _contextObject = new(utf8Message);
 
         _scribanTemplate = ScribanTemplate.Parse(_utf16Source);
         _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(_utf16Source);
@@ -59,7 +54,6 @@ public partial class RenderBenchmark
             { Identifier, _message }
         };
 
-        _regex = RegexInternal();
         _compositeFormat = CompositeFormat.Parse(Format);
     }
 
@@ -77,8 +71,8 @@ public partial class RenderBenchmark
     [Benchmark(Baseline = true)]
     public byte[] SimpleTextTemplate_SG()
     {
-        var writer = new TemplateWriter<ArrayBufferWriter<byte>>(ref Unsafe.AsRef(in _bufferWriter), CultureInfo.InvariantCulture);
-        writer.Write(Source, _contextObject);
+        var writer = TemplateWriter.Create(_bufferWriter);
+        writer.Write(Source, in _contextObject);
         writer.Dispose();
 
         var result = _bufferWriter.WrittenSpan.ToArray();
@@ -112,17 +106,11 @@ public partial class RenderBenchmark
         return handler.ToStringAndClear();
     }
 
-    [Benchmark(Description = "(Regex.Replace)")]
-    public string Regex() => _regex.Replace(_utf16Source, _message);
-
     [Benchmark(Description = "(string.Format)")]
     public string StringFormat() => string.Format(CultureInfo.InvariantCulture, Format, _message);
 
     [Benchmark(Description = "(CompositeFormat)")]
     public string StringFormat_CF() => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _message);
-
-    [GeneratedRegex(Pattern, RegexOptions.CultureInvariant)]
-    private static partial Regex RegexInternal();
 
     internal readonly record struct SampleContext(byte[] Identifier);
 }
