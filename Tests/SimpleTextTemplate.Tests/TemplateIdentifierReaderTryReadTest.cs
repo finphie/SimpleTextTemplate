@@ -11,6 +11,7 @@ public sealed class TemplateIdentifierReaderTryReadTest
     [InlineData("A B", "A B")]
     [InlineData("A:", "A")]
     [InlineData("A::", "A")]
+    [InlineData("A:: ", "A")]
     public void 書式指定及びカルチャー指定なし_識別子名のみ返す(string input, string expectedIdentifier)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
