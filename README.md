@@ -20,13 +20,13 @@ SimpleTextTemplateは、変数の埋め込みのみに対応したテキスト�
 
 ### NuGet（正式リリース版）
 
-```shell
+```bash
 dotnet add package SimpleTextTemplate.Generator
 ```
 
 ### Azure Artifacts（開発用ビルド）
 
-```shell
+```bash
 dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/finphie/Main/_packaging/DotNet/nuget/v3/index.json
 ```
 
@@ -125,21 +125,36 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## ベンチマーク
 
-| Method                      | Mean        | Error      | Ratio  | Gen0   | Gen1   | Allocated |
-|---------------------------- |------------:|-----------:|-------:|-------:|-------:|----------:|
-| SimpleTextTemplate          |    38.51 ns |   0.149 ns |   1.95 | 0.0067 |      - |      56 B |
-| SimpleTextTemplate_SG       |    18.83 ns |   0.425 ns |   1.00 | 0.0067 |      - |      56 B |
-| Scriban                     | 8,532.18 ns | 128.391 ns | 434.20 | 3.6621 | 0.3357 |   30778 B |
-| ScribanLiquid               | 6,945.50 ns |  34.946 ns | 352.62 | 3.9673 | 0.3891 |   33194 B |
-| (Utf8.TryWrite)             |    22.42 ns |   0.470 ns |   1.18 | 0.0067 |      - |      56 B |
-| (InterpolatedStringHandler) |    40.12 ns |   0.299 ns |   2.04 | 0.0105 |      - |      88 B |
-| (Regex.Replace)             |   130.70 ns |   0.513 ns |   6.65 | 0.0105 |      - |      88 B |
-| (string.Format)             |    52.18 ns |   1.083 ns |   2.74 | 0.0105 |      - |      88 B |
-| (CompositeFormat)           |    37.80 ns |   0.696 ns |   1.94 | 0.0105 |      - |      88 B |
+| Method                       | Categories      | Mean         | Error     | Ratio  | Gen0   | Gen1   | Allocated |
+|----------------------------- |---------------- |-------------:|----------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate.Generator | Constant String |     13.31 ns |  0.179 ns |   1.00 | 0.0067 |      - |      56 B |
+| (Utf8.TryWrite)              | Constant String |     23.42 ns |  0.205 ns |   1.76 | 0.0067 |      - |      56 B |
+| (InterpolatedStringHandler)  | Constant String |     39.87 ns |  0.268 ns |   3.00 | 0.0105 |      - |      88 B |
+| (CompositeFormat)            | Constant String |     34.57 ns |  0.322 ns |   2.60 | 0.0105 |      - |      88 B |
+|                              |                 |              |           |        |        |        |           |
+| SimpleTextTemplate.Generator | Constant Int    |     12.52 ns |  0.189 ns |   1.00 | 0.0048 |      - |      40 B |
+| (Utf8.TryWrite)              | Constant Int    |     23.29 ns |  0.101 ns |   1.86 | 0.0048 |      - |      40 B |
+| (InterpolatedStringHandler)  | Constant Int    |     40.04 ns |  0.253 ns |   3.20 | 0.0067 |      - |      56 B |
+| (CompositeFormat)            | Constant Int    |     30.04 ns |  0.171 ns |   2.40 | 0.0067 |      - |      56 B |
+|                              |                 |              |           |        |        |        |           |
+| SimpleTextTemplate.Generator | String          |     24.95 ns |  0.242 ns |   1.00 | 0.0057 |      - |      48 B |
+| SimpleTextTemplate           | String          |     79.17 ns |  0.150 ns |   3.17 | 0.0057 |      - |      48 B |
+| Scriban                      | String          |  8,751.57 ns | 39.993 ns | 350.74 | 3.6926 | 0.3357 |   31003 B |
+| Liquid                       | String          |  7,581.99 ns | 80.655 ns | 303.84 | 3.9902 | 0.4044 |   33418 B |
+| (Utf8.TryWrite)              | String          |     22.21 ns |  0.120 ns |   0.89 | 0.0057 |      - |      48 B |
+| (InterpolatedStringHandler)  | String          |     38.73 ns |  0.219 ns |   1.55 | 0.0086 |      - |      72 B |
+| (CompositeFormat)            | String          |     39.36 ns |  0.432 ns |   1.58 | 0.0086 |      - |      72 B |
+|                              |                 |              |           |        |        |        |           |
+| SimpleTextTemplate.Generator | Int             |     20.77 ns |  0.146 ns |   1.00 | 0.0057 |      - |      48 B |
+| SimpleTextTemplate           | Int             |     81.29 ns |  0.097 ns |   3.91 | 0.0057 |      - |      48 B |
+| Scriban                      | Int             |  9,066.34 ns | 81.421 ns | 436.55 | 3.6926 | 0.3357 |   31027 B |
+| Liquid                       | Int             |  6,999.40 ns | 18.696 ns | 337.04 | 3.9978 | 0.4425 |   33442 B |
+| (Utf8.TryWrite)              | Int             |     16.55 ns |  0.197 ns |   0.80 | 0.0057 |      - |      48 B |
+| (InterpolatedStringHandler)  | Int             |     39.82 ns |  0.246 ns |   1.92 | 0.0076 |      - |      64 B |
+| (CompositeFormat)            | Int             |     30.22 ns |  0.240 ns |   1.46 | 0.0076 |      - |      64 B |
 
 > [!Note]
-> UTF-8またはUTF-16で出力  
-> ()で囲まれているメソッドは正確には処理が異なるため、参考情報
+> ()で囲まれているメソッドは正確には処理が異なるが、参考として記載。
 
 [ベンチマークプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Benchmarks)
 
