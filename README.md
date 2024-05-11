@@ -1,5 +1,4 @@
 # SimpleTextTemplate
-<!-- markdownlint-disable MD033 -->
 
 [![Build(.NET)](https://github.com/finphie/SimpleTextTemplate/actions/workflows/build-dotnet.yml/badge.svg)](https://github.com/finphie/SimpleTextTemplate/actions/workflows/build-dotnet.yml)
 [![NuGet](https://img.shields.io/nuget/v/SimpleTextTemplate.Generator?color=0078d4&label=NuGet)](https://www.nuget.org/packages/SimpleTextTemplate.Generator/)
@@ -13,7 +12,7 @@ SimpleTextTemplateは、変数の埋め込みのみに対応したテキスト�
 ## 説明
 
 - 文字列をUTF-8バイト列として`IBufferWriter<byte>`に出力します。
-- 文字列を`{{`と`}}`で囲むことで変数を埋め込みます。
+- `{{ <変数>:<format>:<culture> }}`で変数を埋め込みます。（`format`と`culture`は省略可能）
 - `{{`と`}}`内の先頭と末尾の空白（U+0020）は無視されます。
 - `{{`と`}}`で囲まれた範囲以外の文字は、そのまま出力されます。
 
@@ -39,27 +38,31 @@ dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/fi
 
 ```csharp
 using System;
-using System.Buffers;
+using System.Globalization;
 using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-var context = new SampleContext("Hello, World", new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
+using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+var context = new SampleContext("Hello, World", 1000, new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
-var bufferWriter = new ArrayPoolBufferWriter<byte>();
-var template = new TemplateWriter<ArrayPoolBufferWriter<byte>>(ref bufferWriter);
+using (var writer = TemplateWriter.Create(_bufferWriter))
+{
+    writer.Write("{{ DateTimeOffsetValue:o }}_{{ StringValue }}!", in context);
+    writer.Write("_{{ ConstantString }}_{{ ConstantInt:N3:ja-JP }}_{{ IntValue }}", in context, CultureInfo.InvariantCulture);
+}
 
-template.Write("{{ DateTime }}_{{ Identifier }}!!!", context);
-template.Dispose();
-
-// 2000-01-01T00:00:00.0000000+00:00_Hello, World!!!
+// 2000-01-01T00:00:00.0000000+00:00_Hello, World!_Hello_999.000_1000
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
-bufferWriter.Dispose();
-
 readonly record struct SampleContext(
-    string Identifier,
-    [property: Identifier("o")] DateTimeOffset DateTime);
+    string StringValue,
+    int IntValue,
+    DateTimeOffset DateTimeOffsetValue)
+{
+    public const string ConstantString = "Hello";
+    public const int ConstantInt = 999;
+}
 ```
 
 [サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
@@ -67,15 +70,26 @@ readonly record struct SampleContext(
 #### 生成コード
 
 ```csharp
+using System.Runtime.CompilerServices;
+using CommunityToolkit.HighPerformance.Buffers;
+using SimpleTextTemplate;
+
 file static class Intercept
 {
-    [global::System.Runtime.CompilerServices.InterceptsLocation(@"<path>\Program.cs", 11, 10)]
-    public static void Write0(this ref global::SimpleTextTemplate.TemplateWriter<global::CommunityToolkit.HighPerformance.Buffers.ArrayPoolBufferWriter<byte>> writer, string _, in global::SampleContext context)
+    [InterceptsLocation]
+    public static void Write0(this ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string _, in SampleContext context, IFormatProvider? provider = null)
     {
-        writer.WriteValue(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTime, "o");
+        writer.WriteValue(Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", CultureInfo.InvariantCulture);
         writer.WriteConstantLiteral("_"u8);
-        writer.WriteString(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@Identifier);
-        writer.WriteConstantLiteral("!!!"u8);
+        writer.WriteString(Unsafe.AsRef(in context).@StringValue);
+        writer.WriteConstantLiteral("!"u8);
+    }
+
+    [InterceptsLocation]
+    public static void Write1(this ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string _, in SampleContext context, IFormatProvider? provider = null)
+    {
+        writer.WriteConstantLiteral("_Hello_999.000_"u8);
+        writer.WriteValue(Unsafe.AsRef(in context).@IntValue, default, CultureInfo.InvariantCulture);
     }
 }
 ```
