@@ -833,6 +833,41 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[0].Methods[3].Format.Should().Be("default");
         interceptInfoList[0].Methods[3].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
     }
+
+    [Fact]
+    public void 定数識別子がnullまたはEmpty()
+    {
+        var sourceCode = Get(
+            [
+                "{{ NullStringConstantField }}{{ NullObjectConstantField }}{{ NullStringStaticField }}{{ NullObjectStaticField }}",
+                "{{ EmptyStringConstantField }}",
+                "A{{ NullStringConstantField }}B{{ EmptyStringConstantField }}C"
+            ],
+            nameof(NullContextTestData));
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(3);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+        interceptInfoList[1].Methods.Should().HaveCount(0);
+        interceptInfoList[2].Methods.Should().HaveCount(1);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteString);
+        interceptInfoList[0].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.NullContextTestData.@NullStringStaticField");
+        interceptInfoList[0].Methods[0].Format.Should().BeNull();
+        interceptInfoList[0].Methods[0].Provider.Should().BeNull();
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.NullContextTestData.@NullObjectStaticField");
+        interceptInfoList[0].Methods[1].Format.Should().Be("default");
+        interceptInfoList[0].Methods[1].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[2].Methods[0].Name.Should().Be(WriteConstantLiteral);
+        interceptInfoList[2].Methods[0].Text.Should().Be("\"ABC\"u8");
+        interceptInfoList[2].Methods[0].Format.Should().BeNull();
+        interceptInfoList[2].Methods[0].Provider.Should().BeNull();
+    }
 }
 
 file static class Constants

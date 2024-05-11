@@ -305,7 +305,17 @@ ref struct InterceptInfoCreator
 
         if (value is string valueString)
         {
-            AddConstantString(valueString);
+            if (valueString.Length != 0)
+            {
+                AddConstantString(valueString);
+            }
+
+            return true;
+        }
+
+        // nullの場合はWriteConstantLiteralメソッドの呼び出しは不要。
+        if (value is null)
+        {
             return true;
         }
 
