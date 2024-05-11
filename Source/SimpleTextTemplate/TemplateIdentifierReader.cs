@@ -112,7 +112,9 @@ public ref struct TemplateIdentifierReader
 
         if (cultureIndex < 0)
         {
-            format = Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length);
+            format = Length != 0
+                ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length)
+                : null;
             culture = null;
             return true;
         }
@@ -120,7 +122,10 @@ public ref struct TemplateIdentifierReader
         format = cultureIndex != 0 ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), cultureIndex) : null;
         Advance(cultureIndex + 1);
 
-        culture = Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length);
+        culture = Length != 0
+            ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length)
+            : null;
+
         return true;
     }
 

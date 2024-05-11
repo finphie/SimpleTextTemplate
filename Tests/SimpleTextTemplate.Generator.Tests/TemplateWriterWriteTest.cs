@@ -711,6 +711,96 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
         interceptInfoList[0].Methods[1].Provider.Should().Be("jaJP");
     }
+
+    [Fact]
+    public void テンプレート文字列の書式指定を省略()
+    {
+        var sourceCode = Get(
+            [
+                "{{DateTimeOffsetStaticField:}}{{ DateTimeOffsetStaticField: }}",
+                "{{ DateTimeOffsetStaticField::ja-JP }}"
+            ],
+            nameof(DateTimeOffsetContextTestData));
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+        interceptInfoList[1].Methods.Should().HaveCount(1);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Format.Should().Be("default");
+        interceptInfoList[0].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Format.Should().Be("default");
+        interceptInfoList[0].Methods[1].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[0].Format.Should().Be("default");
+        interceptInfoList[1].Methods[0].Provider.Should().Be("jaJP");
+    }
+
+    [Fact]
+    public void テンプレート文字列のカルチャー指定を省略()
+    {
+        var sourceCode = Get(
+            [
+                "{{DateTimeOffsetStaticField:o:}}{{ DateTimeOffsetStaticField:o: }}",
+                "{{ DateTimeOffsetStaticField:o:  }}",
+            ],
+            nameof(DateTimeOffsetContextTestData));
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+        interceptInfoList[1].Methods.Should().HaveCount(1);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Format.Should().Be("\"o\"");
+        interceptInfoList[0].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Format.Should().Be("\"o\"");
+        interceptInfoList[0].Methods[1].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[0].Format.Should().Be("\"o\"");
+        interceptInfoList[1].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+    }
+
+    [Fact]
+    public void テンプレート文字列の書式及びカルチャー指定を省略()
+    {
+        var sourceCode = Get(
+            [
+                "{{ DateTimeOffsetStaticField:: }}{{DateTimeOffsetStaticField::}}",
+                "{{ DateTimeOffsetStaticField::  }}",
+            ],
+            nameof(DateTimeOffsetContextTestData));
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(2);
+        interceptInfoList[0].Methods.Should().HaveCount(2);
+        interceptInfoList[1].Methods.Should().HaveCount(1);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Format.Should().Be("default");
+        interceptInfoList[0].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Format.Should().Be("default");
+        interceptInfoList[0].Methods[1].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[1].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[1].Methods[0].Format.Should().Be("default");
+        interceptInfoList[1].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+    }
 }
 
 file static class Constants
