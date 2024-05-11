@@ -801,6 +801,38 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[1].Methods[0].Format.Should().Be("default");
         interceptInfoList[1].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
     }
+
+    [Fact]
+    public void IFormattableを実装していない識別子()
+    {
+        var sourceCode = Get("{{ NonFormattableStaticField }}{{ NonFormattableField }}{{ NonFormattableStaticProperty }}{{ NonFormattableProperty }}", nameof(NonFormattableContextTestData));
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.Should().BeEmpty();
+        interceptInfoList.Should().HaveCount(1);
+        interceptInfoList[0].Methods.Should().HaveCount(4);
+
+        interceptInfoList[0].Methods[0].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[0].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.NonFormattableContextTestData.@NonFormattableStaticField");
+        interceptInfoList[0].Methods[0].Format.Should().Be("default");
+        interceptInfoList[0].Methods[0].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[1].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[1].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@NonFormattableField");
+        interceptInfoList[0].Methods[1].Format.Should().Be("default");
+        interceptInfoList[0].Methods[1].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[2].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[2].Text.Should().Be("global::SimpleTextTemplate.Generator.Tests.Core.NonFormattableContextTestData.@NonFormattableStaticProperty");
+        interceptInfoList[0].Methods[2].Format.Should().Be("default");
+        interceptInfoList[0].Methods[2].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+
+        interceptInfoList[0].Methods[3].Name.Should().Be(WriteValue);
+        interceptInfoList[0].Methods[3].Text.Should().Be("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@NonFormattableProperty");
+        interceptInfoList[0].Methods[3].Format.Should().Be("default");
+        interceptInfoList[0].Methods[3].Provider.Should().Be("global::System.Globalization.CultureInfo.InvariantCulture");
+    }
 }
 
 file static class Constants
