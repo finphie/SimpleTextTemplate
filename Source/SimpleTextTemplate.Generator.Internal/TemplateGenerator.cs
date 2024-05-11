@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
+using SimpleTextTemplate.Generator.Specs;
 
 namespace SimpleTextTemplate.Generator;
 
@@ -21,15 +22,12 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 #endif
         var provider = context.SyntaxProvider
             .CreateSyntaxProvider(
-                static (node, _) => node is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 or 2, Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "Write" } },
+                static (node, _) => node is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 or 2 or 3, Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "Write" } },
                 static (context, cancellationToken) =>
                 {
                     cancellationToken.ThrowIfCancellationRequested();
 
-                    var invocationExpression = (context.Node as InvocationExpressionSyntax)!;
-                    var memberAccessorExpression = (invocationExpression.Expression as MemberAccessExpressionSyntax)!;
-
-                    if (context.SemanticModel.GetOperation(invocationExpression, cancellationToken) is not IInvocationOperation operation)
+                    if (context.SemanticModel.GetOperation(context.Node, cancellationToken) is not IInvocationOperation operation)
                     {
                         return null;
                     }
@@ -39,13 +37,15 @@ public sealed class TemplateGenerator : IIncrementalGenerator
                         return null;
                     }
 
-                    var arguments = invocationExpression.ArgumentList.Arguments;
-                    return arguments.Count == 0 ? null : InterceptInfoCreator.Create(context, operation, cancellationToken);
+                    var creator = new InterceptInfoCreator(context, operation, cancellationToken);
+                    creator.Parse();
+
+                    return new InterceptInfoOrDiagnostic(creator.Intercept, creator.Diagnostics);
                 })
             .Where(static x => x is not null)
             .Select(static (x, _) => x!);
 
-        var diagnostics = provider.Where(static x => x.Diagnostic is not null).Select(static (x, _) => x.Diagnostic!);
+        var diagnostics = provider.SelectMany(static (x, _) => x.Diagnostics);
         context.RegisterSourceOutput(diagnostics, static (context, diagnostic) => context.ReportDiagnostic(diagnostic));
 
         var infoList = provider.Where(static x => x.Info is not null).Select(static (x, _) => x.Info!).Collect();

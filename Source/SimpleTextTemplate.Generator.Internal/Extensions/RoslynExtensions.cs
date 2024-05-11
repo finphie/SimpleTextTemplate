@@ -60,17 +60,14 @@ static class RoslynExtensions
     /// 型情報を取得します。
     /// </summary>
     /// <param name="symbol">シンボル情報</param>
-    /// <returns>指定されたシンボル（フィールドやプロパティ、メソッド戻り値、イベント、パラメーター）の型を返します。</returns>
-    /// <exception cref="InvalidOperationException">指定されたシンボルがフィールドやプロパティ、メソッド戻り値、イベント、パラメーターのいずれにも該当しません。</exception>
-    public static ITypeSymbol GetMemberType(this ISymbol symbol)
+    /// <returns>指定されたシンボルの型を返します。</returns>
+    /// <exception cref="InvalidOperationException">指定されたシンボルがフィールドやプロパティではありません。</exception>
+    public static ITypeSymbol GetFieldOrPropertyType(this ISymbol symbol)
     {
         return symbol switch
         {
             IFieldSymbol fieldSymbol => fieldSymbol.Type,
             IPropertySymbol propertySymbol => propertySymbol.Type,
-            IMethodSymbol methodSymbol => methodSymbol.ReturnType,
-            IEventSymbol eventSymbol => eventSymbol.Type,
-            IParameterSymbol parameterSymbol => parameterSymbol.Type,
             _ => throw new InvalidOperationException($"Unexpected type '{symbol.ToDisplayString()}'.")
         };
     }
@@ -106,4 +103,44 @@ static class RoslynExtensions
     /// <returns>""内で使用できるエスケープされたUTF-8文字列リテラルを返します。</returns>
     public static string ToUtf8Literal(this string value)
         => $"{value.ToLiteral()}u8";
+
+    /// <summary>
+    /// 指定されたシンボルリストに実装されている書式設定インターフェイスの種類を取得します。
+    /// </summary>
+    /// <param name="symbols">シンボル情報のリスト</param>
+    /// <returns>実装されている書式設定インターフェイスの種類を返します。</returns>
+    public static FormattableType GetFormattableType(this IReadOnlyList<INamedTypeSymbol> symbols)
+    {
+        var result = FormattableType.None;
+
+        foreach (var symbol in symbols)
+        {
+            var type = symbol.GetFormattableType();
+
+            if (type == FormattableType.None)
+            {
+                continue;
+            }
+
+            result |= type;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// 指定されたシンボルに実装されている書式設定インターフェイスの種類を取得します。
+    /// </summary>
+    /// <param name="symbol">シンボル情報</param>
+    /// <returns>実装されている書式設定インターフェイスの種類を返します。</returns>
+    public static FormattableType GetFormattableType(this INamedTypeSymbol symbol)
+    {
+        return symbol switch
+        {
+            { Name: nameof(IFormattable), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } => FormattableType.IFormattable,
+            { Name: "ISpanFormattable", ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } => FormattableType.ISpanFormattable,
+            { Name: "IUtf8Formattable", ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } => FormattableType.IUtf8Formattable,
+            _ => FormattableType.None
+        };
+    }
 }

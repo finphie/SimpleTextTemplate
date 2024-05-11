@@ -8,8 +8,4 @@
     <ProjectReference Include="..\..\Source\SimpleTextTemplate\SimpleTextTemplate.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <ProjectReference Include="..\..\Source\SimpleTextTemplate.Contexts\SimpleTextTemplate.Contexts.csproj" />
-  </ItemGroup>
-
 </Project>

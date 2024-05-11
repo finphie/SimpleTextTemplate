@@ -17,4 +17,13 @@ static class ThrowHelper
     [DoesNotReturn]
     public static void ThrowTemplateParserException(nuint position)
         => throw new TemplateException(position);
+
+    /// <summary>
+    /// 新しい<see cref="TemplateException"/>例外をスローします。
+    /// </summary>
+    /// <exception cref="TemplateException">常にこの例外をスローします。</exception>
+    [DebuggerHidden]
+    [DoesNotReturn]
+    public static void ThrowInvalidIdentifierException()
+        => throw new TemplateException("invalid identifier");
 }

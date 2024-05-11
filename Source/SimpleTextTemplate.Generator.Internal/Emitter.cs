@@ -38,6 +38,43 @@ static class Emitter
                 {
             """);
 
+        var cultures = infoList.SelectMany(static x => x.WriteInfoList.Select(static x => x.Provider))
+            .Distinct()
+            .Select(static x => x?.GetName())
+            .Where(static x => !string.IsNullOrEmpty(x))
+            .ToArray();
+
+        foreach (var culture in cultures)
+        {
+            context.CancellationToken.ThrowIfCancellationRequested();
+            builder.AppendLine($"""
+                        static global::System.Globalization.CultureInfo {culture!.Replace("-", string.Empty)};
+                """);
+        }
+
+        if (cultures.Length > 0)
+        {
+            builder.AppendLine("""
+
+                        [global::System.Runtime.CompilerServices.ModuleInitializer]
+                        public static void Initialize()
+                        {
+                """);
+
+            foreach (var culture in cultures)
+            {
+                context.CancellationToken.ThrowIfCancellationRequested();
+                builder.AppendLine($$"""
+                                {{culture!.Replace("-", string.Empty)}} = global::System.Globalization.CultureInfo.GetCultureInfo("{{culture}}", true);               
+                    """);
+            }
+
+            builder.AppendLine("""
+                        }
+
+                """);
+        }
+
         for (var i = 0; i < infoList.Length; i++)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
@@ -50,14 +87,14 @@ static class Emitter
 
             builder.AppendLine($$"""
                         [global::System.Runtime.CompilerServices.InterceptsLocation(@"{{interceptsLocationInfo.FilePath}}", {{interceptsLocationInfo.Line}}, {{interceptsLocationInfo.Column}})]
-                        public static void Write{{i}}(this ref {{writerType}} writer, string _{{(string.IsNullOrEmpty(contextTypeName) ? string.Empty : $", in {contextTypeName} context")}})
+                        public static void Write{{i}}(this ref {{writerType}} writer, string _{{(string.IsNullOrEmpty(contextTypeName) ? string.Empty : $", in {contextTypeName} context, global::System.IFormatProvider? provider = null")}})
                         {
                 """);
 
-            foreach (var (methodType, value, format) in template)
+            foreach (var (methodType, value, format, provider) in template)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
-                builder.AppendLine($"            writer.{GetWriteMethodName(methodType)}({GetValue(methodType, value, format, contextTypeName)});");
+                builder.AppendLine($"            writer.{GetWriteMethodName(methodType)}({GetValue(methodType, value, format, provider, contextTypeName)});");
             }
 
             builder.AppendLine("        }");
@@ -91,24 +128,31 @@ static class Emitter
         };
     }
 
-    static string GetValue(TemplateWriterWriteType type, string value, string? format, string? contextTypeName)
+    static string GetValue(TemplateWriterWriteType type, string value, string? format, IFormatProvider? provider, string? contextTypeName)
     {
         Debug.Assert(
             !(contextTypeName is null && type is WriteStaticLiteral or WriteStaticString or WriteStaticValue),
             $"{nameof(contextTypeName)}がnullかつ静的識別子の場合、コンテキストクラス名が必要となります。");
 
         var formatArgument = format is null
-            ? string.Empty
-            : $", {format.ToLiteral()}";
+            ? "default"
+            : format.ToLiteral();
+
+        var providerArgument = GetProviderArgument(provider);
 
         return type switch
         {
             WriteConstantLiteral => value.ToUtf8Literal(),
             WriteLiteral or WriteString => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
-            WriteEnum or WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}{formatArgument}",
+            WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}, {providerArgument}",
+            WriteEnum => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}",
             WriteStaticLiteral or WriteStaticString => $"{contextTypeName}.@{value}",
-            WriteStaticEnum or WriteStaticValue => $"{contextTypeName}.@{value}{formatArgument}",
+            WriteStaticValue => $"{contextTypeName}.@{value}, {formatArgument}, {providerArgument}",
+            WriteStaticEnum => $"{contextTypeName}.@{value}, {formatArgument}",
             _ => throw new InvalidOperationException()
         };
+
+        static string GetProviderArgument(IFormatProvider? provider)
+            => provider is null ? "provider" : provider.ToFullString();
     }
 }

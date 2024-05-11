@@ -181,11 +181,9 @@ public ref struct TemplateReader
         }
 
         Advance(StartIdentifier.Length);
-
-        // "{{"に連続する空白を削除
         SkipSpace();
 
-        // "}}"がある位置までは識別子となる。
+        // "}}"がある位置までは識別子
         var index = BinaryHelper.IndexOf(ref Buffer, Length, EndIdentifier);
 
         // "{{"と"}}"の間に1文字もないか、"}}"が見つからない場合

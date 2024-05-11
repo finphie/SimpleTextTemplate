@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -7,116 +7,198 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using SimpleTextTemplate.Generator.Extensions;
 using SimpleTextTemplate.Generator.Specs;
+using static Microsoft.CodeAnalysis.SymbolDisplayFormat;
 using static SimpleTextTemplate.Generator.Specs.TemplateWriterWriteType;
 
 namespace SimpleTextTemplate.Generator;
 
 /// <summary>
-/// <see cref="InterceptInfo"/>を作成するクラスです。
+/// <see cref="InterceptInfo"/>を作成する構造体です。
 /// </summary>
-static class InterceptInfoCreator
+ref struct InterceptInfoCreator
 {
+    readonly GeneratorSyntaxContext _context;
+    readonly SemanticModel _semanticModel;
+    readonly Compilation _compilation;
+    readonly CancellationToken _cancellationToken;
+
+    readonly IInvocationOperation _operation;
+    readonly InvocationExpressionSyntax _invocationExpression;
+
+    readonly SeparatedSyntaxList<ArgumentSyntax> _arguments;
+    readonly ExpressionSyntax _templateArgument;
+    readonly ExpressionSyntax? _contextArgument;
+
+    readonly InterceptsLocationInfo _interceptsLocationInfo;
+    readonly INamedTypeSymbol _writerType;
+    readonly ITypeSymbol? _contextType;
+
+    readonly List<TemplateWriterWriteInfo> _writerInfoList = [];
+    readonly List<Diagnostic> _diagnostics = [];
+
+    readonly INamedTypeSymbol _readOnlySpanByteSymbol;
+    readonly INamedTypeSymbol _readOnlySpanCharSymbol;
+
+    bool _success;
+    bool _isConstant;
+
     /// <summary>
-    /// <see cref="InterceptInfo"/>または<see cref="Diagnostic"/>を作成します。
+    /// <see cref="InterceptInfoCreator"/>構造体の新しいインスタンスを取得します。
     /// </summary>
     /// <param name="context">コンテキスト</param>
     /// <param name="operation">メソッド呼び出し</param>
     /// <param name="cancellationToken">キャンセル要求を行うためのトークン</param>
-    /// <returns>
-    /// <see cref="InterceptInfo"/>インスタンスを作成できた場合はそのインスタンスを返します。
-    /// 作成できなかった場合は<see cref="Diagnostic"/>のインスタンスを返します。
-    /// </returns>
-    public static InterceptInfoOrDiagnostic Create(GeneratorSyntaxContext context, IInvocationOperation operation, CancellationToken cancellationToken)
+    /// <exception cref="ArgumentNullException"><paramref name="operation"/>がnullです。</exception>
+    /// <exception cref="ArgumentException"><see cref="SyntaxNode"/>がインターセプターの対象外です。</exception>
+    public InterceptInfoCreator(GeneratorSyntaxContext context, IInvocationOperation operation, CancellationToken cancellationToken)
     {
-        var invocationExpression = (context.Node as InvocationExpressionSyntax)!;
-        var arguments = invocationExpression.ArgumentList.Arguments;
-        var templateArgument = arguments[0].Expression;
+        _context = context;
+        _semanticModel = _context.SemanticModel;
+        _compilation = _semanticModel.Compilation;
+        _cancellationToken = cancellationToken;
 
-        if (context.SemanticModel.GetConstantValue(templateArgument, cancellationToken).Value is not string templateString)
+        _operation = operation ?? throw new ArgumentNullException(nameof(operation));
+
+        _invocationExpression = _context.Node as InvocationExpressionSyntax
+            ?? throw new ArgumentException($"{nameof(context)}.{nameof(context.Node)}が{nameof(InvocationExpressionSyntax)}ではありません。");
+
+        _arguments = _invocationExpression.ArgumentList.Arguments;
+
+        if (_arguments.Count is < 1 or > 3)
         {
-            return new(Diagnostic: Diagnostic.Create(DiagnosticDescriptors.TemplateStringMustBeConstant, templateArgument.GetLocation()));
+            throw new ArgumentException("TemplateWriter.Writeのコンテキスト指定オーバーロードの引数は、1～3個である必要があります。");
+        }
+
+        _templateArgument = _arguments[0].Expression;
+
+        if (_arguments.Count > 1)
+        {
+            _contextArgument = _arguments[1].Expression;
+            _contextType = _semanticModel.GetTypeInfo(_contextArgument, cancellationToken).Type;
+        }
+
+        _interceptsLocationInfo = _operation.GetInterceptsLocationInfo(cancellationToken);
+        _writerType = _semanticModel.GetSymbolInfo(_invocationExpression.Expression, _cancellationToken).Symbol!.ContainingType;
+
+        _readOnlySpanByteSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
+        _readOnlySpanCharSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
+    }
+
+    /// <summary>
+    /// <see cref="InterceptInfo"/>を取得します。
+    /// </summary>
+    public readonly InterceptInfo? Intercept
+        => _success
+        ? new(_interceptsLocationInfo, [.. _writerInfoList], _writerType.ToDisplayString(FullyQualifiedFormat), _contextType?.ToDisplayString(FullyQualifiedFormat))
+        : null;
+
+    /// <summary>
+    /// <see cref="Diagnostic"/>のリストを取得します。
+    /// </summary>
+    public readonly IReadOnlyList<Diagnostic> Diagnostics => [.. _diagnostics];
+
+    /// <summary>
+    /// テンプレート文字列を解析します。
+    /// </summary>
+    public void Parse()
+    {
+        if (_semanticModel.GetConstantValue(_templateArgument, _cancellationToken).Value is not string templateString)
+        {
+            // string.Emptyは定数として扱う。
+            if (_semanticModel.GetOperation(_templateArgument, _cancellationToken) is not IFieldReferenceOperation { Field: { Name: nameof(string.Empty), ContainingType.SpecialType: SpecialType.System_String } })
+            {
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.TemplateStringMustBeConstant, _templateArgument.GetLocation()));
+                return;
+            }
+
+            templateString = string.Empty;
         }
 
         if (!Template.TryParse(Encoding.UTF8.GetBytes(templateString), out var template, out var consumed))
         {
-            return new(Diagnostic: Diagnostic.Create(DiagnosticDescriptors.ParserError, templateArgument.GetLocation(), consumed + 1));
+            _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.ParserError, _templateArgument.GetLocation(), consumed + 1));
+            return;
         }
 
-        TemplateWriterWriteInfo[]? writeInfo;
-        string? contextTypeName = null;
-
-        if (arguments.Count == 1)
+        if (_contextArgument is null)
         {
-            if (!TryGetTemplateWriterWriteInfo(in template, out writeInfo, out var descriptor, cancellationToken))
-            {
-                return new(Diagnostic: Diagnostic.Create(descriptor, invocationExpression.GetLocation()));
-            }
-        }
-        else
-        {
-            var contextArgument = arguments[1].Expression;
-            var contextType = context.SemanticModel.GetTypeInfo(contextArgument, cancellationToken).Type!;
-
-            if (!TryGetTemplateWriterWriteInfo(in template, context.SemanticModel.Compilation, contextType, out writeInfo, out var diagnostic, cancellationToken))
-            {
-                var (descriptor, value) = diagnostic.Value;
-                return new(Diagnostic: Diagnostic.Create(descriptor, contextArgument.GetLocation(), value));
-            }
-
-            contextTypeName = contextType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+            AnalyzeTemplate(in template);
+            return;
         }
 
-        var interceptsLocationInfo = operation.GetInterceptsLocationInfo(cancellationToken);
-        var writerType = context.SemanticModel.GetSymbolInfo(invocationExpression.Expression, cancellationToken).Symbol!.ContainingType;
-
-        var info = new InterceptInfo(interceptsLocationInfo, writeInfo, writerType.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), contextTypeName);
-        return new(info);
+        AnalyzeTemplateWithContext(in template);
     }
 
-    static bool TryGetTemplateWriterWriteInfo(in Template template, [NotNullWhen(true)] out TemplateWriterWriteInfo[]? info, [NotNullWhen(false)] out DiagnosticDescriptor? descriptor, CancellationToken cancellationToken)
+    readonly bool IsInvariantCulture()
     {
-        var infoList = new List<TemplateWriterWriteInfo>();
-
-        foreach (var (block, utf8Value) in template.Blocks)
+        // IFormatProvider指定なしの場合、InvariantCultureとする。
+        if (_arguments.Count == 2)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            return true;
+        }
+
+        var providerExpression = _arguments[2].Expression;
+
+        // IFormatProviderがnullの場合、InvariantCultureとする。
+        if (_semanticModel.GetConstantValue(providerExpression, _cancellationToken) is { HasValue: true, Value: var constantProvider } && constantProvider is null)
+        {
+            return true;
+        }
+
+        var operation = _semanticModel.GetOperation(providerExpression, _cancellationToken);
+
+        return operation is IPropertyReferenceOperation { Property.ContainingNamespace: { Name: nameof(System.Globalization), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } } providerOperation &&
+            providerOperation switch
+            {
+                { Property: { Name: nameof(CultureInfo.InvariantCulture), ContainingType.Name: nameof(CultureInfo) } } or
+                { Property: { Name: nameof(DateTimeFormatInfo.InvariantInfo), ContainingType.Name: nameof(DateTimeFormatInfo) } } => true,
+                _ => false
+            };
+    }
+
+    void AnalyzeTemplate(in Template template)
+    {
+        foreach (var (block, utf8Value, _, _) in template.Blocks)
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
             var value = Encoding.UTF8.GetString(utf8Value);
+
+            if (block != BlockType.Raw)
+            {
+                Debug.Assert(block == BlockType.Identifier, "BlockType.Identifierではない場合、テンプレート解析に不具合があります。");
+
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.RequiredContext, _invocationExpression.GetLocation()));
+                return;
+            }
+
+            _writerInfoList.Add(new(WriteConstantLiteral, value));
+        }
+
+        _success = true;
+    }
+
+    void AnalyzeTemplateWithContext(in Template template)
+    {
+        if (_contextArgument is null || _contextType is null)
+        {
+            throw new InvalidOperationException("コンテキストの型情報が取得できません。");
+        }
+
+        var isInvariantCulture = IsInvariantCulture();
+        var contextMembers = _contextType.GetFieldsAndProperties().ToDictionary(
+            static x => x.Name,
+            static x => (Symbol: x, Formattable: x.GetFieldOrPropertyType().Interfaces.GetFormattableType()));
+
+        foreach (var (block, utf8Value, format, identifierProvider) in template.Blocks)
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
+
+            var value = Encoding.UTF8.GetString(utf8Value);
+            var provider = GetFormatProvider(identifierProvider, isInvariantCulture);
 
             if (block == BlockType.Raw)
             {
-                infoList.Add(new(WriteConstantLiteral, value));
-                continue;
-            }
-
-            Debug.Assert(block == BlockType.Identifier, "BlockType.Identifierではない場合、テンプレート解析に不具合があります。");
-
-            info = null;
-            descriptor = DiagnosticDescriptors.RequiredContext;
-            return false;
-        }
-
-        info = [.. infoList];
-        descriptor = null;
-        return true;
-    }
-
-    static bool TryGetTemplateWriterWriteInfo(in Template template, Compilation compilation, ITypeSymbol contextType, [NotNullWhen(true)] out TemplateWriterWriteInfo[]? info, [NotNullWhen(false)] out (DiagnosticDescriptor Descriptor, string Value)? diagnostic, CancellationToken cancellationToken)
-    {
-        var readOnlySpanByteSymbol = compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
-        var readOnlySpanCharSymbol = compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
-
-        var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(static x => x.Name);
-        var infoList = new List<TemplateWriterWriteInfo>();
-        var isConstant = false;
-
-        foreach (var (block, utf8Value) in template.Blocks)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            var value = Encoding.UTF8.GetString(utf8Value);
-
-            if (block == BlockType.Raw)
-            {
-                AddConstant(infoList, ref isConstant, value);
+                AddConstantString(value);
                 continue;
             }
 
@@ -125,70 +207,119 @@ static class InterceptInfoCreator
             // 識別子がコンテキストに存在しない
             if (!contextMembers.TryGetValue(value, out var identifier))
             {
-                info = null;
-                diagnostic = (DiagnosticDescriptors.InvalidIdentifier, value);
-                return false;
-            }
-
-            // 識別子が文字列定数
-            if ((identifier is IFieldSymbol symbol) && symbol.HasConstantValue && (symbol.ConstantValue is string constantValue))
-            {
-                AddConstant(infoList, ref isConstant, constantValue);
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifier, _contextArgument.GetLocation(), value));
                 continue;
             }
 
-            var type = identifier.GetMemberType();
+            // 識別子が定数かつIFormatProviderの指定がある場合は、定数書き込み
+            if (identifier.Symbol is IFieldSymbol { HasConstantValue: true, ConstantValue: var constantValue } && TryAddConstantValue(constantValue, format, provider))
+            {
+                // IFormattableを実装していない識別子で、formatまたはproviderが設定されている場合
+                if (!identifier.Formattable.HasFlag(FormattableType.IFormattable) && (format is not null || identifierProvider is not null))
+                {
+                    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidConstantIdentifierFormatProvider, _templateArgument.GetLocation()));
+                }
+
+                continue;
+            }
+
+            var type = identifier.Symbol.GetFieldOrPropertyType();
+
+            if (type.TypeKind == TypeKind.Enum)
+            {
+                if (identifierProvider is not null)
+                {
+                    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidEnumIdentifierFormatProvider, _templateArgument.GetLocation()));
+                }
+
+                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticEnum : WriteEnum, value, format, provider));
+                continue;
+            }
+
+            // IFormattable/ISpanFormattable/IUtf8Formattableを実装していない識別子で、formatまたはproviderが設定されている場合
+            if (identifier.Formattable == FormattableType.None && (format is not null || identifierProvider is not null))
+            {
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifierFormatProvider, _templateArgument.GetLocation()));
+            }
 
             // 識別子の型をReadOnlySpan<byte>に暗黙的変換できるどうか
             // ReadOnlySpan<byte>やbyte[]などが一致
-            if (compilation.ClassifyConversion(type, readOnlySpanByteSymbol).IsImplicit)
+            if (_compilation.ClassifyConversion(type, _readOnlySpanByteSymbol).IsImplicit)
             {
-                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticLiteral : WriteLiteral, value));
+                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticLiteral : WriteLiteral, value, format, provider));
                 continue;
             }
 
             // 識別子の型をReadOnlySpan<char>に暗黙的変換できるどうか
             // ReadOnlySpan<char>やstring、char[]などが一致
-            if (compilation.ClassifyConversion(type, readOnlySpanCharSymbol).IsImplicit)
+            if (_compilation.ClassifyConversion(type, _readOnlySpanCharSymbol).IsImplicit)
             {
-                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticString : WriteString, value));
+                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticString : WriteString, value, format, provider));
                 continue;
             }
 
-            var format = identifier.GetAttributes()
-                .FirstOrDefault(static x => x.AttributeClass is { Name: "IdentifierAttribute", ContainingNamespace: { Name: nameof(SimpleTextTemplate), ContainingNamespace.IsGlobalNamespace: true } })
-                ?.ConstructorArguments.FirstOrDefault()
-                .Value as string;
-
-            if (type.TypeKind == TypeKind.Enum)
-            {
-                AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticEnum : WriteEnum, value, format));
-                continue;
-            }
-
-            AddValue(infoList, ref isConstant, new(identifier.IsStatic ? WriteStaticValue : WriteValue, value, format));
+            AddValue(new(identifier.Symbol.IsStatic ? WriteStaticValue : WriteValue, value, format, provider));
         }
 
-        info = [.. infoList];
-        diagnostic = null;
+        _success = true;
+
+        static IFormatProvider? GetFormatProvider(IFormatProvider? provider, bool isDefaultInvariantCulture)
+        {
+            return provider is not null ? provider : GetDefaultFormatProvider(isDefaultInvariantCulture);
+
+            static IFormatProvider? GetDefaultFormatProvider(bool isDefaultInvariantCulture)
+                => isDefaultInvariantCulture ? CultureInfo.InvariantCulture : null;
+        }
+    }
+
+    void AddConstantString(string value)
+    {
+        if (_isConstant)
+        {
+            _writerInfoList[^1] = new(WriteConstantLiteral, _writerInfoList[^1].Value + value);
+            return;
+        }
+
+        _writerInfoList.Add(new(WriteConstantLiteral, value));
+        _isConstant = true;
+    }
+
+    void AddValue(TemplateWriterWriteInfo info)
+    {
+        _writerInfoList.Add(info);
+        _isConstant = false;
+    }
+
+    bool TryAddConstantValue(object value, string? format, IFormatProvider? provider)
+    {
+        if (value is IFormattable formattableValue)
+        {
+            if (provider is null)
+            {
+                return false;
+            }
+
+            AddConstantString(formattableValue.ToString(format, provider));
+            return true;
+        }
+
+        if (value is string valueString)
+        {
+            if (valueString.Length != 0)
+            {
+                AddConstantString(valueString);
+            }
+
+            return true;
+        }
+
+        // nullの場合はWriteConstantLiteralメソッドの呼び出しは不要。
+        if (value is null)
+        {
+            return true;
+        }
+
+        AddConstantString(value.ToString());
         return true;
-
-        static void AddConstant(List<TemplateWriterWriteInfo> infoList, ref bool isConstant, string value)
-        {
-            if (isConstant)
-            {
-                infoList[^1] = new(WriteConstantLiteral, infoList[^1].Value + value);
-                return;
-            }
-
-            infoList.Add(new(WriteConstantLiteral, value));
-            isConstant = true;
-        }
-
-        static void AddValue(List<TemplateWriterWriteInfo> infoList, ref bool isConstant, TemplateWriterWriteInfo info)
-        {
-            infoList.Add(info);
-            isConstant = false;
-        }
     }
 }

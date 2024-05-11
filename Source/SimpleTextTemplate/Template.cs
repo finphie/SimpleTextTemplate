@@ -1,24 +1,24 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.CompilerServices;
-using SimpleTextTemplate.Extensions;
 
 #if NET8_0_OR_GREATER
-using System.Buffers;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 #endif
+
+using Block = (SimpleTextTemplate.BlockType Type, byte[] Value, string? Format, System.IFormatProvider? Culture);
 
 namespace SimpleTextTemplate;
 
 /// <summary>
-/// テンプレートを解析・レンダリングする構造体です。
+/// テンプレート構造を保存する構造体です。
 /// </summary>
 [SuppressMessage("Performance", "CA1815:equals および operator equals を値型でオーバーライドします", Justification = "不要なため。")]
 public readonly struct Template
 {
-    readonly (BlockType Type, byte[] Value)[] _blocks;
+    readonly Block[] _blocks;
 
-    Template((BlockType Type, byte[] Value)[] blocks) => _blocks = blocks;
+    Template(Block[] blocks) => _blocks = blocks;
 
     /// <summary>
     /// ブロック単位のバッファを取得します。
@@ -26,7 +26,12 @@ public readonly struct Template
     /// <value>
     /// ブロック単位のバッファ
     /// </value>
-    public ReadOnlySpan<(BlockType Type, byte[] Value)> Blocks => _blocks.AsSpan();
+    public ReadOnlySpan<Block> Blocks
+#if NET8_0_OR_GREATER
+        => MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(_blocks), _blocks.Length);
+#else
+        => _blocks.AsSpan();
+#endif
 
     /// <summary>
     /// テンプレート文字列を解析します。
@@ -39,29 +44,60 @@ public readonly struct Template
     /// それ以外の場合は<see langword="false"/>を返します。
     /// </returns>
     /// <exception cref="ArgumentNullException">引数がnullです。</exception>
-    public static bool TryParse(byte[] source, out Template template, out nuint consumed)
+    public static bool TryParse(ReadOnlySpan<byte> source, out Template template, out nuint consumed)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(source);
-#endif
         var reader = new TemplateReader(source);
-        var list = new List<(BlockType Type, byte[] Value)>();
+        var list = new List<Block>();
 
         while (reader.TryRead(out var value) is var type && type != BlockType.End)
         {
             if (type == BlockType.None)
             {
-                template = new([]);
-                consumed = reader.Consumed;
-                return false;
+                goto Error;
             }
 
-            list.Add((type, value.ToArray()));
+            if (type != BlockType.Identifier)
+            {
+                list.Add((type, value.ToArray(), null, null));
+                continue;
+            }
+
+            var identifierReader = new TemplateIdentifierReader(value);
+
+            if (!identifierReader.TryRead(out var identifier, out var format, out var culture))
+            {
+                goto Error;
+            }
+
+            CultureInfo? cultureInfo = null;
+
+            try
+            {
+                if (culture is not null)
+                {
+#if NET8_0_OR_GREATER
+                    cultureInfo = CultureInfo.GetCultureInfo(culture, true);
+#else
+                    cultureInfo = CultureInfo.GetCultureInfo(culture);
+#endif
+                }
+            }
+            catch (CultureNotFoundException)
+            {
+                goto Error;
+            }
+
+            list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 
         template = new([.. list]);
         consumed = reader.Consumed;
         return true;
+
+    Error:
+        template = new([]);
+        consumed = reader.Consumed;
+        return false;
     }
 
     /// <summary>
@@ -70,60 +106,36 @@ public readonly struct Template
     /// <param name="source">テンプレート文字列</param>
     /// <returns><see cref="Template"/>構造体のインスタンス</returns>
     /// <exception cref="ArgumentNullException">引数がnullです。</exception>
+    /// <exception cref="CultureNotFoundException">カルチャーが見つかりません。</exception>
     /// <exception cref="TemplateException">テンプレートの解析に失敗しました。</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Template Parse(byte[] source)
+    public static Template Parse(ReadOnlySpan<byte> source)
     {
-#if NET8_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(source);
-#endif
         var reader = new TemplateReader(source);
-        var list = new List<(BlockType Type, byte[] Value)>();
+        var list = new List<Block>();
 
         while (reader.Read(out var value) is var type && type != BlockType.End)
         {
-            list.Add((type, value.ToArray()));
+            if (type != BlockType.Identifier)
+            {
+                list.Add((type, value.ToArray(), null, null));
+                continue;
+            }
+
+            var identifierReader = new TemplateIdentifierReader(value);
+            identifierReader.Read(out var identifier, out var format, out var culture);
+
+            var cultureInfo = culture is null
+                ? null
+#if NET8_0_OR_GREATER
+                : CultureInfo.GetCultureInfo(culture, true);
+#else
+                : CultureInfo.GetCultureInfo(culture);
+#endif
+
+            list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
 
         return new([.. list]);
     }
-
-#if NET8_0_OR_GREATER
-    /// <summary>
-    /// テンプレートをレンダリングして、バッファーライターに書き込みます。
-    /// </summary>
-    /// <typeparam name="TWriter">使用するバッファーライターの型</typeparam>
-    /// <typeparam name="TContext">コンテキストの型</typeparam>
-    /// <param name="bufferWriter">バッファーライター</param>
-    /// <param name="context">コンテキスト</param>
-    /// <exception cref="ArgumentNullException">引数がnullです。</exception>
-    public void Render<TWriter, TContext>(TWriter bufferWriter, TContext context)
-        where TWriter : notnull, IBufferWriter<byte>
-        where TContext : notnull, IContext
-    {
-        ArgumentNullException.ThrowIfNull(bufferWriter);
-        ArgumentNullException.ThrowIfNull(context);
-
-        foreach (var (type, stringOrIdentifier) in Blocks)
-        {
-            ref var stringOrIdentifierStart = ref MemoryMarshal.GetArrayDataReference(stringOrIdentifier);
-
-            switch (type)
-            {
-                case BlockType.Raw:
-                    bufferWriter.Write(ref stringOrIdentifierStart, stringOrIdentifier.Length);
-                    break;
-                case BlockType.Identifier:
-                    var span = MemoryMarshal.CreateReadOnlySpan(ref stringOrIdentifierStart, stringOrIdentifier.Length);
-                    context.TryGetValue(span, out var value);
-                    bufferWriter.Write(ref value.DangerousGetReference(), value.ByteCount);
-                    break;
-                case BlockType.None:
-                case BlockType.End:
-                default:
-                    throw new UnreachableException();
-            }
-        }
-    }
-#endif
 }
