@@ -86,7 +86,7 @@ public sealed class TemplateIdentifierReaderReadTest
             var reader = new TemplateIdentifierReader(":A"u8);
             reader.Read(out _, out _, out _);
         })
-        .Should()
-        .Throw<TemplateException>();
+            .Should()
+            .Throw<TemplateException>();
     }
 }

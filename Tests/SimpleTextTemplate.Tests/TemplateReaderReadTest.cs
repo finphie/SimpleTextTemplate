@@ -70,9 +70,9 @@ public sealed class TemplateReaderReadTest
             var reader = new TemplateReader(array);
             reader.Read(out _);
         })
-        .Should()
-        .Throw<TemplateException>()
-        .Where(x => x.Position == positionPtr);
+            .Should()
+            .Throw<TemplateException>()
+            .Where(x => x.Position == positionPtr);
     }
 
     static void Execute(ReadOnlySpan<byte> buffer, params (BlockType Type, string ExpectedValue, nuint Consumed)[] blocks)

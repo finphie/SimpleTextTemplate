@@ -79,8 +79,8 @@ public sealed class TemplateReaderTryReadTest
             reader.Consumed.Should().Be(consumed);
 
             value.ToArray()
-               .Should()
-               .Equal(Encoding.UTF8.GetBytes(expectedValue));
+                .Should()
+                .Equal(Encoding.UTF8.GetBytes(expectedValue));
         }
     }
 }
