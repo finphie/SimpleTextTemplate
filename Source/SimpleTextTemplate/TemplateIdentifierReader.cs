@@ -66,10 +66,12 @@ public ref struct TemplateIdentifierReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Read(out ReadOnlySpan<byte> value, out string? format, out string? culture)
     {
-        if (!TryRead(out value, out format, out culture))
+        if (TryRead(out value, out format, out culture))
         {
-            ThrowHelper.ThrowInvalidIdentifierException();
+            return;
         }
+
+        ThrowHelper.ThrowInvalidIdentifierException();
     }
 
     /// <summary>
