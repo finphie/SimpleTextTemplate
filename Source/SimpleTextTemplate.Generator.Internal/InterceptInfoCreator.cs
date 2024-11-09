@@ -147,8 +147,8 @@ ref struct InterceptInfoCreator
 
         var operation = _semanticModel.GetOperation(providerExpression, _cancellationToken);
 
-        return operation is IPropertyReferenceOperation { Property.ContainingNamespace: { Name: nameof(System.Globalization), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } } providerOperation &&
-            providerOperation switch
+        return operation is IPropertyReferenceOperation { Property.ContainingNamespace: { Name: nameof(System.Globalization), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } } providerOperation
+            && providerOperation switch
             {
                 { Property: { Name: nameof(CultureInfo.InvariantCulture), ContainingType.Name: nameof(CultureInfo) } } or
                 { Property: { Name: nameof(DateTimeFormatInfo.InvariantInfo), ContainingType.Name: nameof(DateTimeFormatInfo) } } => true,
