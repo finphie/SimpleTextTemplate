@@ -125,11 +125,11 @@ public sealed class TemplateExtensionsRenderTest
     [Fact]
     public void String_識別子を置換()
     {
-        var value = "abc";
+        const string Value = "abc";
 
-        Execute("{{ A }}"u8, value, "abc"u8);
-        Execute("{{ A: }}"u8, value, "abc"u8);
-        Execute("{{ A:: }}"u8, value, "abc"u8);
+        Execute("{{ A }}"u8, Value, "abc"u8);
+        Execute("{{ A: }}"u8, Value, "abc"u8);
+        Execute("{{ A:: }}"u8, Value, "abc"u8);
     }
 
     [Fact]
@@ -145,27 +145,27 @@ public sealed class TemplateExtensionsRenderTest
     [Fact]
     public void Int32_識別子を置換()
     {
-        var value = 1234;
+        const int Value = 1234;
 
-        Execute("{{ A }}"u8, value, "1234"u8);
-        Execute("{{ A: }}"u8, value, "1234"u8);
-        Execute("{{ A:: }}"u8, value, "1234"u8);
-        Execute("{{ A:N3 }}"u8, value, "1,234.000"u8);
-        Execute("{{ A:N3:es-ES }}"u8, value, "1.234,000"u8, CultureInfo.GetCultureInfo("ja-JP", true));
-        Execute("{{ A:N3 }}"u8, value, "1.234,000"u8, CultureInfo.GetCultureInfo("es-ES", true));
+        Execute("{{ A }}"u8, Value, "1234"u8);
+        Execute("{{ A: }}"u8, Value, "1234"u8);
+        Execute("{{ A:: }}"u8, Value, "1234"u8);
+        Execute("{{ A:N3 }}"u8, Value, "1,234.000"u8);
+        Execute("{{ A:N3:es-ES }}"u8, Value, "1.234,000"u8, CultureInfo.GetCultureInfo("ja-JP", true));
+        Execute("{{ A:N3 }}"u8, Value, "1.234,000"u8, CultureInfo.GetCultureInfo("es-ES", true));
     }
 
     [Fact]
     public void Double_識別子を置換()
     {
-        var value = 1234.567;
+        const double Value = 1234.567;
 
-        Execute("{{ A }}"u8, value, "1234.567"u8);
-        Execute("{{ A: }}"u8, value, "1234.567"u8);
-        Execute("{{ A:: }}"u8, value, "1234.567"u8);
-        Execute("{{ A:F2 }}"u8, value, "1234.57"u8);
-        Execute("{{ A:F3:es-ES }}"u8, value, "1234,567"u8, CultureInfo.GetCultureInfo("ja-JP", true));
-        Execute("{{ A:F3 }}"u8, value, "1234,567"u8, CultureInfo.GetCultureInfo("es-ES", true));
+        Execute("{{ A }}"u8, Value, "1234.567"u8);
+        Execute("{{ A: }}"u8, Value, "1234.567"u8);
+        Execute("{{ A:: }}"u8, Value, "1234.567"u8);
+        Execute("{{ A:F2 }}"u8, Value, "1234.57"u8);
+        Execute("{{ A:F3:es-ES }}"u8, Value, "1234,567"u8, CultureInfo.GetCultureInfo("ja-JP", true));
+        Execute("{{ A:F3 }}"u8, Value, "1234,567"u8, CultureInfo.GetCultureInfo("es-ES", true));
     }
 
     [Fact]

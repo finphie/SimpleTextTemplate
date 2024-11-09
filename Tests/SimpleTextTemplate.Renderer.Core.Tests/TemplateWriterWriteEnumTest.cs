@@ -19,12 +19,12 @@ public sealed class TemplateWriterWriteEnumTest
     [Fact]
     public void 書式指定なし_バッファーライターに書き込み()
     {
-        var value = Test1.A;
+        const Test1 Value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         using (var writer = TemplateWriter.Create(bufferWriter))
         {
-            writer.WriteEnum(value);
+            writer.WriteEnum(Value);
         }
 
         bufferWriter.WrittenSpan.ToArray()
@@ -35,12 +35,12 @@ public sealed class TemplateWriterWriteEnumTest
     [Fact]
     public void 書式指定_バッファーライターに書き込み()
     {
-        var value = Test1.A;
+        const Test1 Value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         using (var writer = TemplateWriter.Create(bufferWriter))
         {
-            writer.WriteEnum(value, "D");
+            writer.WriteEnum(Value, "D");
         }
 
         bufferWriter.WrittenSpan.ToArray()
@@ -51,7 +51,7 @@ public sealed class TemplateWriterWriteEnumTest
     [Fact]
     public void Enumを複数回追加_バッファーライターに書き込み()
     {
-        var value = Test2.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA;
+        const Test2 Value = Test2.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA;
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
@@ -59,7 +59,7 @@ public sealed class TemplateWriterWriteEnumTest
         {
             for (; count < 10; count++)
             {
-                writer.WriteEnum(value);
+                writer.WriteEnum(Value);
             }
         }
 

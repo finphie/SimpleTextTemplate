@@ -27,7 +27,7 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void StringEmpty()
     {
-        var sourceCode = $$$"""
+        const string SourceCode = """
             using System.Buffers;
             using SimpleTextTemplate;
             using static System.String;
@@ -41,7 +41,7 @@ public sealed class TemplateWriterWriteTest
             writer.Write(S.Empty);
             writer.Write(Empty);
             """;
-        var (compilation, diagnostics) = Run(sourceCode);
+        var (compilation, diagnostics) = Run(SourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
         diagnostics.Should().BeEmpty();
