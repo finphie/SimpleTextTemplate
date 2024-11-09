@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);SimpleTextTemplate.Generator</InterceptorsPreviewNamespaces>
+    <TargetFramework>net9.0</TargetFramework>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);SimpleTextTemplate.Generator</InterceptorsNamespaces>
   </PropertyGroup>
 
   <ItemGroup>

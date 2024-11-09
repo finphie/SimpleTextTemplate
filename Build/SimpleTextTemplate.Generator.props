@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);SimpleTextTemplate.Generator</InterceptorsPreviewNamespaces>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);SimpleTextTemplate.Generator</InterceptorsNamespaces>
   </PropertyGroup>
 
 </Project>
