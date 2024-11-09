@@ -57,11 +57,7 @@ public sealed class TemplateWriterWriteTest
     [Fact]
     public void 識別子なし()
     {
-        var sourceCode = Get(
-            [
-                "A",
-                "B"
-            ]);
+        var sourceCode = Get(["A", "B"]);
         var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
