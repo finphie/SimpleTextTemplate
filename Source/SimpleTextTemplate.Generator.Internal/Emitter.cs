@@ -1,5 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -22,6 +23,7 @@ static class Emitter
     /// </summary>
     /// <param name="context">インクリメンタルソースジェネレーターで使用するコンテキスト</param>
     /// <param name="infoList">インターセプター情報のリスト</param>
+    [SuppressMessage("Roslynator", "RCS0053:Fix formatting of a list", Justification = "生文字列リテラル")]
     public static void Emit(SourceProductionContext context, ImmutableArray<InterceptInfo> infoList)
     {
         context.CancellationToken.ThrowIfCancellationRequested();
