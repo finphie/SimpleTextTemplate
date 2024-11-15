@@ -52,8 +52,8 @@ static class RoslynExtensions
     {
         return type.GetMembers()
             .Where(static x =>
-                x.DeclaredAccessibility is Accessibility.Public or Accessibility.Internal or Accessibility.ProtectedOrInternal &&
-                x.Kind is SymbolKind.Field or SymbolKind.Property);
+                x.DeclaredAccessibility is Accessibility.Public or Accessibility.Internal or Accessibility.ProtectedOrInternal
+                    && x.Kind is SymbolKind.Field or SymbolKind.Property);
     }
 
     /// <summary>

@@ -25,7 +25,7 @@ static class GeneratorRunner
         {
             "System.Private.CoreLib.dll",
             "System.Runtime.dll",
-            "System.Memory.dll",
+            "System.Memory.dll"
         };
 
         var references = assemblies.Select(x => Path.Join(baseAssemblyPath, x))

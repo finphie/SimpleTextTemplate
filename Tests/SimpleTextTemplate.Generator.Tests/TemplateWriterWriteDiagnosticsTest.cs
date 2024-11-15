@@ -13,7 +13,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     [Fact]
     public void テンプレート文字列が定数ではない_STT1000()
     {
-        var sourceCode = """
+        const string SourceCode = """
             using System.Buffers;
             using SimpleTextTemplate;
             
@@ -22,7 +22,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             var x = "a";
             writer.Write(x);
             """;
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = Run(SourceCode);
 
         diagnostics.Should().HaveCount(1);
 
@@ -47,7 +47,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     [Fact]
     public void テンプレート文字列に識別子がありコンテキストの指定がない_STT1001()
     {
-        var sourceCode = """
+        const string SourceCode = """
             using System.Buffers;
             using SimpleTextTemplate;
             
@@ -55,7 +55,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             var writer = TemplateWriter.Create(bufferWriter);
             writer.Write("{{ x }}");
             """;
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = Run(SourceCode);
 
         diagnostics.Should().HaveCount(1);
 

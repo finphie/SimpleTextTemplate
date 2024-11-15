@@ -11,14 +11,14 @@ public sealed class TemplateWriterWriteValueTest
     [Fact]
     public void Int32_バッファーライターに書き込み()
     {
-        var value = 1234;
+        const int Value = 1234;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         using (var writer = TemplateWriter.Create(bufferWriter))
         {
-            writer.WriteValue(value, default, CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "N3", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "N3", CultureInfo.GetCultureInfo("es-ES", true));
+            writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
+            writer.WriteValue(Value, "N3", CultureInfo.InvariantCulture);
+            writer.WriteValue(Value, "N3", CultureInfo.GetCultureInfo("es-ES", true));
         }
 
         bufferWriter.WrittenSpan.ToArray()
@@ -29,14 +29,14 @@ public sealed class TemplateWriterWriteValueTest
     [Fact]
     public void Double_バッファーライターに書き込み()
     {
-        var value = 1234.567;
+        const double Value = 1234.567;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         using (var writer = TemplateWriter.Create(bufferWriter))
         {
-            writer.WriteValue(value, default, CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "F2", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "F3", CultureInfo.GetCultureInfo("es-ES", true));
+            writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
+            writer.WriteValue(Value, "F2", CultureInfo.InvariantCulture);
+            writer.WriteValue(Value, "F3", CultureInfo.GetCultureInfo("es-ES", true));
         }
 
         bufferWriter.WrittenSpan.ToArray()
@@ -65,7 +65,7 @@ public sealed class TemplateWriterWriteValueTest
     [Fact]
     public void IUtf8SpanFormattable_バッファーライターに書き込み()
     {
-        var value = 11_111_111_111_111_111_111;
+        const ulong Value = 11_111_111_111_111_111_111;
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
@@ -73,7 +73,7 @@ public sealed class TemplateWriterWriteValueTest
         {
             for (; count < 20; count++)
             {
-                writer.WriteValue(value, default, CultureInfo.InvariantCulture);
+                writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
             }
         }
 

@@ -13,6 +13,7 @@ no-duplicate-heading:
   siblings_only: true
 no-trailing-punctuation:
   punctuation: .,;:!?。，；：！？、
+no-blanks-blockquote: false
 ol-prefix:
   style: one
 no-inline-html:
@@ -26,6 +27,7 @@ fenced-code-language:
   allowed_languages:
     - text
     - csharp
+    - razor
     - typescript
     - javascript
     - python
@@ -35,9 +37,12 @@ fenced-code-language:
     - xml
     - json
     - yaml
+    - shell
     - powershell
     - batch
     - bash
+    - editorconfig
+    - dockerfile
   language_only: true
 required-headings: false
 code-block-style:
