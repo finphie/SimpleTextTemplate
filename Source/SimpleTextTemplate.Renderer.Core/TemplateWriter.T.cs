@@ -9,7 +9,7 @@ using System.Text;
 namespace SimpleTextTemplate;
 
 /// <summary>
-/// テンプレート文字列のレンダリングを行います。
+/// 文字列などをバッファーに書き込む構造体です。
 /// </summary>
 /// <typeparam name="T">バッファーライターの型</typeparam>
 public ref struct TemplateWriter<T>

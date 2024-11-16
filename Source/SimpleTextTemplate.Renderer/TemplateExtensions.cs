@@ -14,7 +14,7 @@ public static class TemplateExtensions
     /// <summary>
     /// テンプレートをレンダリングして、バッファーライターに書き込みます。
     /// </summary>
-    /// <typeparam name="TWriter">使用するバッファーライターの型</typeparam>
+    /// <typeparam name="TWriter">バッファーライターの型</typeparam>
     /// <typeparam name="TContext">コンテキストの型</typeparam>
     /// <param name="template">テンプレート構造</param>
     /// <param name="bufferWriter">バッファーライター</param>
