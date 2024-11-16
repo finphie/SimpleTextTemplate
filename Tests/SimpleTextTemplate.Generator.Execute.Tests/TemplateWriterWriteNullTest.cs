@@ -14,11 +14,10 @@ public sealed class TemplateWriterWriteNullTest
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ NullStringConstantField }}", in context);
-            writer.Write("{{ NullObjectConstantField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ NullStringConstantField }}", in context);
+        Template.Render(ref writer, "{{ NullObjectConstantField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -31,11 +30,10 @@ public sealed class TemplateWriterWriteNullTest
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ NullStringStaticField }}", in context);
-            writer.Write("{{ NullObjectStaticField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ NullStringStaticField }}", in context);
+        Template.Render(ref writer, "{{ NullObjectStaticField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -48,11 +46,10 @@ public sealed class TemplateWriterWriteNullTest
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ NullStringField }}", in context);
-            writer.Write("{{ NullObjectField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ NullStringField }}", in context);
+        Template.Render(ref writer, "{{ NullObjectField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -65,11 +62,10 @@ public sealed class TemplateWriterWriteNullTest
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ NullStringStaticProperty }}", in context);
-            writer.Write("{{ NullObjectStaticProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ NullStringStaticProperty }}", in context);
+        Template.Render(ref writer, "{{ NullObjectStaticProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -82,11 +78,10 @@ public sealed class TemplateWriterWriteNullTest
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ NullStringProperty }}", in context);
-            writer.Write("{{ NullObjectProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ NullStringProperty }}", in context);
+        Template.Render(ref writer, "{{ NullObjectProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -99,11 +94,10 @@ public sealed class TemplateWriterWriteNullTest
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ EmptyStringConstantField }}", in context);
-            writer.Write("{{ EmptyStringStaticField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ EmptyStringConstantField }}", in context);
+        Template.Render(ref writer, "{{ EmptyStringStaticField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

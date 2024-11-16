@@ -14,10 +14,9 @@ public sealed class TemplateWriterWriteByteArrayTest
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ BytesStaticField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ BytesStaticField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -30,10 +29,9 @@ public sealed class TemplateWriterWriteByteArrayTest
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ BytesField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ BytesField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -46,10 +44,9 @@ public sealed class TemplateWriterWriteByteArrayTest
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ BytesStaticProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ BytesStaticProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -62,10 +59,9 @@ public sealed class TemplateWriterWriteByteArrayTest
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ BytesProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ BytesProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -78,10 +74,9 @@ public sealed class TemplateWriterWriteByteArrayTest
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ BytesSpanStaticProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ BytesSpanStaticProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -94,10 +89,9 @@ public sealed class TemplateWriterWriteByteArrayTest
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ BytesSpanProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ BytesSpanProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

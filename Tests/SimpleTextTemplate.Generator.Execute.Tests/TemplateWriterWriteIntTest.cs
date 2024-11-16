@@ -12,20 +12,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void 静的フィールド()
     {
+        const string Text = """
+            {{ IntStaticField }}
+            {{ IntStaticField:N3 }}
+            {{ IntStaticField:N3:es-ES }}
+            {{ IntStaticField::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntStaticField }}
-                {{ IntStaticField:N3 }}
-                {{ IntStaticField:N3:es-ES }}
-                {{ IntStaticField::ja-JP }}
-                """,
-                in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -40,21 +38,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void 静的フィールド_InvariantCultureを指定()
     {
+        const string Text = """
+            {{ IntStaticField }}
+            {{ IntStaticField:N3 }}
+            {{ IntStaticField:N3:es-ES }}
+            {{ IntStaticField::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntStaticField }}
-                {{ IntStaticField:N3 }}
-                {{ IntStaticField:N3:es-ES }}
-                {{ IntStaticField::ja-JP }}
-                """,
-                in context,
-                CultureInfo.InvariantCulture);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -69,21 +64,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void 静的フィールド_特定カルチャーを指定()
     {
+        const string Text = """
+            {{ IntStaticField }}
+            {{ IntStaticField:N3 }}
+            {{ IntStaticField:N3:es-ES }}
+            {{ IntStaticField::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntStaticField }}
-                {{ IntStaticField:N3 }}
-                {{ IntStaticField:N3:es-ES }}
-                {{ IntStaticField::ja-JP }}
-                """,
-                in context,
-                CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -98,20 +90,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void フィールド()
     {
+        const string Text = """
+            {{ IntField }}
+            {{ IntField:N3 }}
+            {{ IntField:N3:es-ES }}
+            {{ IntField::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntField }}
-                {{ IntField:N3 }}
-                {{ IntField:N3:es-ES }}
-                {{ IntField::ja-JP }}
-                """,
-                in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -126,21 +116,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void フィールド_InvariantCultureを指定()
     {
+        const string Text = """
+            {{ IntField }}
+            {{ IntField:N3 }}
+            {{ IntField:N3:es-ES }}
+            {{ IntField::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntField }}
-                {{ IntField:N3 }}
-                {{ IntField:N3:es-ES }}
-                {{ IntField::ja-JP }}
-                """,
-                in context,
-                CultureInfo.InvariantCulture);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -155,21 +142,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void フィールド_特定カルチャーを指定()
     {
+        const string Text = """
+            {{ IntField }}
+            {{ IntField:N3 }}
+            {{ IntField:N3:es-ES }}
+            {{ IntField::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntField }}
-                {{ IntField:N3 }}
-                {{ IntField:N3:es-ES }}
-                {{ IntField::ja-JP }}
-                """,
-                in context,
-                CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -184,20 +168,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void 静的プロパティ()
     {
+        const string Text = """
+            {{ IntStaticProperty }}
+            {{ IntStaticProperty:N3 }}
+            {{ IntStaticProperty:N3:es-ES }}
+            {{ IntStaticProperty::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntStaticProperty }}
-                {{ IntStaticProperty:N3 }}
-                {{ IntStaticProperty:N3:es-ES }}
-                {{ IntStaticProperty::ja-JP }}
-                """,
-                in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -212,21 +194,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void 静的プロパティ_InvariantCultureを指定()
     {
+        const string Text = """
+            {{ IntStaticProperty }}
+            {{ IntStaticProperty:N3 }}
+            {{ IntStaticProperty:N3:es-ES }}
+            {{ IntStaticProperty::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntStaticProperty }}
-                {{ IntStaticProperty:N3 }}
-                {{ IntStaticProperty:N3:es-ES }}
-                {{ IntStaticProperty::ja-JP }}
-                """,
-                in context,
-                CultureInfo.InvariantCulture);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -241,21 +220,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void 静的プロパティ_特定カルチャーを指定()
     {
+        const string Text = """
+            {{ IntStaticProperty }}
+            {{ IntStaticProperty:N3 }}
+            {{ IntStaticProperty:N3:es-ES }}
+            {{ IntStaticProperty::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntStaticProperty }}
-                {{ IntStaticProperty:N3 }}
-                {{ IntStaticProperty:N3:es-ES }}
-                {{ IntStaticProperty::ja-JP }}
-                """,
-                in context,
-                CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -270,20 +246,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void プロパティ()
     {
+        const string Text = """
+            {{ IntProperty }}
+            {{ IntProperty:N3 }}
+            {{ IntProperty:N3:es-ES }}
+            {{ IntProperty::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntProperty }}
-                {{ IntProperty:N3 }}
-                {{ IntProperty:N3:es-ES }}
-                {{ IntProperty::ja-JP }}
-                """,
-                in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -298,21 +272,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void プロパティ_InvariantCultureを指定()
     {
+        const string Text = """
+            {{ IntProperty }}
+            {{ IntProperty:N3 }}
+            {{ IntProperty:N3:es-ES }}
+            {{ IntProperty::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntProperty }}
-                {{ IntProperty:N3 }}
-                {{ IntProperty:N3:es-ES }}
-                {{ IntProperty::ja-JP }}
-                """,
-                in context,
-                CultureInfo.InvariantCulture);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -327,21 +298,18 @@ public sealed class TemplateWriterWriteIntTest
     [Fact]
     public void プロパティ_特定カルチャーを指定()
     {
+        const string Text = """
+            {{ IntProperty }}
+            {{ IntProperty:N3 }}
+            {{ IntProperty:N3:es-ES }}
+            {{ IntProperty::ja-JP }}
+            """;
         var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ IntProperty }}
-                {{ IntProperty:N3 }}
-                {{ IntProperty:N3:es-ES }}
-                {{ IntProperty::ja-JP }}
-                """,
-                in context,
-                CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
