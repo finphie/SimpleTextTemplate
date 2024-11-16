@@ -5,7 +5,7 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateWriterWriteAccessibilityTest
+public sealed class TemplateRenderAccessibilityTest
 {
     [Fact]
     public void 静的Internalフィールド()

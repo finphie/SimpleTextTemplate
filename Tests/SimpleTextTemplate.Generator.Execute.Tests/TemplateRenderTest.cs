@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateWriterWriteTest
+public sealed class TemplateRenderTest
 {
     [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1122:Use string.Empty for empty strings", Justification = "テスト")]
     [Fact]

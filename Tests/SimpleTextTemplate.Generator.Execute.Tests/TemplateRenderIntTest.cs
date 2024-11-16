@@ -7,19 +7,18 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateWriterWriteDateTimeOffsetTest
+public sealed class TemplateRenderIntTest
 {
     [Fact]
     public void 静的フィールド()
     {
         const string Text = """
-            {{ DateTimeOffsetStaticField }}
-            {{ DateTimeOffsetStaticField:o }}
-            {{ DateTimeOffsetStaticField:D:ja-JP }}
-            {{ DateTimeOffsetStaticField::ja-JP }}
+            {{ IntStaticField }}
+            {{ IntStaticField:N3 }}
+            {{ IntStaticField:N3:es-ES }}
+            {{ IntStaticField::ja-JP }}
             """;
-
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -29,10 +28,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -40,13 +39,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void 静的フィールド_InvariantCultureを指定()
     {
         const string Text = """
-            {{ DateTimeOffsetStaticField }}
-            {{ DateTimeOffsetStaticField:o }}
-            {{ DateTimeOffsetStaticField:D:ja-JP }}
-            {{ DateTimeOffsetStaticField::ja-JP }}
+            {{ IntStaticField }}
+            {{ IntStaticField:N3 }}
+            {{ IntStaticField:N3:es-ES }}
+            {{ IntStaticField::ja-JP }}
             """;
-
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -56,10 +54,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -67,13 +65,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void 静的フィールド_特定カルチャーを指定()
     {
         const string Text = """
-            {{ DateTimeOffsetStaticField }}
-            {{ DateTimeOffsetStaticField:o }}
-            {{ DateTimeOffsetStaticField:D:ja-JP }}
-            {{ DateTimeOffsetStaticField::ja-JP }}
+            {{ IntStaticField }}
+            {{ IntStaticField:N3 }}
+            {{ IntStaticField:N3:es-ES }}
+            {{ IntStaticField::ja-JP }}
             """;
-
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -83,10 +80,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            2000/01/01 0:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -94,13 +91,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void フィールド()
     {
         const string Text = """
-            {{ DateTimeOffsetField }}
-            {{ DateTimeOffsetField:o }}
-            {{ DateTimeOffsetField:D:ja-JP }}
-            {{ DateTimeOffsetField::ja-JP }}
+            {{ IntField }}
+            {{ IntField:N3 }}
+            {{ IntField:N3:es-ES }}
+            {{ IntField::ja-JP }}
             """;
-
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -110,10 +106,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -121,12 +117,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void フィールド_InvariantCultureを指定()
     {
         const string Text = """
-            {{ DateTimeOffsetField }}
-            {{ DateTimeOffsetField:o }}
-            {{ DateTimeOffsetField:D:ja-JP }}
-            {{ DateTimeOffsetField::ja-JP }}
+            {{ IntField }}
+            {{ IntField:N3 }}
+            {{ IntField:N3:es-ES }}
+            {{ IntField::ja-JP }}
             """;
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -136,10 +132,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -147,12 +143,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void フィールド_特定カルチャーを指定()
     {
         const string Text = """
-            {{ DateTimeOffsetField }}
-            {{ DateTimeOffsetField:o }}
-            {{ DateTimeOffsetField:D:ja-JP }}
-            {{ DateTimeOffsetField::ja-JP }}
+            {{ IntField }}
+            {{ IntField:N3 }}
+            {{ IntField:N3:es-ES }}
+            {{ IntField::ja-JP }}
             """;
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -162,10 +158,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            2000/01/01 0:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -173,12 +169,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void 静的プロパティ()
     {
         const string Text = """
-            {{ DateTimeOffsetStaticProperty }}
-            {{ DateTimeOffsetStaticProperty:o }}
-            {{ DateTimeOffsetStaticProperty:D:ja-JP }}
-            {{ DateTimeOffsetStaticProperty::ja-JP }}
+            {{ IntStaticProperty }}
+            {{ IntStaticProperty:N3 }}
+            {{ IntStaticProperty:N3:es-ES }}
+            {{ IntStaticProperty::ja-JP }}
             """;
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -188,10 +184,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -199,12 +195,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void 静的プロパティ_InvariantCultureを指定()
     {
         const string Text = """
-            {{ DateTimeOffsetStaticProperty }}
-            {{ DateTimeOffsetStaticProperty:o }}
-            {{ DateTimeOffsetStaticProperty:D:ja-JP }}
-            {{ DateTimeOffsetStaticProperty::ja-JP }}
+            {{ IntStaticProperty }}
+            {{ IntStaticProperty:N3 }}
+            {{ IntStaticProperty:N3:es-ES }}
+            {{ IntStaticProperty::ja-JP }}
             """;
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -214,10 +210,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -225,12 +221,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void 静的プロパティ_特定カルチャーを指定()
     {
         const string Text = """
-            {{ DateTimeOffsetStaticProperty }}
-            {{ DateTimeOffsetStaticProperty:o }}
-            {{ DateTimeOffsetStaticProperty:D:ja-JP }}
-            {{ DateTimeOffsetStaticProperty::ja-JP }}
+            {{ IntStaticProperty }}
+            {{ IntStaticProperty:N3 }}
+            {{ IntStaticProperty:N3:es-ES }}
+            {{ IntStaticProperty::ja-JP }}
             """;
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -240,10 +236,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            2000/01/01 0:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -251,12 +247,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void プロパティ()
     {
         const string Text = """
-            {{ DateTimeOffsetProperty }}
-            {{ DateTimeOffsetProperty:o }}
-            {{ DateTimeOffsetProperty:D:ja-JP }}
-            {{ DateTimeOffsetProperty::ja-JP }}
+            {{ IntProperty }}
+            {{ IntProperty:N3 }}
+            {{ IntProperty:N3:es-ES }}
+            {{ IntProperty::ja-JP }}
             """;
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -266,10 +262,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -277,12 +273,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void プロパティ_InvariantCultureを指定()
     {
         const string Text = """
-            {{ DateTimeOffsetProperty }}
-            {{ DateTimeOffsetProperty:o }}
-            {{ DateTimeOffsetProperty:D:ja-JP }}
-            {{ DateTimeOffsetProperty::ja-JP }}
+            {{ IntProperty }}
+            {{ IntProperty:N3 }}
+            {{ IntProperty:N3:es-ES }}
+            {{ IntProperty::ja-JP }}
             """;
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -292,10 +288,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 
@@ -303,12 +299,12 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     public void プロパティ_特定カルチャーを指定()
     {
         const string Text = """
-            {{ DateTimeOffsetProperty }}
-            {{ DateTimeOffsetProperty:o }}
-            {{ DateTimeOffsetProperty:D:ja-JP }}
-            {{ DateTimeOffsetProperty::ja-JP }}
+            {{ IntProperty }}
+            {{ IntProperty:N3 }}
+            {{ IntProperty:N3:es-ES }}
+            {{ IntProperty::ja-JP }}
             """;
-        var context = new DateTimeOffsetContextTestData();
+        var context = new IntContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
@@ -318,10 +314,10 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
             .Be("""
-            2000/01/01 0:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
+            1234
+            1,234.000
+            1.234,000
+            1234
             """);
     }
 }

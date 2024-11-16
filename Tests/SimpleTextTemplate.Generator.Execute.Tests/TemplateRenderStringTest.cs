@@ -6,93 +6,80 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateWriterWriteEnumTest
+public sealed class TemplateRenderStringTest
 {
     [Fact]
-    public void 静的フィールド()
+    public void 定数()
     {
-        const string Text = """
-            {{ EnumStaticField }}
-            {{ EnumStaticField:D }}
-            """;
-        var context = new EnumContextTestData();
+        var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context);
+        Template.Render(ref writer, "{{ StringConstantField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("""
-            A
-            0
-            """);
+            .Be("_StringConstantField");
+    }
+
+    [Fact]
+    public void 静的フィールド()
+    {
+        var context = new StringContextTestData();
+        var bufferWriter = new ArrayBufferWriter<byte>();
+
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ StringStaticField }}", in context);
+        writer.Dispose();
+
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .Should()
+            .Be("_StringStaticField");
     }
 
     [Fact]
     public void フィールド()
     {
-        const string Text = """
-            {{ EnumField }}
-            {{ EnumField:D }}
-            """;
-        var context = new EnumContextTestData();
+        var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context);
+        Template.Render(ref writer, "{{ StringField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("""
-            A
-            0
-            """);
+            .Be("_StringField");
     }
 
     [Fact]
     public void 静的プロパティ()
     {
-        const string Text = """
-            {{ EnumStaticProperty }}
-            {{ EnumStaticProperty:D }}
-            """;
-        var context = new EnumContextTestData();
+        var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context);
+        Template.Render(ref writer, "{{ StringStaticProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("""
-            A
-            0
-            """);
+            .Be("_StringStaticProperty");
     }
 
     [Fact]
     public void プロパティ()
     {
-        const string Text = """
-            {{ EnumProperty }}
-            {{ EnumProperty:D }}
-            """;
-        var context = new EnumContextTestData();
+        var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context);
+        Template.Render(ref writer, "{{ StringProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("""
-            A
-            0
-            """);
+            .Be("_StringProperty");
     }
 }

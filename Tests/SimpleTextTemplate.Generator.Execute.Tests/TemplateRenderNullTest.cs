@@ -6,95 +6,101 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateWriterWriteByteArrayTest
+public sealed class TemplateRenderNullTest
 {
     [Fact]
-    public void 静的フィールド()
+    public void 定数()
     {
-        var context = new ByteArrayContextTestData();
+        var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ BytesStaticField }}", in context);
+        Template.Render(ref writer, "{{ NullStringConstantField }}", in context);
+        Template.Render(ref writer, "{{ NullObjectConstantField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("_BytesStaticField");
+            .BeEmpty();
+    }
+
+    [Fact]
+    public void 静的フィールド()
+    {
+        var context = new NullContextTestData();
+        var bufferWriter = new ArrayBufferWriter<byte>();
+
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ NullStringStaticField }}", in context);
+        Template.Render(ref writer, "{{ NullObjectStaticField }}", in context);
+        writer.Dispose();
+
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .Should()
+            .BeEmpty();
     }
 
     [Fact]
     public void フィールド()
     {
-        var context = new ByteArrayContextTestData();
+        var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ BytesField }}", in context);
+        Template.Render(ref writer, "{{ NullStringField }}", in context);
+        Template.Render(ref writer, "{{ NullObjectField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("_BytesField");
+            .BeEmpty();
     }
 
     [Fact]
     public void 静的プロパティ()
     {
-        var context = new ByteArrayContextTestData();
+        var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ BytesStaticProperty }}", in context);
+        Template.Render(ref writer, "{{ NullStringStaticProperty }}", in context);
+        Template.Render(ref writer, "{{ NullObjectStaticProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("_BytesStaticProperty");
+            .BeEmpty();
     }
 
     [Fact]
     public void プロパティ()
     {
-        var context = new ByteArrayContextTestData();
+        var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ BytesProperty }}", in context);
+        Template.Render(ref writer, "{{ NullStringProperty }}", in context);
+        Template.Render(ref writer, "{{ NullObjectProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("_BytesProperty");
+            .BeEmpty();
     }
 
     [Fact]
-    public void 静的ReadOnlySpanプロパティ()
+    public void Empty()
     {
-        var context = new ByteArrayContextTestData();
+        var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ BytesSpanStaticProperty }}", in context);
+        Template.Render(ref writer, "{{ EmptyStringConstantField }}", in context);
+        Template.Render(ref writer, "{{ EmptyStringStaticField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
-            .Be("_BytesSpanStaticProperty");
-    }
-
-    [Fact]
-    public void ReadOnlySpanプロパティ()
-    {
-        var context = new ByteArrayContextTestData();
-        var bufferWriter = new ArrayBufferWriter<byte>();
-
-        var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ BytesSpanProperty }}", in context);
-        writer.Dispose();
-
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_BytesSpanProperty");
+            .BeEmpty();
     }
 }
