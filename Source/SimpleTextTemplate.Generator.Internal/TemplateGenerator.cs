@@ -1,6 +1,7 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
 using SimpleTextTemplate.Generator.Specs;
 
 namespace SimpleTextTemplate.Generator;
@@ -11,37 +12,19 @@ namespace SimpleTextTemplate.Generator;
 [Generator(LanguageNames.CSharp)]
 public sealed class TemplateGenerator : IIncrementalGenerator
 {
+    const string RenderMethodName = "Render";
+
     /// <inheritdoc/>
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
 #if DEBUG
         if (!System.Diagnostics.Debugger.IsAttached)
         {
-            // System.Diagnostics.Debugger.Launch();
+             System.Diagnostics.Debugger.Launch();
         }
 #endif
         var provider = context.SyntaxProvider
-            .CreateSyntaxProvider(
-                static (node, _) => node is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 or 2 or 3, Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "Write" } },
-                static (context, cancellationToken) =>
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    if (context.SemanticModel.GetOperation(context.Node, cancellationToken) is not IInvocationOperation operation)
-                    {
-                        return null;
-                    }
-
-                    if (operation is not { TargetMethod.ContainingType: { Name: "TemplateWriter", ContainingNamespace: { Name: nameof(SimpleTextTemplate), ContainingNamespace.IsGlobalNamespace: true } } })
-                    {
-                        return null;
-                    }
-
-                    var creator = new InterceptInfoCreator(context, operation, cancellationToken);
-                    creator.Parse();
-
-                    return new InterceptInfoOrDiagnostic(creator.Intercept, creator.Diagnostics);
-                })
+            .CreateSyntaxProvider(IsPotentialRenderMethodInvocation, GetInterceptInfoOrDiagnostic)
             .Where(static x => x is not null)
             .Select(static (x, _) => x!);
 
@@ -50,5 +33,120 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 
         var infoList = provider.Where(static x => x.Info is not null).Select(static (x, _) => x.Info!).Collect();
         context.RegisterSourceOutput(infoList, Emitter.Emit);
+    }
+
+    static bool IsPotentialRenderMethodInvocation(SyntaxNode node, CancellationToken cancellationToken)
+    {
+        return node is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 2 or 4 } syntax
+            && syntax switch
+            {
+                { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier.ValueText: RenderMethodName } } } => true,
+                { Expression: IdentifierNameSyntax { Identifier.ValueText: RenderMethodName } } => true,
+                _ => false
+            };
+    }
+
+    static InterceptInfoOrDiagnostic? GetInterceptInfoOrDiagnostic(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var invocation = (InvocationExpressionSyntax)context.Node;
+        var model = context.SemanticModel;
+
+        if (model.GetSymbolInfo(invocation, cancellationToken).Symbol is not IMethodSymbol { Name: RenderMethodName } methodSymbol)
+        {
+            return null;
+        }
+
+        var compilation = model.Compilation;
+
+        if (!IsTemplateClass(compilation, methodSymbol))
+        {
+            return null;
+        }
+
+        if (!IsValidRenderMethodParameters(compilation, methodSymbol.Parameters))
+        {
+            return null;
+        }
+
+        var creator = new InterceptInfoCreator(context, methodSymbol, cancellationToken);
+        creator.Parse();
+
+        return new InterceptInfoOrDiagnostic(creator.Intercept, creator.Diagnostics);
+    }
+
+    static bool IsTemplateClass(Compilation compilation, IMethodSymbol methodSymbol)
+    {
+        var targetType = compilation.GetTypeByMetadataName("SimpleTextTemplate.Template");
+        return targetType is not null && SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingType, targetType);
+    }
+
+    static bool IsValidRenderMethodParameters(Compilation compilation, ImmutableArray<IParameterSymbol> parameters)
+    {
+        if (parameters.Length is not (2 or 4))
+        {
+            throw new InvalidOperationException("Invalid parameters.");
+        }
+
+        if (parameters is not [var firstParameter, var secondParameter, ..])
+        {
+            return false;
+        }
+
+        // TemplateWriter<T>
+        if (!IsTemplateWriterType(compilation, firstParameter))
+        {
+            return false;
+        }
+
+        // string
+        if (secondParameter.Type.SpecialType != SpecialType.System_String)
+        {
+            return false;
+        }
+
+        if (parameters.Length == 2)
+        {
+            return true;
+        }
+
+        // context
+        if (!IsContextType(parameters[2]))
+        {
+            return true;
+        }
+
+        // IFormatProvider
+        return IsIFormatProviderType(compilation, parameters[3]);
+    }
+
+    static bool IsTemplateWriterType(Compilation compilation, IParameterSymbol parameter)
+    {
+        if (!parameter.RefKind.Equals(RefKind.Ref))
+        {
+            return false;
+        }
+
+        if (parameter.Type is not INamedTypeSymbol parameterType)
+        {
+            return false;
+        }
+
+        var templateWriterType = compilation.GetTypeByMetadataName("SimpleTextTemplate.TemplateWriter`1");
+        return templateWriterType is not null && SymbolEqualityComparer.Default.Equals(parameterType.ConstructedFrom, templateWriterType);
+    }
+
+    static bool IsContextType(IParameterSymbol parameter) => parameter.RefKind.Equals(RefKind.In);
+
+    static bool IsIFormatProviderType(Compilation compilation, IParameterSymbol parameter)
+    {
+        if (!parameter.HasExplicitDefaultValue || parameter.ExplicitDefaultValue is not null || parameter.NullableAnnotation != NullableAnnotation.Annotated)
+        {
+            return false;
+        }
+
+        var providerType = compilation.GetTypeByMetadataName("System.IFormatProvider");
+        return providerType is not null && SymbolEqualityComparer.Default.Equals(parameter.Type, providerType);
     }
 }
