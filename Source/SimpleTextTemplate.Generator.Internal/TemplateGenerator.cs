@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SimpleTextTemplate.Generator.Specs;
+using static SimpleTextTemplate.Generator.Constants;
 
 namespace SimpleTextTemplate.Generator;
 
@@ -37,7 +38,7 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 
     static bool IsPotentialRenderMethodInvocation(SyntaxNode node, CancellationToken cancellationToken)
     {
-        return node is InvocationExpressionSyntax { ArgumentList.Arguments.Count: 2 or 4 } syntax
+        return node is InvocationExpressionSyntax { ArgumentList.Arguments.Count: >= TemplateRenderParameterCount and <= TemplateRenderParameterCountWithContext } syntax
             && syntax switch
             {
                 { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier.ValueText: RenderMethodName } } } => true,
@@ -70,8 +71,8 @@ public sealed class TemplateGenerator : IIncrementalGenerator
             return null;
         }
 
-        var creator = new InterceptInfoCreator(context, methodSymbol, cancellationToken);
-        creator.Parse();
+        var creator = new InterceptInfoCreator(context, methodSymbol);
+        creator.Parse(cancellationToken);
 
         return new InterceptInfoOrDiagnostic(creator.Intercept, creator.Diagnostics);
     }
@@ -84,7 +85,7 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 
     static bool IsValidRenderMethodParameters(Compilation compilation, ImmutableArray<IParameterSymbol> parameters)
     {
-        if (parameters.Length is not (2 or 4))
+        if (parameters.Length is not (TemplateRenderParameterCount or TemplateRenderParameterCountWithContext))
         {
             throw new InvalidOperationException("Invalid parameters.");
         }
@@ -106,19 +107,19 @@ public sealed class TemplateGenerator : IIncrementalGenerator
             return false;
         }
 
-        if (parameters.Length == 2)
+        if (parameters.Length == TemplateRenderParameterCount)
         {
             return true;
         }
 
         // context
-        if (!IsContextType(parameters[2]))
+        if (!IsContextType(parameters[TemplateRenderContextIndex]))
         {
-            return true;
+            return false;
         }
 
         // IFormatProvider
-        return IsIFormatProviderType(compilation, parameters[3]);
+        return IsIFormatProviderType(compilation, parameters[TemplateRenderIFormatProviderIndex]);
     }
 
     static bool IsTemplateWriterType(Compilation compilation, IParameterSymbol parameter)
