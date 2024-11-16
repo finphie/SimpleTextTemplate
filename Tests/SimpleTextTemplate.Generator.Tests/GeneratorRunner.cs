@@ -46,7 +46,7 @@ static class GeneratorRunner
     public static CompileResult Run(string source)
     {
         var generator = new TemplateGenerator();
-        var options = CSharpParseOptions.Default.WithFeatures([new("InterceptorsPreviewNamespaces", "SimpleTextTemplate.Generator")]);
+        var options = CSharpParseOptions.Default.WithFeatures([new("InterceptorsNamespaces", "SimpleTextTemplate.Generator")]);
         var driver = CSharpGeneratorDriver.Create(generator).WithUpdatedParseOptions(options);
 
         var compilation = _baseCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(source, options));
