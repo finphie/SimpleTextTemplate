@@ -13,10 +13,9 @@ public sealed class TemplateWriterWriteAccessibilityTest
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ _internalStaticField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ _internalStaticField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -29,10 +28,9 @@ public sealed class TemplateWriterWriteAccessibilityTest
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ _internalField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ _internalField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -45,10 +43,9 @@ public sealed class TemplateWriterWriteAccessibilityTest
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ ProtectedInternalStaticField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ ProtectedInternalStaticField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -61,10 +58,9 @@ public sealed class TemplateWriterWriteAccessibilityTest
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ ProtectedInternalField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ ProtectedInternalField }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -77,10 +73,9 @@ public sealed class TemplateWriterWriteAccessibilityTest
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ InternalStaticProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ InternalStaticProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -93,10 +88,9 @@ public sealed class TemplateWriterWriteAccessibilityTest
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ InternalProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ InternalProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -109,10 +103,9 @@ public sealed class TemplateWriterWriteAccessibilityTest
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ ProtectedInternalStaticProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ ProtectedInternalStaticProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -125,10 +118,9 @@ public sealed class TemplateWriterWriteAccessibilityTest
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ ProtectedInternalProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        Template.Render(ref writer, "{{ ProtectedInternalProperty }}", in context);
+        writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
