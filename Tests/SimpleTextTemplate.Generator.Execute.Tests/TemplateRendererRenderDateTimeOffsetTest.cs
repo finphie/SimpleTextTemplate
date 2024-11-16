@@ -24,7 +24,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -51,7 +51,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -78,7 +78,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -105,7 +105,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -131,7 +131,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -157,7 +157,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -183,7 +183,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -209,7 +209,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -235,7 +235,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -261,7 +261,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -287,7 +287,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -313,7 +313,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

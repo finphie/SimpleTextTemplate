@@ -16,7 +16,7 @@ public sealed class TemplateRendererRenderCharArrayTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ CharsStaticField }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -31,7 +31,7 @@ public sealed class TemplateRendererRenderCharArrayTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ CharsField }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -46,7 +46,7 @@ public sealed class TemplateRendererRenderCharArrayTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ CharsStaticProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -61,7 +61,7 @@ public sealed class TemplateRendererRenderCharArrayTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ CharsProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -76,7 +76,7 @@ public sealed class TemplateRendererRenderCharArrayTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ CharsSpanStaticProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -91,7 +91,7 @@ public sealed class TemplateRendererRenderCharArrayTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ CharsSpanProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

@@ -20,7 +20,7 @@ public sealed class TemplateRendererRenderEnumTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -42,7 +42,7 @@ public sealed class TemplateRendererRenderEnumTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -64,7 +64,7 @@ public sealed class TemplateRendererRenderEnumTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -86,7 +86,7 @@ public sealed class TemplateRendererRenderEnumTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, Text, in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

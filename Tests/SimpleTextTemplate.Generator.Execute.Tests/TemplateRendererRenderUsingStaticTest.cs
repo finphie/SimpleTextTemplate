@@ -17,7 +17,7 @@ public sealed class TemplateRendererRenderUsingStaticTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         Render(ref writer, "{{ BytesStaticField }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -32,7 +32,7 @@ public sealed class TemplateRendererRenderUsingStaticTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         Render(ref writer, "{{ BytesField }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -47,7 +47,7 @@ public sealed class TemplateRendererRenderUsingStaticTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         Render(ref writer, "{{ BytesStaticProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -62,7 +62,7 @@ public sealed class TemplateRendererRenderUsingStaticTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         Render(ref writer, "{{ BytesProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

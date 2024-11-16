@@ -16,7 +16,7 @@ partial class RenderBenchmark
     {
         var writer = TemplateWriter.Create(_bufferWriter);
         writer.Write(ConstantStringTemplate, in _generatorContext);
-        writer.Dispose();
+        writer.Flush();
 
         var result = _bufferWriter.WrittenSpan.ToArray();
         _bufferWriter.ResetWrittenCount();

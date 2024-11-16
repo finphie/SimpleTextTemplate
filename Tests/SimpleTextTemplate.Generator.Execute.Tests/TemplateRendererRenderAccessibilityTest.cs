@@ -15,7 +15,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ _internalStaticField }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -30,7 +30,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ _internalField }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -45,7 +45,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ ProtectedInternalStaticField }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -60,7 +60,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ ProtectedInternalField }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -75,7 +75,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ InternalStaticProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -90,7 +90,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ InternalProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -105,7 +105,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ ProtectedInternalStaticProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -120,7 +120,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
 
         var writer = TemplateWriter.Create(bufferWriter);
         TemplateRenderer.Render(ref writer, "{{ ProtectedInternalProperty }}", in context);
-        writer.Dispose();
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

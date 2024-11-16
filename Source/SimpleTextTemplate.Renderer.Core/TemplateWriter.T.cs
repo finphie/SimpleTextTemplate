@@ -82,7 +82,7 @@ public ref struct TemplateWriter<T>
     /// 書き込み処理を反映します。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly void Dispose()
+    public readonly void Flush()
     {
         var writtenCount = WrittenCount;
         _bufferWriter.Advance(writtenCount);
