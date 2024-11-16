@@ -1,7 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Operations;
 using SimpleTextTemplate.Generator.Specs;
 
 namespace SimpleTextTemplate.Generator.Extensions;
@@ -11,35 +9,6 @@ namespace SimpleTextTemplate.Generator.Extensions;
 /// </summary>
 static class RoslynExtensions
 {
-    /// <summary>
-    /// InterceptsLocation属性の情報を取得します。
-    /// </summary>
-    /// <param name="invocation">メソッド呼び出し</param>
-    /// <param name="cancellationToken">キャンセル要求を行うためのトークン</param>
-    /// <returns>指定されたメソッドからInterceptsLocation属性の情報を生成して返します。</returns>
-    /// <exception cref="ArgumentException">引数が<see cref="InvocationExpressionSyntax"/>ではありません。</exception>
-    public static InterceptsLocationInfo GetInterceptsLocationInfo(this IInvocationOperation invocation, CancellationToken cancellationToken)
-    {
-        if (invocation.Syntax is not InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax memberAccessorExpressionSyntax })
-        {
-            throw new ArgumentException("InvocationExpressionSyntaxである必要があります。", nameof(invocation));
-        }
-
-        var operationSyntaxTree = invocation.Syntax.SyntaxTree;
-        var lineSpan = operationSyntaxTree.GetLineSpan(memberAccessorExpressionSyntax.Name.Span, cancellationToken);
-
-        return new(
-            FilePath: GetInterceptorFilePath(invocation, operationSyntaxTree),
-            Line: lineSpan.StartLinePosition.Line + 1,
-            Column: lineSpan.StartLinePosition.Character + 1);
-
-        static string GetInterceptorFilePath(IInvocationOperation invocation, SyntaxTree operationSyntaxTree)
-        {
-            var filePath = operationSyntaxTree.FilePath;
-            return invocation.SemanticModel?.Compilation.Options.SourceReferenceResolver?.NormalizePath(filePath, null) ?? filePath;
-        }
-    }
-
     /// <summary>
     /// フィールドとプロパティ情報を取得します。
     /// </summary>
