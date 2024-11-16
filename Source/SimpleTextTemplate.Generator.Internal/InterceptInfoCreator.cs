@@ -122,7 +122,7 @@ ref struct InterceptInfoCreator
     readonly bool IsInvariantCulture(CancellationToken cancellationToken)
     {
         // IFormatProvider指定なしの場合、InvariantCultureとする。
-        if (_arguments.Count == 3)
+        if (_arguments.Count < TemplateRenderIFormatProviderIndex + 1)
         {
             return true;
         }
