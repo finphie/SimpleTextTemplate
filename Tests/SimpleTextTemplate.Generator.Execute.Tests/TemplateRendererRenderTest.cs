@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateRenderTest
+public sealed class TemplateRendererRenderTest
 {
     [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1122:Use string.Empty for empty strings", Justification = "テスト")]
     [Fact]
@@ -15,8 +15,8 @@ public sealed class TemplateRenderTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "");
-        Template.Render(ref writer, string.Empty);
+        TemplateRenderer.Render(ref writer, "");
+        TemplateRenderer.Render(ref writer, string.Empty);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -30,7 +30,7 @@ public sealed class TemplateRenderTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "A");
+        TemplateRenderer.Render(ref writer, "A");
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -47,7 +47,7 @@ public sealed class TemplateRenderTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text);
+        TemplateRenderer.Render(ref writer, Text);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -67,11 +67,11 @@ public sealed class TemplateRenderTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text);
-        Template.Render(ref writer, Text);
-        Template.Render(ref writer, Text);
-        Template.Render(ref writer, Text);
-        Template.Render(ref writer, Text);
+        TemplateRenderer.Render(ref writer, Text);
+        TemplateRenderer.Render(ref writer, Text);
+        TemplateRenderer.Render(ref writer, Text);
+        TemplateRenderer.Render(ref writer, Text);
+        TemplateRenderer.Render(ref writer, Text);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)

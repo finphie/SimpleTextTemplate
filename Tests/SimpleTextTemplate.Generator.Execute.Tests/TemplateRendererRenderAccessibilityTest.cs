@@ -5,7 +5,7 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateRenderAccessibilityTest
+public sealed class TemplateRendererRenderAccessibilityTest
 {
     [Fact]
     public void 静的Internalフィールド()
@@ -14,7 +14,7 @@ public sealed class TemplateRenderAccessibilityTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ _internalStaticField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ _internalStaticField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -29,7 +29,7 @@ public sealed class TemplateRenderAccessibilityTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ _internalField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ _internalField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -44,7 +44,7 @@ public sealed class TemplateRenderAccessibilityTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ ProtectedInternalStaticField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ ProtectedInternalStaticField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -59,7 +59,7 @@ public sealed class TemplateRenderAccessibilityTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ ProtectedInternalField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ ProtectedInternalField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -74,7 +74,7 @@ public sealed class TemplateRenderAccessibilityTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ InternalStaticProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ InternalStaticProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -89,7 +89,7 @@ public sealed class TemplateRenderAccessibilityTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ InternalProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ InternalProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -104,7 +104,7 @@ public sealed class TemplateRenderAccessibilityTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ ProtectedInternalStaticProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ ProtectedInternalStaticProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -119,7 +119,7 @@ public sealed class TemplateRenderAccessibilityTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ ProtectedInternalProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ ProtectedInternalProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)

@@ -3,11 +3,11 @@ using System.Text;
 using FluentAssertions;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
-using TemplateRenderer = SimpleTextTemplate.Template;
+using TemplateRenderer = SimpleTextTemplate.TemplateRenderer;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateRenderUsingAliasTest
+public sealed class TemplateRendererRenderUsingAliasTest
 {
     [Fact]
     public void 静的フィールド()

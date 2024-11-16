@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateRenderIntTest
+public sealed class TemplateRendererRenderIntTest
 {
     [Fact]
     public void 静的フィールド()
@@ -22,7 +22,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context);
+        TemplateRenderer.Render(ref writer, Text, in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -48,7 +48,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -74,7 +74,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -100,7 +100,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context);
+        TemplateRenderer.Render(ref writer, Text, in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -126,7 +126,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -152,7 +152,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -178,7 +178,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context);
+        TemplateRenderer.Render(ref writer, Text, in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -204,7 +204,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -230,7 +230,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -256,7 +256,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context);
+        TemplateRenderer.Render(ref writer, Text, in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -282,7 +282,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -308,7 +308,7 @@ public sealed class TemplateRenderIntTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)

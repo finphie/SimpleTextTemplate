@@ -6,7 +6,7 @@ namespace SimpleTextTemplate;
 /// <summary>
 /// テンプレート
 /// </summary>
-public static class Template
+public static class TemplateRenderer
 {
     /// <summary>
     /// テンプレートをレンダリングします。

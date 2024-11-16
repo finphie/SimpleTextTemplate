@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateRenderStringTest
+public sealed class TemplateRendererRenderStringTest
 {
     [Fact]
     public void 定数()
@@ -15,7 +15,7 @@ public sealed class TemplateRenderStringTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ StringConstantField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ StringConstantField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -30,7 +30,7 @@ public sealed class TemplateRenderStringTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ StringStaticField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ StringStaticField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -45,7 +45,7 @@ public sealed class TemplateRenderStringTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ StringField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ StringField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -60,7 +60,7 @@ public sealed class TemplateRenderStringTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ StringStaticProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ StringStaticProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -75,7 +75,7 @@ public sealed class TemplateRenderStringTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ StringProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ StringProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)

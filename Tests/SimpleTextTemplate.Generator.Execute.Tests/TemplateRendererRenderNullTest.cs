@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateRenderNullTest
+public sealed class TemplateRendererRenderNullTest
 {
     [Fact]
     public void 定数()
@@ -15,8 +15,8 @@ public sealed class TemplateRenderNullTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ NullStringConstantField }}", in context);
-        Template.Render(ref writer, "{{ NullObjectConstantField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullStringConstantField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullObjectConstantField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -31,8 +31,8 @@ public sealed class TemplateRenderNullTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ NullStringStaticField }}", in context);
-        Template.Render(ref writer, "{{ NullObjectStaticField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullStringStaticField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullObjectStaticField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -47,8 +47,8 @@ public sealed class TemplateRenderNullTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ NullStringField }}", in context);
-        Template.Render(ref writer, "{{ NullObjectField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullStringField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullObjectField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -63,8 +63,8 @@ public sealed class TemplateRenderNullTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ NullStringStaticProperty }}", in context);
-        Template.Render(ref writer, "{{ NullObjectStaticProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullStringStaticProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullObjectStaticProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -79,8 +79,8 @@ public sealed class TemplateRenderNullTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ NullStringProperty }}", in context);
-        Template.Render(ref writer, "{{ NullObjectProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullStringProperty }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ NullObjectProperty }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -95,8 +95,8 @@ public sealed class TemplateRenderNullTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        Template.Render(ref writer, "{{ EmptyStringConstantField }}", in context);
-        Template.Render(ref writer, "{{ EmptyStringStaticField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ EmptyStringConstantField }}", in context);
+        TemplateRenderer.Render(ref writer, "{{ EmptyStringStaticField }}", in context);
         writer.Dispose();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
