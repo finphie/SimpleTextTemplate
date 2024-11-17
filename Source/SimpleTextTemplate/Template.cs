@@ -152,7 +152,7 @@ public readonly struct Template
     /// <param name="provider">カルチャー指定</param>
     public readonly void Render<TWriter, TContext>(TWriter bufferWriter, TContext context, IFormatProvider? provider = null)
         where TWriter : notnull, IBufferWriter<byte>, allows ref struct
-        where TContext : notnull, IContext
+        where TContext : notnull, IContext, allows ref struct
     {
         provider ??= CultureInfo.InvariantCulture;
         var writer = TemplateWriter.Create(bufferWriter);
