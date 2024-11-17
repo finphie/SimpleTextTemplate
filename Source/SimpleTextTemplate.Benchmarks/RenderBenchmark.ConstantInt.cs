@@ -15,7 +15,7 @@ partial class RenderBenchmark
     public byte[] SimpleTextTemplate_Generator_ConstantInt()
     {
         var writer = TemplateWriter.Create(_bufferWriter);
-        writer.Write(ConstantIntTemplate, in _generatorContext);
+        TemplateRenderer.Render(ref writer, ConstantIntTemplate, in _generatorContext);
         writer.Flush();
 
         var result = _bufferWriter.WrittenSpan.ToArray();
