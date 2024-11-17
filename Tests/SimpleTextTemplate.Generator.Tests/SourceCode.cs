@@ -53,23 +53,23 @@ static class SourceCode
 
             if (context is null)
             {
-                builder.AppendLine(value: $"        writer.Write({source});");
+                builder.AppendLine(value: $"        TemplateRenderer.Render(ref writer, {source});");
                 continue;
             }
 
             if (provider is null)
             {
-                builder.AppendLine(value: $"        writer.Write({source}, in context);");
+                builder.AppendLine(value: $"        TemplateRenderer.Render(ref writer, {source}, in context);");
                 continue;
             }
 
             if (provider.StartsWith("CultureInfo", StringComparison.Ordinal) || provider.StartsWith("DateTimeFormatInfo", StringComparison.Ordinal))
             {
-                builder.AppendLine(value: $"        writer.Write({source}, in context, System.Globalization.{provider});");
+                builder.AppendLine(value: $"        TemplateRenderer.Render(ref writer, {source}, in context, System.Globalization.{provider});");
                 continue;
             }
 
-            builder.AppendLine(value: $"        writer.Write({source}, in context, {provider});");
+            builder.AppendLine(value: $"        TemplateRenderer.Render(ref writer, {source}, in context, {provider});");
         }
 
         builder.AppendLine("""

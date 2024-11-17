@@ -29,6 +29,7 @@ static class GeneratorRunner
         };
 
         var references = assemblies.Select(x => Path.Join(baseAssemblyPath, x))
+            .Append(typeof(TemplateRenderer).Assembly.Location)
             .Append(typeof(TemplateWriter<>).Assembly.Location)
             .Append(typeof(ByteArrayContextTestData).Assembly.Location)
             .Select(static x => MetadataReference.CreateFromFile(x));

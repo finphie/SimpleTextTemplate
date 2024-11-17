@@ -35,11 +35,11 @@ public sealed class TemplateWriterWriteTest
             
             var bufferWriter = new ArrayBufferWriter<byte>();
             var writer = TemplateWriter.Create(bufferWriter);
-            writer.Write(string.Empty);
-            writer.Write(System.String.Empty);
-            writer.Write(global::System.String.Empty);
-            writer.Write(S.Empty);
-            writer.Write(Empty);
+            TemplateRenderer.Render(ref writer, string.Empty);
+            TemplateRenderer.Render(ref writer, System.String.Empty);
+            TemplateRenderer.Render(ref writer, global::System.String.Empty);
+            TemplateRenderer.Render(ref writer, S.Empty);
+            TemplateRenderer.Render(ref writer, Empty);
             """;
         var (compilation, diagnostics) = Run(SourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
@@ -607,7 +607,7 @@ public sealed class TemplateWriterWriteTest
             var bufferWriter = new ArrayBufferWriter<byte>();
             var writer = TemplateWriter.Create(bufferWriter);
             var context = new {{{nameof(ByteArrayContextTestData)}}}();
-            writer.Write("{{ BytesStaticField }}", in context);
+            TemplateRenderer.Render(ref writer, "{{ BytesStaticField }}", in context);
             """;
         var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
