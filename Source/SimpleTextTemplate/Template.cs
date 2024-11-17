@@ -150,14 +150,10 @@ public readonly struct Template
     /// <param name="bufferWriter">バッファーライター</param>
     /// <param name="context">コンテキスト</param>
     /// <param name="provider">カルチャー指定</param>
-    /// <exception cref="ArgumentNullException">引数がnullです。</exception>
     public readonly void Render<TWriter, TContext>(TWriter bufferWriter, TContext context, IFormatProvider? provider = null)
-        where TWriter : notnull, IBufferWriter<byte>
+        where TWriter : notnull, IBufferWriter<byte>, allows ref struct
         where TContext : notnull, IContext
     {
-        ArgumentNullException.ThrowIfNull(bufferWriter);
-        ArgumentNullException.ThrowIfNull(context);
-
         provider ??= CultureInfo.InvariantCulture;
         var writer = TemplateWriter.Create(bufferWriter);
 

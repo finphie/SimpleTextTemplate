@@ -12,7 +12,7 @@ namespace SimpleTextTemplate;
 /// </summary>
 /// <typeparam name="T">バッファーライターの型</typeparam>
 public ref struct TemplateWriter<T>
-    where T : notnull, IBufferWriter<byte>
+    where T : notnull, IBufferWriter<byte>, allows ref struct
 {
     readonly T _bufferWriter;
 

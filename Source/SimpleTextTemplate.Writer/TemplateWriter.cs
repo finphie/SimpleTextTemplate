@@ -16,6 +16,6 @@ public static class TemplateWriter
     /// <returns><see cref="IBufferWriter{T}"/>に書き込みを行う、<see cref="TemplateWriter{T}"/>構造体のインスタンスを返します。</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static TemplateWriter<T> Create<T>(T bufferWriter)
-        where T : notnull, IBufferWriter<byte>
+        where T : notnull, IBufferWriter<byte>, allows ref struct
         => new(bufferWriter);
 }
