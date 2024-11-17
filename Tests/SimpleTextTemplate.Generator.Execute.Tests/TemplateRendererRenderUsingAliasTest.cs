@@ -3,7 +3,7 @@ using System.Text;
 using FluentAssertions;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
-using TemplateRenderer = SimpleTextTemplate.TemplateRenderer;
+using Template = SimpleTextTemplate.TemplateRenderer;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
@@ -16,7 +16,7 @@ public sealed class TemplateRendererRenderUsingAliasTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        TemplateRenderer.Render(ref writer, "{{ BytesStaticField }}", in context);
+        Template.Render(ref writer, "{{ BytesStaticField }}", in context);
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -31,7 +31,7 @@ public sealed class TemplateRendererRenderUsingAliasTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        TemplateRenderer.Render(ref writer, "{{ BytesField }}", in context);
+        Template.Render(ref writer, "{{ BytesField }}", in context);
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -46,7 +46,7 @@ public sealed class TemplateRendererRenderUsingAliasTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        TemplateRenderer.Render(ref writer, "{{ BytesStaticProperty }}", in context);
+        Template.Render(ref writer, "{{ BytesStaticProperty }}", in context);
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
@@ -61,7 +61,7 @@ public sealed class TemplateRendererRenderUsingAliasTest
         var bufferWriter = new ArrayBufferWriter<byte>();
 
         var writer = TemplateWriter.Create(bufferWriter);
-        TemplateRenderer.Render(ref writer, "{{ BytesProperty }}", in context);
+        Template.Render(ref writer, "{{ BytesProperty }}", in context);
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
