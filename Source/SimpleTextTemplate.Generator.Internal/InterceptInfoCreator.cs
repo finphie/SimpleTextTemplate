@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Operations;
 using SimpleTextTemplate.Generator.Extensions;
 using SimpleTextTemplate.Generator.Specs;
-using static Microsoft.CodeAnalysis.SymbolDisplayFormat;
+using static SimpleTextTemplate.Generator.Constants;
 using static SimpleTextTemplate.Generator.Specs.TemplateWriterWriteType;
 
 namespace SimpleTextTemplate.Generator;
@@ -20,24 +20,22 @@ ref struct InterceptInfoCreator
     readonly GeneratorSyntaxContext _context;
     readonly SemanticModel _semanticModel;
     readonly Compilation _compilation;
-    readonly CancellationToken _cancellationToken;
+    readonly IMethodSymbol _methodSymbol;
 
-    readonly IInvocationOperation _operation;
     readonly InvocationExpressionSyntax _invocationExpression;
 
     readonly SeparatedSyntaxList<ArgumentSyntax> _arguments;
     readonly ExpressionSyntax _templateArgument;
-    readonly ExpressionSyntax? _contextArgument;
-
-    readonly InterceptsLocationInfo _interceptsLocationInfo;
-    readonly INamedTypeSymbol _writerType;
-    readonly ITypeSymbol? _contextType;
 
     readonly List<TemplateWriterWriteInfo> _writerInfoList = [];
     readonly List<Diagnostic> _diagnostics = [];
 
     readonly INamedTypeSymbol _readOnlySpanByteSymbol;
     readonly INamedTypeSymbol _readOnlySpanCharSymbol;
+
+#pragma warning disable RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
+    InterceptableLocation? _interceptableLocation;
+#pragma warning restore RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
 
     bool _success;
     bool _isConstant;
@@ -46,39 +44,25 @@ ref struct InterceptInfoCreator
     /// <see cref="InterceptInfoCreator"/>構造体の新しいインスタンスを取得します。
     /// </summary>
     /// <param name="context">コンテキスト</param>
-    /// <param name="operation">メソッド呼び出し</param>
-    /// <param name="cancellationToken">キャンセル要求を行うためのトークン</param>
-    /// <exception cref="ArgumentNullException"><paramref name="operation"/>がnullです。</exception>
-    /// <exception cref="ArgumentException"><see cref="SyntaxNode"/>がインターセプターの対象外です。</exception>
-    public InterceptInfoCreator(GeneratorSyntaxContext context, IInvocationOperation operation, CancellationToken cancellationToken)
+    /// <param name="methodSymbol">メソッドシンボル</param>
+    public InterceptInfoCreator(GeneratorSyntaxContext context, IMethodSymbol methodSymbol)
     {
         _context = context;
         _semanticModel = _context.SemanticModel;
         _compilation = _semanticModel.Compilation;
-        _cancellationToken = cancellationToken;
-
-        _operation = operation ?? throw new ArgumentNullException(nameof(operation));
+        _methodSymbol = methodSymbol;
 
         _invocationExpression = _context.Node as InvocationExpressionSyntax
             ?? throw new ArgumentException($"{nameof(context)}.{nameof(context.Node)}が{nameof(InvocationExpressionSyntax)}ではありません。");
 
         _arguments = _invocationExpression.ArgumentList.Arguments;
 
-        if (_arguments.Count is < 1 or > 3)
+        if (_arguments.Count is < TemplateRenderParameterCount or > TemplateRenderParameterCountWithContext)
         {
-            throw new ArgumentException("TemplateWriter.Writeのコンテキスト指定オーバーロードの引数は、1～3個である必要があります。");
+            throw new ArgumentException("Template.Renderの引数は、2～4個である必要があります。");
         }
 
-        _templateArgument = _arguments[0].Expression;
-
-        if (_arguments.Count > 1)
-        {
-            _contextArgument = _arguments[1].Expression;
-            _contextType = _semanticModel.GetTypeInfo(_contextArgument, cancellationToken).Type;
-        }
-
-        _interceptsLocationInfo = _operation.GetInterceptsLocationInfo(cancellationToken);
-        _writerType = _semanticModel.GetSymbolInfo(_invocationExpression.Expression, _cancellationToken).Symbol!.ContainingType;
+        _templateArgument = _arguments[TemplateRenderTextIndex].Expression;
 
         _readOnlySpanByteSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
         _readOnlySpanCharSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
@@ -88,8 +72,8 @@ ref struct InterceptInfoCreator
     /// <see cref="InterceptInfo"/>を取得します。
     /// </summary>
     public readonly InterceptInfo? Intercept
-        => _success
-        ? new(_interceptsLocationInfo, [.. _writerInfoList], _writerType.ToDisplayString(FullyQualifiedFormat), _contextType?.ToDisplayString(FullyQualifiedFormat))
+        => _success && _interceptableLocation is not null
+        ? new(_interceptableLocation, [.. _writerInfoList], _methodSymbol)
         : null;
 
     /// <summary>
@@ -100,12 +84,18 @@ ref struct InterceptInfoCreator
     /// <summary>
     /// テンプレート文字列を解析します。
     /// </summary>
-    public void Parse()
+    /// <param name="cancellationToken">キャンセル要求を行うためのトークン</param>
+    public void Parse(CancellationToken cancellationToken)
     {
-        if (_semanticModel.GetConstantValue(_templateArgument, _cancellationToken).Value is not string templateString)
+#pragma warning disable RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
+        _interceptableLocation ??= _semanticModel.GetInterceptableLocation(_invocationExpression, cancellationToken)
+            ?? throw new InvalidOperationException("インターセプト可能な場所を取得できませんでした。");
+#pragma warning restore RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
+
+        if (_semanticModel.GetConstantValue(_templateArgument, cancellationToken).Value is not string templateString)
         {
             // string.Emptyは定数として扱う。
-            if (_semanticModel.GetOperation(_templateArgument, _cancellationToken) is not IFieldReferenceOperation { Field: { Name: nameof(string.Empty), ContainingType.SpecialType: SpecialType.System_String } })
+            if (_semanticModel.GetOperation(_templateArgument, cancellationToken) is not IFieldReferenceOperation { Field: { Name: nameof(string.Empty), ContainingType.SpecialType: SpecialType.System_String } })
             {
                 _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.TemplateStringMustBeConstant, _templateArgument.GetLocation()));
                 return;
@@ -120,32 +110,32 @@ ref struct InterceptInfoCreator
             return;
         }
 
-        if (_contextArgument is null)
+        if (_arguments.Count == TemplateRenderParameterCount)
         {
-            AnalyzeTemplate(in template);
+            AnalyzeTemplate(in template, cancellationToken);
             return;
         }
 
-        AnalyzeTemplateWithContext(in template);
+        AnalyzeTemplateWithContext(in template, cancellationToken);
     }
 
-    readonly bool IsInvariantCulture()
+    readonly bool IsInvariantCulture(CancellationToken cancellationToken)
     {
         // IFormatProvider指定なしの場合、InvariantCultureとする。
-        if (_arguments.Count == 2)
+        if (_arguments.Count < TemplateRenderIFormatProviderIndex + 1)
         {
             return true;
         }
 
-        var providerExpression = _arguments[2].Expression;
+        var providerExpression = _arguments[TemplateRenderIFormatProviderIndex].Expression;
 
         // IFormatProviderがnullの場合、InvariantCultureとする。
-        if (_semanticModel.GetConstantValue(providerExpression, _cancellationToken) is { HasValue: true, Value: var constantProvider } && constantProvider is null)
+        if (_semanticModel.GetConstantValue(providerExpression, cancellationToken) is { HasValue: true, Value: var constantProvider } && constantProvider is null)
         {
             return true;
         }
 
-        var operation = _semanticModel.GetOperation(providerExpression, _cancellationToken);
+        var operation = _semanticModel.GetOperation(providerExpression, cancellationToken);
 
         return operation is IPropertyReferenceOperation { Property.ContainingNamespace: { Name: nameof(System.Globalization), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } } providerOperation
             && providerOperation switch
@@ -156,11 +146,11 @@ ref struct InterceptInfoCreator
             };
     }
 
-    void AnalyzeTemplate(in Template template)
+    void AnalyzeTemplate(in Template template, CancellationToken cancellationToken)
     {
         foreach (var (block, utf8Value, _, _) in template.Blocks)
         {
-            _cancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
             var value = Encoding.UTF8.GetString(utf8Value);
 
             if (block != BlockType.Raw)
@@ -177,21 +167,24 @@ ref struct InterceptInfoCreator
         _success = true;
     }
 
-    void AnalyzeTemplateWithContext(in Template template)
+    void AnalyzeTemplateWithContext(in Template template, CancellationToken cancellationToken)
     {
-        if (_contextArgument is null || _contextType is null)
+        var contextArgument = _arguments[TemplateRenderContextIndex].Expression;
+        var contextType = _semanticModel.GetTypeInfo(contextArgument, cancellationToken).Type;
+
+        if (contextArgument is null || contextType is null)
         {
             throw new InvalidOperationException("コンテキストの型情報が取得できません。");
         }
 
-        var isInvariantCulture = IsInvariantCulture();
-        var contextMembers = _contextType.GetFieldsAndProperties().ToDictionary(
+        var isInvariantCulture = IsInvariantCulture(cancellationToken);
+        var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(
             static x => x.Name,
             static x => (Symbol: x, Formattable: x.GetFieldOrPropertyType().Interfaces.GetFormattableType()));
 
         foreach (var (block, utf8Value, format, identifierProvider) in template.Blocks)
         {
-            _cancellationToken.ThrowIfCancellationRequested();
+            cancellationToken.ThrowIfCancellationRequested();
 
             var value = Encoding.UTF8.GetString(utf8Value);
             var provider = GetFormatProvider(identifierProvider, isInvariantCulture);
@@ -207,7 +200,7 @@ ref struct InterceptInfoCreator
             // 識別子がコンテキストに存在しない
             if (!contextMembers.TryGetValue(value, out var identifier))
             {
-                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifier, _contextArgument.GetLocation(), value));
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifier, contextArgument.GetLocation(), value));
                 continue;
             }
 

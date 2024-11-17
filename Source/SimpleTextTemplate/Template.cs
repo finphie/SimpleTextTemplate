@@ -3,6 +3,8 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 
 #if NET8_0_OR_GREATER
+using System.Buffers;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 #endif
 
@@ -138,4 +140,63 @@ public readonly struct Template
 
         return new([.. list]);
     }
+
+#if NET8_0_OR_GREATER
+    /// <summary>
+    /// テンプレートをレンダリングして、バッファーライターに書き込みます。
+    /// </summary>
+    /// <typeparam name="TWriter">バッファーライターの型</typeparam>
+    /// <typeparam name="TContext">コンテキストの型</typeparam>
+    /// <param name="bufferWriter">バッファーライター</param>
+    /// <param name="context">コンテキスト</param>
+    /// <param name="provider">カルチャー指定</param>
+    /// <exception cref="ArgumentNullException">引数がnullです。</exception>
+    public readonly void Render<TWriter, TContext>(TWriter bufferWriter, TContext context, IFormatProvider? provider = null)
+        where TWriter : notnull, IBufferWriter<byte>
+        where TContext : notnull, IContext
+    {
+        ArgumentNullException.ThrowIfNull(bufferWriter);
+        ArgumentNullException.ThrowIfNull(context);
+
+        provider ??= CultureInfo.InvariantCulture;
+        var writer = TemplateWriter.Create(bufferWriter);
+
+        foreach (var (type, stringOrIdentifier, format, culture) in Blocks)
+        {
+            ref var stringOrIdentifierStart = ref MemoryMarshal.GetArrayDataReference(stringOrIdentifier);
+            var span = MemoryMarshal.CreateReadOnlySpan(ref stringOrIdentifierStart, stringOrIdentifier.Length);
+
+            switch (type)
+            {
+                case BlockType.Raw:
+                    writer.WriteLiteral(span);
+                    break;
+                case BlockType.Identifier:
+                    context.TryGetValue(span, out var value);
+
+                    if (value is byte[] utf8Value)
+                    {
+                        writer.WriteLiteral(utf8Value);
+                    }
+                    else if (value is char[] utf16Value)
+                    {
+                        writer.WriteString(utf16Value);
+                    }
+                    else
+                    {
+                        var cultureInfo = culture is null ? provider : culture;
+                        writer.WriteValue(value, format, cultureInfo);
+                    }
+
+                    break;
+                case BlockType.None:
+                case BlockType.End:
+                default:
+                    throw new UnreachableException();
+            }
+        }
+
+        writer.Flush();
+    }
+#endif
 }

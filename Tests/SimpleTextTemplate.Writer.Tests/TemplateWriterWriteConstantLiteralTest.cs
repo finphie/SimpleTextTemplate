@@ -3,7 +3,7 @@ using System.Text;
 using FluentAssertions;
 using Xunit;
 
-namespace SimpleTextTemplate.Renderer.Core.Tests;
+namespace SimpleTextTemplate.Writer.Tests;
 
 public sealed class TemplateWriterWriteConstantLiteralTest
 {
@@ -23,10 +23,9 @@ public sealed class TemplateWriterWriteConstantLiteralTest
         var utf8Value = Encoding.UTF8.GetBytes(value);
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.WriteConstantLiteral(utf8Value);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        writer.WriteConstantLiteral(utf8Value);
+        writer.Flush();
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
@@ -51,13 +50,14 @@ public sealed class TemplateWriterWriteConstantLiteralTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
+        var writer = TemplateWriter.Create(bufferWriter);
+
+        for (; count < 10; count++)
         {
-            for (; count < 10; count++)
-            {
-                writer.WriteConstantLiteral(utf8Value);
-            }
+            writer.WriteConstantLiteral(utf8Value);
         }
+
+        writer.Flush();
 
         var array = bufferWriter.WrittenSpan.ToArray();
         array.Should().OnlyContain(static x => x == (byte)'a');

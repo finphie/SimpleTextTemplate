@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
-    <InterceptorsPreviewNamespaces>$(InterceptorsPreviewNamespaces);SimpleTextTemplate.Generator</InterceptorsPreviewNamespaces>
+    <InterceptorsNamespaces>$(InterceptorsNamespaces);SimpleTextTemplate.Generator</InterceptorsNamespaces>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +14,7 @@
     <ProjectReference Include="..\SimpleTextTemplate.Contexts\SimpleTextTemplate.Contexts.csproj" />
     <ProjectReference Include="..\SimpleTextTemplate.Generator.Internal\SimpleTextTemplate.Generator.Internal.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" />
-    <ProjectReference Include="..\SimpleTextTemplate.Renderer\SimpleTextTemplate.Renderer.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate\SimpleTextTemplate.csproj" />
   </ItemGroup>
 
 </Project>

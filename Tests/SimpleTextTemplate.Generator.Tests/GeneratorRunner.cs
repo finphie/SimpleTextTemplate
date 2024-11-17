@@ -29,6 +29,7 @@ static class GeneratorRunner
         };
 
         var references = assemblies.Select(x => Path.Join(baseAssemblyPath, x))
+            .Append(typeof(TemplateRenderer).Assembly.Location)
             .Append(typeof(TemplateWriter<>).Assembly.Location)
             .Append(typeof(ByteArrayContextTestData).Assembly.Location)
             .Select(static x => MetadataReference.CreateFromFile(x));
@@ -46,7 +47,7 @@ static class GeneratorRunner
     public static CompileResult Run(string source)
     {
         var generator = new TemplateGenerator();
-        var options = CSharpParseOptions.Default.WithFeatures([new("InterceptorsPreviewNamespaces", "SimpleTextTemplate.Generator")]);
+        var options = CSharpParseOptions.Default.WithFeatures([new("InterceptorsNamespaces", "SimpleTextTemplate.Generator")]);
         var driver = CSharpGeneratorDriver.Create(generator).WithUpdatedParseOptions(options);
 
         var compilation = _baseCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(source, options));

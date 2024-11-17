@@ -7,25 +7,24 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateWriterWriteDateTimeOffsetTest
+public sealed class TemplateRendererRenderDateTimeOffsetTest
 {
     [Fact]
     public void 静的フィールド()
     {
+        const string Text = """
+            {{ DateTimeOffsetStaticField }}
+            {{ DateTimeOffsetStaticField:o }}
+            {{ DateTimeOffsetStaticField:D:ja-JP }}
+            {{ DateTimeOffsetStaticField::ja-JP }}
+            """;
+
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetStaticField }}
-                {{ DateTimeOffsetStaticField:o }}
-                {{ DateTimeOffsetStaticField:D:ja-JP }}
-                {{ DateTimeOffsetStaticField::ja-JP }}
-                """,
-                in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -40,21 +39,19 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void 静的フィールド_InvariantCultureを指定()
     {
+        const string Text = """
+            {{ DateTimeOffsetStaticField }}
+            {{ DateTimeOffsetStaticField:o }}
+            {{ DateTimeOffsetStaticField:D:ja-JP }}
+            {{ DateTimeOffsetStaticField::ja-JP }}
+            """;
+
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetStaticField }}
-                {{ DateTimeOffsetStaticField:o }}
-                {{ DateTimeOffsetStaticField:D:ja-JP }}
-                {{ DateTimeOffsetStaticField::ja-JP }}
-                """,
-                in context,
-                CultureInfo.InvariantCulture);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -69,21 +66,19 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void 静的フィールド_特定カルチャーを指定()
     {
+        const string Text = """
+            {{ DateTimeOffsetStaticField }}
+            {{ DateTimeOffsetStaticField:o }}
+            {{ DateTimeOffsetStaticField:D:ja-JP }}
+            {{ DateTimeOffsetStaticField::ja-JP }}
+            """;
+
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetStaticField }}
-                {{ DateTimeOffsetStaticField:o }}
-                {{ DateTimeOffsetStaticField:D:ja-JP }}
-                {{ DateTimeOffsetStaticField::ja-JP }}
-                """,
-                in context,
-                CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -98,20 +93,19 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void フィールド()
     {
+        const string Text = """
+            {{ DateTimeOffsetField }}
+            {{ DateTimeOffsetField:o }}
+            {{ DateTimeOffsetField:D:ja-JP }}
+            {{ DateTimeOffsetField::ja-JP }}
+            """;
+
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetField }}
-                {{ DateTimeOffsetField:o }}
-                {{ DateTimeOffsetField:D:ja-JP }}
-                {{ DateTimeOffsetField::ja-JP }}
-                """,
-                in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -126,21 +120,18 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void フィールド_InvariantCultureを指定()
     {
+        const string Text = """
+            {{ DateTimeOffsetField }}
+            {{ DateTimeOffsetField:o }}
+            {{ DateTimeOffsetField:D:ja-JP }}
+            {{ DateTimeOffsetField::ja-JP }}
+            """;
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetField }}
-                {{ DateTimeOffsetField:o }}
-                {{ DateTimeOffsetField:D:ja-JP }}
-                {{ DateTimeOffsetField::ja-JP }}
-                """,
-                in context,
-                CultureInfo.InvariantCulture);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -155,21 +146,18 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void フィールド_特定カルチャーを指定()
     {
+        const string Text = """
+            {{ DateTimeOffsetField }}
+            {{ DateTimeOffsetField:o }}
+            {{ DateTimeOffsetField:D:ja-JP }}
+            {{ DateTimeOffsetField::ja-JP }}
+            """;
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetField }}
-                {{ DateTimeOffsetField:o }}
-                {{ DateTimeOffsetField:D:ja-JP }}
-                {{ DateTimeOffsetField::ja-JP }}
-                """,
-                in context,
-                CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -184,20 +172,18 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void 静的プロパティ()
     {
+        const string Text = """
+            {{ DateTimeOffsetStaticProperty }}
+            {{ DateTimeOffsetStaticProperty:o }}
+            {{ DateTimeOffsetStaticProperty:D:ja-JP }}
+            {{ DateTimeOffsetStaticProperty::ja-JP }}
+            """;
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetStaticProperty }}
-                {{ DateTimeOffsetStaticProperty:o }}
-                {{ DateTimeOffsetStaticProperty:D:ja-JP }}
-                {{ DateTimeOffsetStaticProperty::ja-JP }}
-                """,
-                in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -212,21 +198,18 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void 静的プロパティ_InvariantCultureを指定()
     {
+        const string Text = """
+            {{ DateTimeOffsetStaticProperty }}
+            {{ DateTimeOffsetStaticProperty:o }}
+            {{ DateTimeOffsetStaticProperty:D:ja-JP }}
+            {{ DateTimeOffsetStaticProperty::ja-JP }}
+            """;
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetStaticProperty }}
-                {{ DateTimeOffsetStaticProperty:o }}
-                {{ DateTimeOffsetStaticProperty:D:ja-JP }}
-                {{ DateTimeOffsetStaticProperty::ja-JP }}
-                """,
-                in context,
-                CultureInfo.InvariantCulture);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -241,21 +224,18 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void 静的プロパティ_特定カルチャーを指定()
     {
+        const string Text = """
+            {{ DateTimeOffsetStaticProperty }}
+            {{ DateTimeOffsetStaticProperty:o }}
+            {{ DateTimeOffsetStaticProperty:D:ja-JP }}
+            {{ DateTimeOffsetStaticProperty::ja-JP }}
+            """;
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetStaticProperty }}
-                {{ DateTimeOffsetStaticProperty:o }}
-                {{ DateTimeOffsetStaticProperty:D:ja-JP }}
-                {{ DateTimeOffsetStaticProperty::ja-JP }}
-                """,
-                in context,
-                CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -270,20 +250,18 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void プロパティ()
     {
+        const string Text = """
+            {{ DateTimeOffsetProperty }}
+            {{ DateTimeOffsetProperty:o }}
+            {{ DateTimeOffsetProperty:D:ja-JP }}
+            {{ DateTimeOffsetProperty::ja-JP }}
+            """;
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetProperty }}
-                {{ DateTimeOffsetProperty:o }}
-                {{ DateTimeOffsetProperty:D:ja-JP }}
-                {{ DateTimeOffsetProperty::ja-JP }}
-                """,
-                in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -298,21 +276,18 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void プロパティ_InvariantCultureを指定()
     {
+        const string Text = """
+            {{ DateTimeOffsetProperty }}
+            {{ DateTimeOffsetProperty:o }}
+            {{ DateTimeOffsetProperty:D:ja-JP }}
+            {{ DateTimeOffsetProperty::ja-JP }}
+            """;
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetProperty }}
-                {{ DateTimeOffsetProperty:o }}
-                {{ DateTimeOffsetProperty:D:ja-JP }}
-                {{ DateTimeOffsetProperty::ja-JP }}
-                """,
-                in context,
-                CultureInfo.InvariantCulture);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -327,21 +302,18 @@ public sealed class TemplateWriterWriteDateTimeOffsetTest
     [Fact]
     public void プロパティ_特定カルチャーを指定()
     {
+        const string Text = """
+            {{ DateTimeOffsetProperty }}
+            {{ DateTimeOffsetProperty:o }}
+            {{ DateTimeOffsetProperty:D:ja-JP }}
+            {{ DateTimeOffsetProperty::ja-JP }}
+            """;
         var context = new DateTimeOffsetContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write(
-                """
-                {{ DateTimeOffsetProperty }}
-                {{ DateTimeOffsetProperty:o }}
-                {{ DateTimeOffsetProperty:D:ja-JP }}
-                {{ DateTimeOffsetProperty::ja-JP }}
-                """,
-                in context,
-                CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

@@ -20,7 +20,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             var bufferWriter = new ArrayBufferWriter<byte>();
             var writer = TemplateWriter.Create(bufferWriter);
             var x = "a";
-            writer.Write(x);
+            TemplateRenderer.Render(ref writer, x);
             """;
         var (_, diagnostics) = Run(SourceCode);
 
@@ -53,7 +53,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             
             var bufferWriter = new ArrayBufferWriter<byte>();
             var writer = TemplateWriter.Create(bufferWriter);
-            writer.Write("{{ x }}");
+            TemplateRenderer.Render(ref writer, "{{ x }}");
             """;
         var (_, diagnostics) = Run(SourceCode);
 
@@ -61,7 +61,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
 
         diagnostics[0].Id.Should().Be("STT1001");
         diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("writer.Write(\"{{ x }}\")");
+        diagnostics[0].GetText().Should().Be("TemplateRenderer.Render(ref writer, \"{{ x }}\")");
     }
 
     [Fact]

@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -9,7 +8,7 @@ using System.Text;
 namespace SimpleTextTemplate;
 
 /// <summary>
-/// テンプレート文字列のレンダリングを行います。
+/// 文字列などをバッファーに書き込む構造体です。
 /// </summary>
 /// <typeparam name="T">バッファーライターの型</typeparam>
 public ref struct TemplateWriter<T>
@@ -53,36 +52,10 @@ public ref struct TemplateWriter<T>
     }
 
     /// <summary>
-    /// バッファーに文字列を書き込みます。
-    /// </summary>
-    /// <remarks>
-    /// <para>SimpleTextTemplate.Generatorへの参照が必要です。</para>
-    /// </remarks>
-    /// <param name="text">テンプレート文字列</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Write(string text) => throw new UnreachableException();
-
-    /// <summary>
-    /// バッファーにコンテキストを書き込みます。
-    /// <paramref name="provider"/>のデフォルトは、<see cref="CultureInfo.InvariantCulture"/>です。
-    /// </summary>
-    /// <remarks>
-    /// <para>SimpleTextTemplate.Generatorへの参照が必要です。</para>
-    /// </remarks>
-    /// <typeparam name="TContext">コンテキストの型</typeparam>
-    /// <param name="text">テンプレート文字列</param>
-    /// <param name="context">コンテキスト</param>
-    /// <param name="provider">カルチャー指定</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Write<TContext>(string text, in TContext context, IFormatProvider? provider = null)
-        where TContext : notnull
-        => throw new UnreachableException();
-
-    /// <summary>
     /// 書き込み処理を反映します。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly void Dispose()
+    public readonly void Flush()
     {
         var writtenCount = WrittenCount;
         _bufferWriter.Advance(writtenCount);
@@ -154,7 +127,6 @@ public ref struct TemplateWriter<T>
     /// バッファーにUTF-8文字列を書き込みます。
     /// </summary>
     /// <param name="value">UTF-8文字列</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteLiteral(scoped ReadOnlySpan<byte> value)
     {
@@ -167,7 +139,6 @@ public ref struct TemplateWriter<T>
     /// バッファーに文字列を書き込みます。
     /// </summary>
     /// <param name="value">文字列</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteString(scoped ReadOnlySpan<char> value)
     {
@@ -186,7 +157,6 @@ public ref struct TemplateWriter<T>
     /// <typeparam name="TValue">列挙型</typeparam>
     /// <param name="value">列挙型の値</param>
     /// <param name="format">カスタム形式</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteEnum<TValue>(TValue value, ReadOnlySpan<char> format = default)
         where TValue : struct, Enum
@@ -241,7 +211,6 @@ public ref struct TemplateWriter<T>
     /// <param name="value">変数の値</param>
     /// <param name="format">カスタム形式</param>
     /// <param name="provider">カルチャー指定</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteValue<TValue>(TValue value, ReadOnlySpan<char> format, IFormatProvider? provider)
     {

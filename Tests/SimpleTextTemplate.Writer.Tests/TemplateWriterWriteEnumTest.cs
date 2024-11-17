@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Xunit;
 
-namespace SimpleTextTemplate.Renderer.Core.Tests;
+namespace SimpleTextTemplate.Writer.Tests;
 
 public sealed class TemplateWriterWriteEnumTest
 {
@@ -22,10 +22,9 @@ public sealed class TemplateWriterWriteEnumTest
         const Test1 Value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.WriteEnum(Value);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        writer.WriteEnum(Value);
+        writer.Flush();
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
@@ -38,10 +37,9 @@ public sealed class TemplateWriterWriteEnumTest
         const Test1 Value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.WriteEnum(Value, "D");
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        writer.WriteEnum(Value, "D");
+        writer.Flush();
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
@@ -55,13 +53,14 @@ public sealed class TemplateWriterWriteEnumTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
+        var writer = TemplateWriter.Create(bufferWriter);
+
+        for (; count < 10; count++)
         {
-            for (; count < 10; count++)
-            {
-                writer.WriteEnum(Value);
-            }
+            writer.WriteEnum(Value);
         }
+
+        writer.Flush();
 
         var array = bufferWriter.WrittenSpan.ToArray();
         array.Should().OnlyContain(static x => x == (byte)'A');

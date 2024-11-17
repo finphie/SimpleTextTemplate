@@ -80,22 +80,25 @@ static class Emitter
         for (var i = 0; i < infoList.Length; i++)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
-            var (interceptsLocationInfo, template, writerType, contextTypeName) = infoList[i]!;
+            var (interceptsLocationInfo, template, methodSymbol) = infoList[i]!;
 
             if (i != 0)
             {
                 builder.AppendLine();
             }
 
+            var parameters = string.Join(", ", methodSymbol.Parameters.Select(static x => x.GetParameterText()));
             builder.AppendLine($$"""
-                        [global::System.Runtime.CompilerServices.InterceptsLocation(@"{{interceptsLocationInfo.FilePath}}", {{interceptsLocationInfo.Line}}, {{interceptsLocationInfo.Column}})]
-                        public static void Write{{i}}(this ref {{writerType}} writer, string _{{(string.IsNullOrEmpty(contextTypeName) ? string.Empty : $", in {contextTypeName} context, global::System.IFormatProvider? provider = null")}})
+                        [global::System.Runtime.CompilerServices.InterceptsLocation({{interceptsLocationInfo.Version}}, "{{interceptsLocationInfo.Data}}")]
+                        public static void Render{{i}}({{parameters}})
                         {
                 """);
 
             foreach (var (methodType, value, format, provider) in template)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
+
+                var contextTypeName = methodSymbol.Parameters.ElementAtOrDefault(2)?.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
                 builder.AppendLine($"            writer.{GetWriteMethodName(methodType)}({GetValue(methodType, value, format, provider, contextTypeName)});");
             }
 
@@ -110,7 +113,7 @@ static class Emitter
             {
                 [global::System.CodeDom.Compiler.GeneratedCode("{{FullName}}", "{{Version}}")]
                 [global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]
-                file sealed class InterceptsLocationAttribute(string filePath, int line, int column) : global::System.Attribute;
+                file sealed class InterceptsLocationAttribute(int version, string data) : global::System.Attribute;
             }
             """);
 

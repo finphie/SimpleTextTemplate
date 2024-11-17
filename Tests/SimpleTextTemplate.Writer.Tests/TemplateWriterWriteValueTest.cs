@@ -4,7 +4,7 @@ using System.Text;
 using FluentAssertions;
 using Xunit;
 
-namespace SimpleTextTemplate.Renderer.Core.Tests;
+namespace SimpleTextTemplate.Writer.Tests;
 
 public sealed class TemplateWriterWriteValueTest
 {
@@ -14,12 +14,11 @@ public sealed class TemplateWriterWriteValueTest
         const int Value = 1234;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
-            writer.WriteValue(Value, "N3", CultureInfo.InvariantCulture);
-            writer.WriteValue(Value, "N3", CultureInfo.GetCultureInfo("es-ES", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
+        writer.WriteValue(Value, "N3", CultureInfo.InvariantCulture);
+        writer.WriteValue(Value, "N3", CultureInfo.GetCultureInfo("es-ES", true));
+        writer.Flush();
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
@@ -32,12 +31,11 @@ public sealed class TemplateWriterWriteValueTest
         const double Value = 1234.567;
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
-            writer.WriteValue(Value, "F2", CultureInfo.InvariantCulture);
-            writer.WriteValue(Value, "F3", CultureInfo.GetCultureInfo("es-ES", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
+        writer.WriteValue(Value, "F2", CultureInfo.InvariantCulture);
+        writer.WriteValue(Value, "F3", CultureInfo.GetCultureInfo("es-ES", true));
+        writer.Flush();
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
@@ -50,12 +48,11 @@ public sealed class TemplateWriterWriteValueTest
         var value = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.WriteValue(value, default, CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "d", CultureInfo.InvariantCulture);
-            writer.WriteValue(value, "D", CultureInfo.GetCultureInfo("ja-JP", true));
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        writer.WriteValue(value, default, CultureInfo.InvariantCulture);
+        writer.WriteValue(value, "d", CultureInfo.InvariantCulture);
+        writer.WriteValue(value, "D", CultureInfo.GetCultureInfo("ja-JP", true));
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -69,13 +66,14 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
+        var writer = TemplateWriter.Create(bufferWriter);
+
+        for (; count < 20; count++)
         {
-            for (; count < 20; count++)
-            {
-                writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
-            }
+            writer.WriteValue(Value, default, CultureInfo.InvariantCulture);
         }
+
+        writer.Flush();
 
         var array = bufferWriter.WrittenSpan.ToArray();
         array.Should().OnlyContain(static x => x == (byte)'1');
@@ -89,13 +87,14 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
+        var writer = TemplateWriter.Create(bufferWriter);
+
+        for (; count < 20; count++)
         {
-            for (; count < 20; count++)
-            {
-                writer.WriteValue(value, default, CultureInfo.InvariantCulture);
-            }
+            writer.WriteValue(value, default, CultureInfo.InvariantCulture);
         }
+
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -109,13 +108,14 @@ public sealed class TemplateWriterWriteValueTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
+        var writer = TemplateWriter.Create(bufferWriter);
+
+        for (; count < 20; count++)
         {
-            for (; count < 20; count++)
-            {
-                writer.WriteValue(value, default, CultureInfo.InvariantCulture);
-            }
+            writer.WriteValue(value, default, CultureInfo.InvariantCulture);
         }
+
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()

@@ -16,4 +16,9 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <ProjectReference Include="..\SimpleTextTemplate.Abstractions\SimpleTextTemplate.Abstractions.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate.Writer\SimpleTextTemplate.Writer.csproj" />
+  </ItemGroup>
+
 </Project>

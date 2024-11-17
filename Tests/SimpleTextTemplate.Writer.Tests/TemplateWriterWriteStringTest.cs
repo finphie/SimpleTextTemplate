@@ -3,7 +3,7 @@ using System.Text;
 using FluentAssertions;
 using Xunit;
 
-namespace SimpleTextTemplate.Renderer.Core.Tests;
+namespace SimpleTextTemplate.Writer.Tests;
 
 public sealed class TemplateWriterWriteStringTest
 {
@@ -16,10 +16,9 @@ public sealed class TemplateWriterWriteStringTest
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.WriteString(value);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        writer.WriteString(value);
+        writer.Flush();
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
@@ -32,10 +31,9 @@ public sealed class TemplateWriterWriteStringTest
         var value = new string('a', 1024);
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.WriteString(value);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        writer.WriteString(value);
+        writer.Flush();
 
         bufferWriter.WrittenSpan.ToArray()
             .Should()
@@ -49,13 +47,14 @@ public sealed class TemplateWriterWriteStringTest
         var bufferWriter = new ArrayBufferWriter<byte>();
         var count = 0;
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
+        var writer = TemplateWriter.Create(bufferWriter);
+
+        for (; count < 10; count++)
         {
-            for (; count < 10; count++)
-            {
-                writer.WriteString(value);
-            }
+            writer.WriteString(value);
         }
+
+        writer.Flush();
 
         var array = bufferWriter.WrittenSpan.ToArray();
         array.Should().OnlyContain(static x => x == (byte)'a');

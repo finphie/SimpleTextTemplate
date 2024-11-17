@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-public sealed class TemplateWriterWriteStringTest
+public sealed class TemplateRendererRenderStringTest
 {
     [Fact]
     public void 定数()
@@ -14,10 +14,9 @@ public sealed class TemplateWriterWriteStringTest
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ StringConstantField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, "{{ StringConstantField }}", in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -30,10 +29,9 @@ public sealed class TemplateWriterWriteStringTest
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ StringStaticField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, "{{ StringStaticField }}", in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -46,10 +44,9 @@ public sealed class TemplateWriterWriteStringTest
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ StringField }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, "{{ StringField }}", in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -62,10 +59,9 @@ public sealed class TemplateWriterWriteStringTest
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ StringStaticProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, "{{ StringStaticProperty }}", in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
@@ -78,10 +74,9 @@ public sealed class TemplateWriterWriteStringTest
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        using (var writer = TemplateWriter.Create(bufferWriter))
-        {
-            writer.Write("{{ StringProperty }}", in context);
-        }
+        var writer = TemplateWriter.Create(bufferWriter);
+        TemplateRenderer.Render(ref writer, "{{ StringProperty }}", in context);
+        writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .Should()
