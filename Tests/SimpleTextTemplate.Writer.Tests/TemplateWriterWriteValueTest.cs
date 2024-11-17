@@ -4,7 +4,7 @@ using System.Text;
 using FluentAssertions;
 using Xunit;
 
-namespace SimpleTextTemplate.Renderer.Core.Tests;
+namespace SimpleTextTemplate.Writer.Tests;
 
 public sealed class TemplateWriterWriteValueTest
 {

@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTextTemplate.Generato
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTextTemplate.Renderer.Tests", "Tests\SimpleTextTemplate.Renderer.Tests\SimpleTextTemplate.Renderer.Tests.csproj", "{6EC731BB-EC46-4499-909C-803CE67BC4DB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTextTemplate.Renderer.Core.Tests", "Tests\SimpleTextTemplate.Renderer.Core.Tests\SimpleTextTemplate.Renderer.Core.Tests.csproj", "{1E8843C0-FFA1-4608-9FB7-BD053FD58E88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTextTemplate.Writer.Tests", "Tests\SimpleTextTemplate.Writer.Tests\SimpleTextTemplate.Writer.Tests.csproj", "{1E8843C0-FFA1-4608-9FB7-BD053FD58E88}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleTextTemplate.Generator.Execute.Tests", "Tests\SimpleTextTemplate.Generator.Execute.Tests\SimpleTextTemplate.Generator.Execute.Tests.csproj", "{6584D3BF-0099-46FD-8E95-9CD872BACA56}"
 EndProject
