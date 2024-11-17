@@ -1,14 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <IsPackable>true</IsPackable>
-    <Description>SimpleTextTemplateのレンダリングコア部分です。</Description>
-  </PropertyGroup>
 
-  <PropertyGroup>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>templating</PackageTags>
-  </PropertyGroup>
 
 </Project>
