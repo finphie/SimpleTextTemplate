@@ -43,7 +43,7 @@ using SimpleTextTemplate;
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
 var context = new SampleContext("Hello, World", 1000, new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
-var writer = TemplateWriter.Create(_bufferWriter);
+var writer = TemplateWriter.Create(bufferWriter);
 TemplateRenderer.Render(ref writer, "{{ DateTimeOffsetValue:o }}_{{ StringValue }}!", in context);
 TemplateRenderer.Render(ref writer, "_{{ ConstantString }}_{{ ConstantInt:N3:ja-JP }}_{{ IntValue }}", in context, CultureInfo.InvariantCulture);
 writer.Flush();
