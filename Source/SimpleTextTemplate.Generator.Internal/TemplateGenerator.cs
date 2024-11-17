@@ -78,7 +78,7 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 
     static bool IsTemplateClass(Compilation compilation, IMethodSymbol methodSymbol)
     {
-        var targetType = compilation.GetTypeByMetadataName("SimpleTextTemplate.Template");
+        var targetType = compilation.GetTypeByMetadataName("SimpleTextTemplate.TemplateRenderer");
         return targetType is not null && SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingType, targetType);
     }
 
