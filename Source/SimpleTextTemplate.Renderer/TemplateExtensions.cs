@@ -29,7 +29,7 @@ public static class TemplateExtensions
         ArgumentNullException.ThrowIfNull(context);
 
         provider ??= CultureInfo.InvariantCulture;
-        using var writer = TemplateWriter.Create(bufferWriter);
+        var writer = TemplateWriter.Create(bufferWriter);
 
         foreach (var (type, stringOrIdentifier, format, culture) in template.Blocks)
         {
@@ -69,5 +69,7 @@ public static class TemplateExtensions
                     throw new UnreachableException();
             }
         }
+
+        writer.Flush();
     }
 }
