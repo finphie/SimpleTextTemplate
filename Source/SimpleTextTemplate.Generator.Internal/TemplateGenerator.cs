@@ -20,7 +20,7 @@ public sealed class TemplateGenerator : IIncrementalGenerator
 #if DEBUG
         if (!System.Diagnostics.Debugger.IsAttached)
         {
-            //System.Diagnostics.Debugger.Launch();
+            // System.Diagnostics.Debugger.Launch();
         }
 #endif
         var provider = context.SyntaxProvider
