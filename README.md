@@ -6,9 +6,6 @@
 
 SimpleTextTemplateは、変数の埋め込みのみに対応したテキストテンプレートエンジンです。
 
-> [!CAUTION]
-> SimpleTextTemplate.Generatorを使用する場合、.NET SDK 8.0.300-preview.24203.14や9.0.100-preview.3.24204.13ではインターセプターの不具合により正常に動作しません。8.0.2xxをご使用ください。
-
 ## 説明
 
 - 文字列をUTF-8バイト列として`IBufferWriter<byte>`に出力します。
@@ -46,11 +43,10 @@ using SimpleTextTemplate;
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
 var context = new SampleContext("Hello, World", 1000, new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
-using (var writer = TemplateWriter.Create(_bufferWriter))
-{
-    writer.Write("{{ DateTimeOffsetValue:o }}_{{ StringValue }}!", in context);
-    writer.Write("_{{ ConstantString }}_{{ ConstantInt:N3:ja-JP }}_{{ IntValue }}", in context, CultureInfo.InvariantCulture);
-}
+var writer = TemplateWriter.Create(_bufferWriter);
+TemplateRenderer.Render(ref writer, "{{ DateTimeOffsetValue:o }}_{{ StringValue }}!", in context);
+TemplateRenderer.Render(ref writer, "_{{ ConstantString }}_{{ ConstantInt:N3:ja-JP }}_{{ IntValue }}", in context, CultureInfo.InvariantCulture);
+writer.Flush();
 
 // 2000-01-01T00:00:00.0000000+00:00_Hello, World!_Hello_999.000_1000
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
@@ -76,8 +72,8 @@ using SimpleTextTemplate;
 
 file static class Intercept
 {
-    [InterceptsLocation]
-    public static void Write0(this ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string _, in SampleContext context, IFormatProvider? provider = null)
+    [InterceptsLocation(1, "...")]
+    public static void Write0(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
     {
         writer.WriteValue(Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", CultureInfo.InvariantCulture);
         writer.WriteConstantLiteral("_"u8);
@@ -85,8 +81,8 @@ file static class Intercept
         writer.WriteConstantLiteral("!"u8);
     }
 
-    [InterceptsLocation]
-    public static void Write1(this ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string _, in SampleContext context, IFormatProvider? provider = null)
+    [InterceptsLocation(1, "...")]
+    public static void Write1(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
     {
         writer.WriteConstantLiteral("_Hello_999.000_"u8);
         writer.WriteValue(Unsafe.AsRef(in context).@IntValue, default, CultureInfo.InvariantCulture);
@@ -95,11 +91,11 @@ file static class Intercept
 ```
 
 <details>
-<summary>SimpleTextTemplate.Renderer（非推奨）</summary>
+<summary>SimpleTextTemplate（非推奨）</summary>
 
 ### SimpleTextTemplate.Renderer（非推奨）
 
-[SimpleTextTemplate.Renderer](https://www.nuget.org/packages/SimpleTextTemplate.Renderer/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)への参照が必要です。
+[SimpleTextTemplate](https://www.nuget.org/packages/SimpleTextTemplate/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)への参照が必要です。
 
 ```csharp
 using System;
@@ -160,7 +156,7 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## サポートフレームワーク
 
-.NET 8
+.NET 9
 
 ## 作者
 
@@ -197,6 +193,8 @@ MIT
 - [Microsoft.CodeAnalysis.Analyzers](https://github.com/dotnet/roslyn-analyzers)
 - [Microsoft.CodeAnalysis.NetAnalyzers](https://github.com/dotnet/roslyn-analyzers)
 - [Microsoft.VisualStudio.Threading.Analyzers](https://github.com/Microsoft/vs-threading)
+- [Roslynator.Analyzers](https://github.com/dotnet/roslynator)
+- [Roslynator.Formatting.Analyzers](https://github.com/dotnet/roslynator)
 - [StyleCop.Analyzers](https://github.com/DotNetAnalyzers/StyleCopAnalyzers)
 
 ### ベンチマーク
