@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
@@ -10,7 +10,6 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
     <ProjectReference Include="..\..\Source\SimpleTextTemplate.Contexts\SimpleTextTemplate.Contexts.csproj" />
-    <ProjectReference Include="..\..\Source\SimpleTextTemplate\SimpleTextTemplate.csproj" />
   </ItemGroup>
 
 </Project>
