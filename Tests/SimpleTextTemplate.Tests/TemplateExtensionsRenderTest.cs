@@ -1,4 +1,5 @@
-﻿using System.Buffers;
+﻿#if NET9_0_OR_GREATER
+using System.Buffers;
 using System.Globalization;
 using System.Text;
 using FluentAssertions;
@@ -6,7 +7,7 @@ using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using Xunit;
 
-namespace SimpleTextTemplate.Renderer.Tests;
+namespace SimpleTextTemplate.Tests;
 
 public sealed class TemplateExtensionsRenderTest
 {
@@ -194,3 +195,4 @@ public sealed class TemplateExtensionsRenderTest
             .Equal(expectedValue.ToArray());
     }
 }
+#endif
