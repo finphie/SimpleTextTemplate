@@ -172,7 +172,6 @@ MIT
 
 ### ライブラリ
 
-- [CommunityToolkit.Diagnostics](https://github.com/CommunityToolkit/dotnet)
 - [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet)
 - [Microsoft.CodeAnalysis.CSharp](https://github.com/dotnet/roslyn)
 - [Utf8Utility](https://github.com/finphie/Utf8Utility)
