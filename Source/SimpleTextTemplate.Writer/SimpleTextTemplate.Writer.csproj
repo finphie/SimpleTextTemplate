@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <IsPackable>true</IsPackable>
+    <RootNamespace>SimpleTextTemplate</RootNamespace>
     <Description>SimpleTextTemplateのWriter部分です。</Description>
   </PropertyGroup>
 
