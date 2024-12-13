@@ -21,7 +21,7 @@
       バージョン4.10.0は、Visual Studio 2022 バージョン 17.10以降で動作する。
       https://learn.microsoft.com/visualstudio/extensibility/roslyn-version-support
     -->
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
