@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Tests;
@@ -16,11 +16,11 @@ public sealed class TemplateIdentifierReaderTryReadTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateIdentifierReader(utf8Input);
 
-        reader.TryRead(out var value, out var format, out var culture).Should().BeTrue();
+        reader.TryRead(out var value, out var format, out var culture).ShouldBeTrue();
 
-        value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.Should().BeNull();
-        culture.Should().BeNull();
+        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
+        format.ShouldBeNull();
+        culture.ShouldBeNull();
     }
 
     [Theory]
@@ -34,11 +34,11 @@ public sealed class TemplateIdentifierReaderTryReadTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateIdentifierReader(utf8Input);
 
-        reader.TryRead(out var value, out var format, out var culture).Should().BeTrue();
+        reader.TryRead(out var value, out var format, out var culture).ShouldBeTrue();
 
-        value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.Should().Be(expectedFormat);
-        culture.Should().BeNull();
+        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
+        format.ShouldBe(expectedFormat);
+        culture.ShouldBeNull();
     }
 
     [Theory]
@@ -53,11 +53,11 @@ public sealed class TemplateIdentifierReaderTryReadTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateIdentifierReader(utf8Input);
 
-        reader.TryRead(out var value, out var format, out var culture).Should().BeTrue();
+        reader.TryRead(out var value, out var format, out var culture).ShouldBeTrue();
 
-        value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.Should().BeNull();
-        culture.Should().Be(expectedCulture);
+        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
+        format.ShouldBeNull();
+        culture.ShouldBe(expectedCulture);
     }
 
     [Theory]
@@ -71,17 +71,17 @@ public sealed class TemplateIdentifierReaderTryReadTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateIdentifierReader(utf8Input);
 
-        reader.TryRead(out var value, out var format, out var culture).Should().BeTrue();
+        reader.TryRead(out var value, out var format, out var culture).ShouldBeTrue();
 
-        value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.Should().Be(expectedFormat);
-        culture.Should().Be(expectedCulture);
+        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
+        format.ShouldBe(expectedFormat);
+        culture.ShouldBe(expectedCulture);
     }
 
     [Fact]
     public void バイト列先頭がコロン_TemplateException()
     {
         var reader = new TemplateIdentifierReader(":A"u8);
-        reader.TryRead(out _, out _, out _).Should().BeFalse();
+        reader.TryRead(out _, out _, out _).ShouldBeFalse();
     }
 }
