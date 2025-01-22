@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Tests;
@@ -57,33 +57,19 @@ public sealed class TemplateParseTest
     [InlineData("{{ }", 3)]
     public void 識別子終了タグなし_TemplateException(string input, int position)
     {
-        // nuint型とint型との比較の際、例外が発生する。
-        // そのため、int型をあらかじめUIntPtr型でキャストしておく。
-        var positionPtr = (UIntPtr)position;
-
-        Encoding.UTF8.GetBytes(input).Invoking(static x => Template.Parse(x))
-            .Should()
-            .Throw<TemplateException>()
-            .Where(x => x.Position == positionPtr);
+        var exception = Should.Throw<TemplateException>(() => Execute(input));
+        exception.Position.ShouldBe((nuint)position);
     }
 
     [Theory]
     [InlineData("{{ : }}")]
     [InlineData("{{ :: }}")]
     public void 識別子が空_TemplateException(string input)
-    {
-        Encoding.UTF8.GetBytes(input).Invoking(static x => Template.Parse(x))
-            .Should()
-            .Throw<TemplateException>();
-    }
+        => Should.Throw<TemplateException>(() => Execute(input));
 
     [Fact]
     public void 無効なカルチャー_TemplateException()
-    {
-        FluentActions.Invoking(() => Template.Parse("{{ A::B }}"u8))
-            .Should()
-            .Throw<CultureNotFoundException>();
-    }
+        => Should.Throw<CultureNotFoundException>(() => Template.Parse("{{ A::B }}"u8));
 
     static void Execute(string input) => Template.Parse(Encoding.UTF8.GetBytes(input));
 }
