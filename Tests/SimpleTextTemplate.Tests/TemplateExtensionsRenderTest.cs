@@ -2,7 +2,7 @@
 using System.Buffers;
 using System.Globalization;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using SimpleTextTemplate.Contexts;
 using Utf8Utility;
 using Xunit;
@@ -24,9 +24,8 @@ public sealed class TemplateExtensionsRenderTest
         dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("Test1"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("Test1");
     }
 
     [Theory]
@@ -44,9 +43,8 @@ public sealed class TemplateExtensionsRenderTest
         dic.TryAdd(new("BBB"u8), "Test2"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("Test1Test2"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("Test1Test2");
     }
 
     [Theory]
@@ -61,9 +59,8 @@ public sealed class TemplateExtensionsRenderTest
         dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("zTest1z"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("zTest1z");
     }
 
     [Theory]
@@ -81,9 +78,8 @@ public sealed class TemplateExtensionsRenderTest
         dic.TryAdd(new("BBB"u8), "Test2"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("Test1zTest2"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("Test1zTest2");
     }
 
     [Theory]
@@ -98,9 +94,8 @@ public sealed class TemplateExtensionsRenderTest
         dic.TryAdd(new("B"u8), "Test2"u8.ToArray());
 
         template.Render(bufferWriter, Context.Create(dic));
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("xTest1123Test2x"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("xTest1123Test2x");
     }
 
     [Fact]
@@ -108,9 +103,9 @@ public sealed class TemplateExtensionsRenderTest
     {
         var value = new Utf8Array("abc"u8);
 
-        Execute("{{ A }}"u8, value, "abc"u8);
-        Execute("{{ A: }}"u8, value, "abc"u8);
-        Execute("{{ A:: }}"u8, value, "abc"u8);
+        Execute("{{ A }}"u8, value, "abc");
+        Execute("{{ A: }}"u8, value, "abc");
+        Execute("{{ A:: }}"u8, value, "abc");
     }
 
     [Fact]
@@ -118,9 +113,9 @@ public sealed class TemplateExtensionsRenderTest
     {
         var value = "abc"u8.ToArray();
 
-        Execute("{{ A }}"u8, value, "abc"u8);
-        Execute("{{ A: }}"u8, value, "abc"u8);
-        Execute("{{ A:: }}"u8, value, "abc"u8);
+        Execute("{{ A }}"u8, value, "abc");
+        Execute("{{ A: }}"u8, value, "abc");
+        Execute("{{ A:: }}"u8, value, "abc");
     }
 
     [Fact]
@@ -128,9 +123,9 @@ public sealed class TemplateExtensionsRenderTest
     {
         const string Value = "abc";
 
-        Execute("{{ A }}"u8, Value, "abc"u8);
-        Execute("{{ A: }}"u8, Value, "abc"u8);
-        Execute("{{ A:: }}"u8, Value, "abc"u8);
+        Execute("{{ A }}"u8, Value, "abc");
+        Execute("{{ A: }}"u8, Value, "abc");
+        Execute("{{ A:: }}"u8, Value, "abc");
     }
 
     [Fact]
@@ -138,9 +133,9 @@ public sealed class TemplateExtensionsRenderTest
     {
         var value = "abc".ToArray();
 
-        Execute("{{ A }}"u8, value, "abc"u8);
-        Execute("{{ A: }}"u8, value, "abc"u8);
-        Execute("{{ A:: }}"u8, value, "abc"u8);
+        Execute("{{ A }}"u8, value, "abc");
+        Execute("{{ A: }}"u8, value, "abc");
+        Execute("{{ A:: }}"u8, value, "abc");
     }
 
     [Fact]
@@ -148,12 +143,12 @@ public sealed class TemplateExtensionsRenderTest
     {
         const int Value = 1234;
 
-        Execute("{{ A }}"u8, Value, "1234"u8);
-        Execute("{{ A: }}"u8, Value, "1234"u8);
-        Execute("{{ A:: }}"u8, Value, "1234"u8);
-        Execute("{{ A:N3 }}"u8, Value, "1,234.000"u8);
-        Execute("{{ A:N3:es-ES }}"u8, Value, "1.234,000"u8, CultureInfo.GetCultureInfo("ja-JP", true));
-        Execute("{{ A:N3 }}"u8, Value, "1.234,000"u8, CultureInfo.GetCultureInfo("es-ES", true));
+        Execute("{{ A }}"u8, Value, "1234");
+        Execute("{{ A: }}"u8, Value, "1234");
+        Execute("{{ A:: }}"u8, Value, "1234");
+        Execute("{{ A:N3 }}"u8, Value, "1,234.000");
+        Execute("{{ A:N3:es-ES }}"u8, Value, "1.234,000", CultureInfo.GetCultureInfo("ja-JP", true));
+        Execute("{{ A:N3 }}"u8, Value, "1.234,000", CultureInfo.GetCultureInfo("es-ES", true));
     }
 
     [Fact]
@@ -161,12 +156,12 @@ public sealed class TemplateExtensionsRenderTest
     {
         const double Value = 1234.567;
 
-        Execute("{{ A }}"u8, Value, "1234.567"u8);
-        Execute("{{ A: }}"u8, Value, "1234.567"u8);
-        Execute("{{ A:: }}"u8, Value, "1234.567"u8);
-        Execute("{{ A:F2 }}"u8, Value, "1234.57"u8);
-        Execute("{{ A:F3:es-ES }}"u8, Value, "1234,567"u8, CultureInfo.GetCultureInfo("ja-JP", true));
-        Execute("{{ A:F3 }}"u8, Value, "1234,567"u8, CultureInfo.GetCultureInfo("es-ES", true));
+        Execute("{{ A }}"u8, Value, "1234.567");
+        Execute("{{ A: }}"u8, Value, "1234.567");
+        Execute("{{ A:: }}"u8, Value, "1234.567");
+        Execute("{{ A:F2 }}"u8, Value, "1234.57");
+        Execute("{{ A:F3:es-ES }}"u8, Value, "1234,567", CultureInfo.GetCultureInfo("ja-JP", true));
+        Execute("{{ A:F3 }}"u8, Value, "1234,567", CultureInfo.GetCultureInfo("es-ES", true));
     }
 
     [Fact]
@@ -174,14 +169,14 @@ public sealed class TemplateExtensionsRenderTest
     {
         var value = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(9));
 
-        Execute("{{ A }}"u8, value, "01/01/2000 00:00:00 +09:00"u8);
-        Execute("{{ A: }}"u8, value, "01/01/2000 00:00:00 +09:00"u8);
-        Execute("{{ A:: }}"u8, value, "01/01/2000 00:00:00 +09:00"u8);
-        Execute("{{ A:d }}"u8, value, "01/01/2000"u8);
-        Execute("{{ A:D:ja-JP }}"u8, value, "2000年1月1日土曜日"u8, CultureInfo.GetCultureInfo("en-US", true));
+        Execute("{{ A }}"u8, value, "01/01/2000 00:00:00 +09:00");
+        Execute("{{ A: }}"u8, value, "01/01/2000 00:00:00 +09:00");
+        Execute("{{ A:: }}"u8, value, "01/01/2000 00:00:00 +09:00");
+        Execute("{{ A:d }}"u8, value, "01/01/2000");
+        Execute("{{ A:D:ja-JP }}"u8, value, "2000年1月1日土曜日", CultureInfo.GetCultureInfo("en-US", true));
     }
 
-    static void Execute<T>(ReadOnlySpan<byte> source, T value, ReadOnlySpan<byte> expectedValue, CultureInfo? provider = null)
+    static void Execute<T>(ReadOnlySpan<byte> source, T value, string expectedValue, CultureInfo? provider = null)
         where T : notnull
     {
         var template = Template.Parse(source);
@@ -190,9 +185,8 @@ public sealed class TemplateExtensionsRenderTest
         dic.TryAdd(new("A"u8), value);
 
         template.Render(bufferWriter, Context.Create(dic), provider);
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal(expectedValue.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe(expectedValue);
     }
 }
 #endif
