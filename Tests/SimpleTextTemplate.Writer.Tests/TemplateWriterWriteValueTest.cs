@@ -55,8 +55,7 @@ public sealed class TemplateWriterWriteValueTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日土曜日");
+            .ShouldBe("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日土曜日");
     }
 
     [Fact]
@@ -97,8 +96,7 @@ public sealed class TemplateWriterWriteValueTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
+            .ShouldBe(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
     }
 
     [Fact]
@@ -118,8 +116,7 @@ public sealed class TemplateWriterWriteValueTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
+            .ShouldBe(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
     }
 
     sealed record FormattableRecord(DateTimeOffset Value) : IFormattable

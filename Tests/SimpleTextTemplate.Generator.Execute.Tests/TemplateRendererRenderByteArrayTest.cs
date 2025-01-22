@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
 
@@ -19,8 +19,7 @@ public sealed class TemplateRendererRenderByteArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_BytesStaticField");
+            .ShouldBe("_BytesStaticField");
     }
 
     [Fact]
@@ -34,8 +33,7 @@ public sealed class TemplateRendererRenderByteArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_BytesField");
+            .ShouldBe("_BytesField");
     }
 
     [Fact]
@@ -49,8 +47,7 @@ public sealed class TemplateRendererRenderByteArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_BytesStaticProperty");
+            .ShouldBe("_BytesStaticProperty");
     }
 
     [Fact]
@@ -64,8 +61,7 @@ public sealed class TemplateRendererRenderByteArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_BytesProperty");
+            .ShouldBe("_BytesProperty");
     }
 
     [Fact]
@@ -79,8 +75,7 @@ public sealed class TemplateRendererRenderByteArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_BytesSpanStaticProperty");
+            .ShouldBe("_BytesSpanStaticProperty");
     }
 
     [Fact]
@@ -94,7 +89,6 @@ public sealed class TemplateRendererRenderByteArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_BytesSpanProperty");
+            .ShouldBe("_BytesSpanProperty");
     }
 }

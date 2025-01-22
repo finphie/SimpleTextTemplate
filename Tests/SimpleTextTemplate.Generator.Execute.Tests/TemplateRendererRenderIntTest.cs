@@ -1,7 +1,7 @@
 ﻿using System.Buffers;
 using System.Globalization;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
 
@@ -26,8 +26,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -52,8 +51,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -78,8 +76,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -104,8 +101,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -130,8 +126,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -156,8 +151,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -182,8 +176,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -208,8 +201,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -234,8 +226,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -260,8 +251,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -286,8 +276,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000
@@ -312,8 +301,7 @@ public sealed class TemplateRendererRenderIntTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             1234
             1,234.000
             1.234,000

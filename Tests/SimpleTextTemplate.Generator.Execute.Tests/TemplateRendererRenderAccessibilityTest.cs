@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
@@ -18,8 +18,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("InternalStaticField");
+            .ShouldBe("InternalStaticField");
     }
 
     [Fact]
@@ -33,8 +32,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("InternalField");
+            .ShouldBe("InternalField");
     }
 
     [Fact]
@@ -48,8 +46,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_ProtectedInternalStaticField");
+            .ShouldBe("_ProtectedInternalStaticField");
     }
 
     [Fact]
@@ -63,8 +60,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_ProtectedInternalField");
+            .ShouldBe("_ProtectedInternalField");
     }
 
     [Fact]
@@ -78,8 +74,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_InternalStaticProperty");
+            .ShouldBe("_InternalStaticProperty");
     }
 
     [Fact]
@@ -93,8 +88,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_InternalProperty");
+            .ShouldBe("_InternalProperty");
     }
 
     [Fact]
@@ -108,8 +102,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_ProtectedInternalStaticProperty");
+            .ShouldBe("_ProtectedInternalStaticProperty");
     }
 
     [Fact]
@@ -123,7 +116,6 @@ public sealed class TemplateRendererRenderAccessibilityTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_ProtectedInternalProperty");
+            .ShouldBe("_ProtectedInternalProperty");
     }
 }
