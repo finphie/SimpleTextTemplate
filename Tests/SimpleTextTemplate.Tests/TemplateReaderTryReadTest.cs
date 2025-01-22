@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 using static SimpleTextTemplate.BlockType;
 
@@ -48,10 +48,10 @@ public sealed class TemplateReaderTryReadTest
     {
         var reader = new TemplateReader([]);
 
-        reader.TryRead(out var value).Should().Be(End);
-        reader.Consumed.Should().Be(0);
+        reader.TryRead(out var value).ShouldBe(End);
+        reader.Consumed.ShouldBe((nuint)0);
 
-        value.ToArray().Should().BeEmpty();
+        value.ToArray().ShouldBeEmpty();
     }
 
     [Theory]
@@ -63,10 +63,10 @@ public sealed class TemplateReaderTryReadTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryRead(out var value).Should().Be(None);
-        reader.Consumed.Should().Be((nuint)consumed);
+        reader.TryRead(out var value).ShouldBe(None);
+        reader.Consumed.ShouldBe((nuint)consumed);
 
-        value.ToArray().Should().BeEmpty();
+        value.ToArray().ShouldBeEmpty();
     }
 
     static void Execute(ReadOnlySpan<byte> buffer, params (BlockType Type, string ExpectedValue, nuint Consumed)[] blocks)
@@ -75,12 +75,11 @@ public sealed class TemplateReaderTryReadTest
 
         foreach (var (type, expectedValue, consumed) in blocks)
         {
-            reader.TryRead(out var value).Should().Be(type);
-            reader.Consumed.Should().Be(consumed);
+            reader.TryRead(out var value).ShouldBe(type);
+            reader.Consumed.ShouldBe(consumed);
 
-            value.ToArray()
-                .Should()
-                .Equal(Encoding.UTF8.GetBytes(expectedValue));
+            Encoding.UTF8.GetString(value)
+                .ShouldBe(expectedValue);
         }
     }
 }
