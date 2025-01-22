@@ -1,8 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Text;
-using FluentAssertions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 
 namespace SimpleTextTemplate.Generator.Tests;
@@ -53,7 +52,7 @@ static class GeneratorRunner
         var compilation = _baseCompilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(source, options));
         driver.RunGeneratorsAndUpdateCompilation(compilation, out var outputCompilation, out var diagnostics);
 
-        compilation.GetDiagnostics().Should().BeEmpty();
+        compilation.GetDiagnostics().ShouldBeEmpty();
 
         return new(outputCompilation, diagnostics);
     }
