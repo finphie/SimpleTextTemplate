@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
 
@@ -20,8 +20,7 @@ public sealed class TemplateRendererRenderNullTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -36,8 +35,7 @@ public sealed class TemplateRendererRenderNullTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -52,8 +50,7 @@ public sealed class TemplateRendererRenderNullTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -68,8 +65,7 @@ public sealed class TemplateRendererRenderNullTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -84,8 +80,7 @@ public sealed class TemplateRendererRenderNullTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .BeEmpty();
+            .ShouldBeEmpty();
     }
 
     [Fact]
@@ -100,7 +95,6 @@ public sealed class TemplateRendererRenderNullTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .BeEmpty();
+            .ShouldBeEmpty();
     }
 }
