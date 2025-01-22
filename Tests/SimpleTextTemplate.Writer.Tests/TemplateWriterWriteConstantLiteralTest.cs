@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Writer.Tests;
@@ -27,9 +27,8 @@ public sealed class TemplateWriterWriteConstantLiteralTest
         writer.WriteConstantLiteral(utf8Value);
         writer.Flush();
 
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal(utf8Value);
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe(value);
     }
 
     [Theory]
@@ -60,7 +59,7 @@ public sealed class TemplateWriterWriteConstantLiteralTest
         writer.Flush();
 
         var array = bufferWriter.WrittenSpan.ToArray();
-        array.Should().OnlyContain(static x => x == (byte)'a');
-        array.Should().HaveCount(value.Length * count);
+        array.ShouldAllBe(static x => x == (byte)'a');
+        array.Length.ShouldBe(value.Length * count);
     }
 }

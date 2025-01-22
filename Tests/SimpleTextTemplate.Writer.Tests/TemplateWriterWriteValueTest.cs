@@ -1,7 +1,7 @@
 ﻿using System.Buffers;
 using System.Globalization;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Writer.Tests;
@@ -20,9 +20,8 @@ public sealed class TemplateWriterWriteValueTest
         writer.WriteValue(Value, "N3", CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("12341,234.0001.234,000"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("12341,234.0001.234,000");
     }
 
     [Fact]
@@ -37,9 +36,8 @@ public sealed class TemplateWriterWriteValueTest
         writer.WriteValue(Value, "F3", CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("1234.5671234.571234,567"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("1234.5671234.571234,567");
     }
 
     [Fact]
@@ -75,8 +73,8 @@ public sealed class TemplateWriterWriteValueTest
         writer.Flush();
 
         var array = bufferWriter.WrittenSpan.ToArray();
-        array.Should().OnlyContain(static x => x == (byte)'1');
-        array.Should().HaveCount(20 * count);
+        array.ShouldAllBe(static x => x == (byte)'1');
+        array.Length.ShouldBe(20 * count);
     }
 
     [Fact]

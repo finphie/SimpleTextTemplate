@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
-using FluentAssertions;
+using System.Text;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Writer.Tests;
@@ -26,9 +27,8 @@ public sealed class TemplateWriterWriteEnumTest
         writer.WriteEnum(Value);
         writer.Flush();
 
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("A"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("A");
     }
 
     [Fact]
@@ -41,9 +41,8 @@ public sealed class TemplateWriterWriteEnumTest
         writer.WriteEnum(Value, "D");
         writer.Flush();
 
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("0"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("0");
     }
 
     [Fact]
@@ -62,8 +61,8 @@ public sealed class TemplateWriterWriteEnumTest
 
         writer.Flush();
 
-        var array = bufferWriter.WrittenSpan.ToArray();
-        array.Should().OnlyContain(static x => x == (byte)'A');
-        array.Should().HaveCount(30 * count);
+        var array = Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
+        array.ShouldAllBe(static x => x == (byte)'A');
+        array.Length.ShouldBe(30 * count);
     }
 }
