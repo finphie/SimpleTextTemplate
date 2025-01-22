@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 using static SimpleTextTemplate.BlockType;
 
@@ -48,10 +48,10 @@ public sealed class TemplateReaderReadTest
     {
         var reader = new TemplateReader([]);
 
-        reader.Read(out var value).Should().Be(End);
-        reader.Consumed.Should().Be(0);
+        reader.Read(out var value).ShouldBe(End);
+        reader.Consumed.ShouldBe((nuint)0);
 
-        value.ToArray().Should().BeEmpty();
+        value.ToArray().ShouldBeEmpty();
     }
 
     [Theory]
@@ -60,19 +60,12 @@ public sealed class TemplateReaderReadTest
     [InlineData("{{ }", 3)]
     public void 識別子終了タグなし_TemplateException(string input, int position)
     {
-        // nuint型とint型との比較の際、例外が発生する。
-        // そのため、int型をあらかじめUIntPtr型でキャストしておく。
-        var positionPtr = (UIntPtr)position;
-
-        var utf8Input = Encoding.UTF8.GetBytes(input);
-        utf8Input.Invoking(static array =>
+        var exception = Should.Throw<TemplateException>(() =>
         {
-            var reader = new TemplateReader(array);
+            var reader = new TemplateReader(Encoding.UTF8.GetBytes(input));
             reader.Read(out _);
-        })
-            .Should()
-            .Throw<TemplateException>()
-            .Where(x => x.Position == positionPtr);
+        });
+        exception.Position.ShouldBe((nuint)position);
     }
 
     static void Execute(ReadOnlySpan<byte> buffer, params (BlockType Type, string ExpectedValue, nuint Consumed)[] blocks)
@@ -81,12 +74,11 @@ public sealed class TemplateReaderReadTest
 
         foreach (var (type, expectedValue, consumed) in blocks)
         {
-            reader.Read(out var value).Should().Be(type);
-            reader.Consumed.Should().Be(consumed);
+            reader.Read(out var value).ShouldBe(type);
+            reader.Consumed.ShouldBe(consumed);
 
-            value.ToArray()
-                .Should()
-                .Equal(Encoding.UTF8.GetBytes(expectedValue));
+            Encoding.UTF8.GetString(value)
+                .ShouldBe(expectedValue);
         }
     }
 }
