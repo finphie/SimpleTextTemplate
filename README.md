@@ -178,12 +178,8 @@ MIT
 
 ### テスト
 
-- [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
-- [Microsoft.NET.Test.Sdk](https://github.com/microsoft/vstest)
-- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
-- [NuGet.Frameworks](https://github.com/NuGet/NuGet.Client)
-- [xunit](https://github.com/xunit/xunit)
-- [xunit.runner.visualstudio](https://github.com/xunit/visualstudio.xunit)
+- [Shouldly](https://github.com/shouldly/shouldly)
+- [xunit.v3](https://github.com/xunit/xunit)
 
 ### アナライザー
 
@@ -210,5 +206,4 @@ MIT
 
 ### その他
 
-- [Microsoft.SourceLink.GitHub](https://github.com/dotnet/sourcelink)
 - [PolySharp](https://github.com/Sergio0694/PolySharp)
