@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Tests;
@@ -18,9 +18,9 @@ public sealed class TemplateIdentifierReaderReadTest
 
         reader.Read(out var value, out var format, out var culture);
 
-        value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.Should().BeNull();
-        culture.Should().BeNull();
+        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
+        format.ShouldBeNull();
+        culture.ShouldBeNull();
     }
 
     [Theory]
@@ -36,9 +36,9 @@ public sealed class TemplateIdentifierReaderReadTest
 
         reader.Read(out var value, out var format, out var culture);
 
-        value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.Should().Be(expectedFormat);
-        culture.Should().BeNull();
+        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
+        format.ShouldBe(expectedFormat);
+        culture.ShouldBeNull();
     }
 
     [Theory]
@@ -55,9 +55,9 @@ public sealed class TemplateIdentifierReaderReadTest
 
         reader.Read(out var value, out var format, out var culture);
 
-        value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.Should().BeNull();
-        culture.Should().Be(expectedCulture);
+        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
+        format.ShouldBeNull();
+        culture.ShouldBe(expectedCulture);
     }
 
     [Theory]
@@ -73,20 +73,18 @@ public sealed class TemplateIdentifierReaderReadTest
 
         reader.Read(out var value, out var format, out var culture);
 
-        value.ToArray().Should().Equal(Encoding.UTF8.GetBytes(expectedIdentifier));
-        format.Should().Be(expectedFormat);
-        culture.Should().Be(expectedCulture);
+        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
+        format.ShouldBe(expectedFormat);
+        culture.ShouldBe(expectedCulture);
     }
 
     [Fact]
     public void バイト列先頭がコロン_TemplateException()
     {
-        FluentActions.Invoking(() =>
+        Should.Throw<TemplateException>(() =>
         {
             var reader = new TemplateIdentifierReader(":A"u8);
             reader.Read(out _, out _, out _);
-        })
-            .Should()
-            .Throw<TemplateException>();
+        });
     }
 }
