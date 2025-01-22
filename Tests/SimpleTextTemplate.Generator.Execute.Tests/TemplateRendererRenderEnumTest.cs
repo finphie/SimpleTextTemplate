@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
 
@@ -23,8 +23,7 @@ public sealed class TemplateRendererRenderEnumTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             A
             0
             """);
@@ -45,8 +44,7 @@ public sealed class TemplateRendererRenderEnumTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             A
             0
             """);
@@ -67,8 +65,7 @@ public sealed class TemplateRendererRenderEnumTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             A
             0
             """);
@@ -89,8 +86,7 @@ public sealed class TemplateRendererRenderEnumTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             A
             0
             """);

@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
 
@@ -19,8 +19,7 @@ public sealed class TemplateRendererRenderStringTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_StringConstantField");
+            .ShouldBe("_StringConstantField");
     }
 
     [Fact]
@@ -34,8 +33,7 @@ public sealed class TemplateRendererRenderStringTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_StringStaticField");
+            .ShouldBe("_StringStaticField");
     }
 
     [Fact]
@@ -49,8 +47,7 @@ public sealed class TemplateRendererRenderStringTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_StringField");
+            .ShouldBe("_StringField");
     }
 
     [Fact]
@@ -64,8 +61,7 @@ public sealed class TemplateRendererRenderStringTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_StringStaticProperty");
+            .ShouldBe("_StringStaticProperty");
     }
 
     [Fact]
@@ -79,7 +75,6 @@ public sealed class TemplateRendererRenderStringTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_StringProperty");
+            .ShouldBe("_StringProperty");
     }
 }

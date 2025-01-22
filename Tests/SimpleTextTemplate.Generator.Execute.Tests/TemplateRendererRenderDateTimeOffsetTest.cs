@@ -1,7 +1,7 @@
 ﻿using System.Buffers;
 using System.Globalization;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
 
@@ -27,8 +27,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             01/01/2000 00:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -54,8 +53,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             01/01/2000 00:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -81,8 +79,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             2000/01/01 0:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -108,8 +105,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             01/01/2000 00:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -134,8 +130,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             01/01/2000 00:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -160,8 +155,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             2000/01/01 0:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -186,8 +180,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             01/01/2000 00:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -212,8 +205,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             01/01/2000 00:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -238,8 +230,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             2000/01/01 0:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -264,8 +255,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             01/01/2000 00:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -290,8 +280,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             01/01/2000 00:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日
@@ -316,8 +305,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("""
+            .ShouldBe("""
             2000/01/01 0:00:00 +09:00
             2000-01-01T00:00:00.0000000+09:00
             2000年1月1日土曜日

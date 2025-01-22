@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 using Xunit;
 
@@ -19,8 +19,7 @@ public sealed class TemplateRendererRenderCharArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_CharsStaticField");
+            .ShouldBe("_CharsStaticField");
     }
 
     [Fact]
@@ -34,8 +33,7 @@ public sealed class TemplateRendererRenderCharArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_CharsField");
+            .ShouldBe("_CharsField");
     }
 
     [Fact]
@@ -49,8 +47,7 @@ public sealed class TemplateRendererRenderCharArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_CharsStaticProperty");
+            .ShouldBe("_CharsStaticProperty");
     }
 
     [Fact]
@@ -64,8 +61,7 @@ public sealed class TemplateRendererRenderCharArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_CharsProperty");
+            .ShouldBe("_CharsProperty");
     }
 
     [Fact]
@@ -79,8 +75,7 @@ public sealed class TemplateRendererRenderCharArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_CharsSpanStaticProperty");
+            .ShouldBe("_CharsSpanStaticProperty");
     }
 
     [Fact]
@@ -94,7 +89,6 @@ public sealed class TemplateRendererRenderCharArrayTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("_CharsSpanProperty");
+            .ShouldBe("_CharsSpanProperty");
     }
 }
