@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Tests;
@@ -22,12 +22,11 @@ public sealed class TemplateReaderTryReadIdentifierTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryReadIdentifier(out var value).Should().BeTrue();
-        reader.Consumed.Should().Be((nuint)consumed);
+        reader.TryReadIdentifier(out var value).ShouldBeTrue();
+        reader.Consumed.ShouldBe((nuint)consumed);
 
-        value.ToArray()
-            .Should()
-            .Equal(Encoding.UTF8.GetBytes(identifier));
+        Encoding.UTF8.GetString(value)
+            .ShouldBe(identifier);
     }
 
     [Theory]
@@ -50,9 +49,9 @@ public sealed class TemplateReaderTryReadIdentifierTest
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryReadIdentifier(out var value).Should().BeFalse();
-        reader.Consumed.Should().Be((nuint)consumed);
+        reader.TryReadIdentifier(out var value).ShouldBeFalse();
+        reader.Consumed.ShouldBe((nuint)consumed);
 
-        value.ToArray().Should().BeEmpty();
+        value.ToArray().ShouldBeEmpty();
     }
 }
