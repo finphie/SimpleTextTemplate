@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Tests;
@@ -52,8 +52,8 @@ public sealed class TemplateTryParseTest
     [InlineData("{{ }", 3)]
     public void 識別子終了タグなし_falseを返す(string input, int expectedConsumed)
     {
-        Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).Should().BeFalse();
-        ((int)consumed).Should().Be(expectedConsumed);
+        Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).ShouldBeFalse();
+        consumed.ShouldBe((nuint)expectedConsumed);
     }
 
     [Theory]
@@ -61,21 +61,21 @@ public sealed class TemplateTryParseTest
     [InlineData("{{ :: }}")]
     public void 識別子が空_falseを返す(string input)
     {
-        Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).Should().BeFalse();
-        ((int)consumed).Should().Be(input.Length);
+        Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).ShouldBeFalse();
+        consumed.ShouldBe((nuint)input.Length);
     }
 
     [Fact]
     public void 無効なカルチャー_falseを返す()
     {
         var input = "{{ A::B }}"u8;
-        Template.TryParse(input, out _, out var consumed).Should().BeFalse();
-        ((int)consumed).Should().Be(input.Length);
+        Template.TryParse(input, out _, out var consumed).ShouldBeFalse();
+        consumed.ShouldBe((nuint)input.Length);
     }
 
     static void Execute(string input)
     {
-        Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).Should().BeTrue();
-        ((int)consumed).Should().Be(input.Length);
+        Template.TryParse(Encoding.UTF8.GetBytes(input), out _, out var consumed).ShouldBeTrue();
+        consumed.ShouldBe((nuint)input.Length);
     }
 }
