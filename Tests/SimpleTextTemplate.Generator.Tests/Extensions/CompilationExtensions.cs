@@ -42,9 +42,9 @@ static class CompilationExtensions
                             arguments.Length > 2 ? arguments[2] : null);
                     });
 
-                return new InterceptInfo(statements.ToArray());
+                return new InterceptInfo([.. statements]);
             });
 
-        return blocks.ToArray();
+        return [.. blocks];
     }
 }
