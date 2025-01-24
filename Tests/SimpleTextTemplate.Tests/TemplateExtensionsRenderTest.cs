@@ -1,6 +1,7 @@
 ﻿#if NET9_0_OR_GREATER
 using System.Buffers;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using Shouldly;
 using SimpleTextTemplate.Contexts;
@@ -173,7 +174,15 @@ public sealed class TemplateExtensionsRenderTest
         Execute("{{ A: }}"u8, value, "01/01/2000 00:00:00 +09:00");
         Execute("{{ A:: }}"u8, value, "01/01/2000 00:00:00 +09:00");
         Execute("{{ A:d }}"u8, value, "01/01/2000");
-        Execute("{{ A:D:ja-JP }}"u8, value, "2000年1月1日土曜日", CultureInfo.GetCultureInfo("en-US", true));
+
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Execute("{{ A:D:ja-JP }}"u8, value, "2000年1月1日土曜日", CultureInfo.GetCultureInfo("en-US", true));
+        }
+        else
+        {
+            Execute("{{ A:D:ja-JP }}"u8, value, "2000年1月1日 土曜日", CultureInfo.GetCultureInfo("en-US", true));
+        }
     }
 
     static void Execute<T>(ReadOnlySpan<byte> source, T value, string expectedValue, CultureInfo? provider = null)

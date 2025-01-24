@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
@@ -26,13 +27,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000 /01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000 /01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -52,13 +66,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000 /01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -78,13 +105,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            2000/01/01 0:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                2000/01/01 0:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                2000/01/01 0:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -104,13 +144,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -129,13 +182,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -154,13 +220,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            2000/01/01 0:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                2000/01/01 0:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                2000/01/01 0:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -179,13 +258,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -204,13 +296,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -229,13 +334,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            2000/01/01 0:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                2000/01/01 0:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                2000/01/01 0:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -254,13 +372,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -279,13 +410,26 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            01/01/2000 00:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                01/01/2000 00:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 
     [Fact]
@@ -304,12 +448,25 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            2000/01/01 0:00:00 +09:00
-            2000-01-01T00:00:00.0000000+09:00
-            2000年1月1日土曜日
-            2000/01/01 0:00:00 +09:00
-            """);
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                2000/01/01 0:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("""
+                2000/01/01 0:00:00 +09:00
+                2000-01-01T00:00:00.0000000+09:00
+                2000年1月1日 土曜日
+                2000/01/01 0:00:00 +09:00
+                """);
+        }
     }
 }

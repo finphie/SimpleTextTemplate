@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
 using Shouldly;
 using Xunit;
@@ -52,8 +53,16 @@ public sealed class TemplateWriterWriteValueTest
         writer.WriteValue(value, "D", CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日土曜日");
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日土曜日");
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日 土曜日");
+        }
     }
 
     [Fact]
