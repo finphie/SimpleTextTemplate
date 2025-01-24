@@ -34,7 +34,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
                 01/01/2000 00:00:00 +09:00
                 2000-01-01T00:00:00.0000000+09:00
                 2000年1月1日土曜日
-                2000 /01/01 0:00:00 +09:00
+                2000/01/01 0:00:00 +09:00
                 """);
         }
         else
@@ -44,7 +44,7 @@ public sealed class TemplateRendererRenderDateTimeOffsetTest
                 01/01/2000 00:00:00 +09:00
                 2000-01-01T00:00:00.0000000+09:00
                 2000年1月1日 土曜日
-                2000 /01/01 0:00:00 +09:00
+                2000/01/01 0:00:00 +09:00
                 """);
         }
     }
