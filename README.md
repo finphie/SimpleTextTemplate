@@ -13,6 +13,9 @@ SimpleTextTemplateは、変数の埋め込みのみに対応したテキスト�
 - `{{`と`}}`内の先頭と末尾の空白（U+0020）は無視されます。
 - `{{`と`}}`で囲まれた範囲以外の文字は、そのまま出力されます。
 
+> [!Important]
+> 一部のカルチャーではOSによって定数展開が変わります。
+
 ## インストール
 
 ### NuGet（正式リリース版）
@@ -178,12 +181,8 @@ MIT
 
 ### テスト
 
-- [FluentAssertions](https://github.com/fluentassertions/fluentassertions)
-- [Microsoft.NET.Test.Sdk](https://github.com/microsoft/vstest)
-- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
-- [NuGet.Frameworks](https://github.com/NuGet/NuGet.Client)
-- [xunit](https://github.com/xunit/xunit)
-- [xunit.runner.visualstudio](https://github.com/xunit/visualstudio.xunit)
+- [Shouldly](https://github.com/shouldly/shouldly)
+- [xunit.v3](https://github.com/xunit/xunit)
 
 ### アナライザー
 
@@ -210,5 +209,4 @@ MIT
 
 ### その他
 
-- [Microsoft.SourceLink.GitHub](https://github.com/dotnet/sourcelink)
 - [PolySharp](https://github.com/Sergio0694/PolySharp)

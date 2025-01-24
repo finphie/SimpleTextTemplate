@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+﻿using Shouldly;
 using SimpleTextTemplate.Generator.Tests.Core;
 using SimpleTextTemplate.Generator.Tests.Extensions;
 using Xunit;
@@ -16,7 +16,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
         const string SourceCode = """
             using System.Buffers;
             using SimpleTextTemplate;
-            
+
             var bufferWriter = new ArrayBufferWriter<byte>();
             var writer = TemplateWriter.Create(bufferWriter);
             var x = "a";
@@ -24,11 +24,11 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             """;
         var (_, diagnostics) = Run(SourceCode);
 
-        diagnostics.Should().HaveCount(1);
+        diagnostics.Count.ShouldBe(1);
 
-        diagnostics[0].Id.Should().Be("STT1000");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("x");
+        diagnostics[0].Id.ShouldBe("STT1000");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("x");
     }
 
     [Fact]
@@ -37,11 +37,11 @@ public sealed class TemplateWriterWriteDiagnosticsTest
         var sourceCode = Get(templateText: null);
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(1);
+        diagnostics.Count.ShouldBe(1);
 
-        diagnostics[0].Id.Should().Be("STT1000");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("null");
+        diagnostics[0].Id.ShouldBe("STT1000");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("null");
     }
 
     [Fact]
@@ -50,18 +50,18 @@ public sealed class TemplateWriterWriteDiagnosticsTest
         const string SourceCode = """
             using System.Buffers;
             using SimpleTextTemplate;
-            
+
             var bufferWriter = new ArrayBufferWriter<byte>();
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ x }}");
             """;
         var (_, diagnostics) = Run(SourceCode);
 
-        diagnostics.Should().HaveCount(1);
+        diagnostics.Count.ShouldBe(1);
 
-        diagnostics[0].Id.Should().Be("STT1001");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("TemplateRenderer.Render(ref writer, \"{{ x }}\")");
+        diagnostics[0].Id.ShouldBe("STT1001");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("TemplateRenderer.Render(ref writer, \"{{ x }}\")");
     }
 
     [Fact]
@@ -70,11 +70,11 @@ public sealed class TemplateWriterWriteDiagnosticsTest
         var sourceCode = Get("{{ A }}", nameof(ByteArrayContextTestData));
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(1);
+        diagnostics.Count.ShouldBe(1);
 
-        diagnostics[0].Id.Should().Be("STT1002");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("context");
+        diagnostics[0].Id.ShouldBe("STT1002");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("context");
     }
 
     [Fact]
@@ -83,15 +83,15 @@ public sealed class TemplateWriterWriteDiagnosticsTest
         var sourceCode = Get("{{ A }}{{ B }}", nameof(ByteArrayContextTestData));
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(2);
+        diagnostics.Count.ShouldBe(2);
 
-        diagnostics[0].Id.Should().Be("STT1002");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("context");
+        diagnostics[0].Id.ShouldBe("STT1002");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("context");
 
-        diagnostics[1].Id.Should().Be("STT1002");
-        diagnostics[1].Severity.Should().Be(Error);
-        diagnostics[1].GetText().Should().Be("context");
+        diagnostics[1].Id.ShouldBe("STT1002");
+        diagnostics[1].Severity.ShouldBe(Error);
+        diagnostics[1].GetText().ShouldBe("context");
     }
 
     [Fact]
@@ -100,11 +100,11 @@ public sealed class TemplateWriterWriteDiagnosticsTest
         var sourceCode = Get("{{");
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(1);
+        diagnostics.Count.ShouldBe(1);
 
-        diagnostics[0].Id.Should().Be("STT1003");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("\"{{\"");
+        diagnostics[0].Id.ShouldBe("STT1003");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("\"{{\"");
     }
 
     [Fact]
@@ -113,11 +113,11 @@ public sealed class TemplateWriterWriteDiagnosticsTest
         var sourceCode = Get("{{}}");
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(1);
+        diagnostics.Count.ShouldBe(1);
 
-        diagnostics[0].Id.Should().Be("STT1003");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("\"{{}}\"");
+        diagnostics[0].Id.ShouldBe("STT1003");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("\"{{}}\"");
     }
 
     [Fact]
@@ -126,11 +126,11 @@ public sealed class TemplateWriterWriteDiagnosticsTest
         var sourceCode = Get("{{ }}");
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(1);
+        diagnostics.Count.ShouldBe(1);
 
-        diagnostics[0].Id.Should().Be("STT1003");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("\"{{ }}\"");
+        diagnostics[0].Id.ShouldBe("STT1003");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("\"{{ }}\"");
     }
 
     [Fact]
@@ -145,19 +145,19 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             nameof(StringContextTestData));
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(3);
+        diagnostics.Count.ShouldBe(3);
 
-        diagnostics[0].Id.Should().Be("STT1004");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("\"{{ StringConstantField:A }}\"");
+        diagnostics[0].Id.ShouldBe("STT1004");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("\"{{ StringConstantField:A }}\"");
 
-        diagnostics[1].Id.Should().Be("STT1004");
-        diagnostics[1].Severity.Should().Be(Error);
-        diagnostics[1].GetText().Should().Be("\"{{ StringConstantField::ja-JP }}\"");
+        diagnostics[1].Id.ShouldBe("STT1004");
+        diagnostics[1].Severity.ShouldBe(Error);
+        diagnostics[1].GetText().ShouldBe("\"{{ StringConstantField::ja-JP }}\"");
 
-        diagnostics[2].Id.Should().Be("STT1004");
-        diagnostics[2].Severity.Should().Be(Error);
-        diagnostics[2].GetText().Should().Be("\"{{ StringConstantField:A:ja-JP }}\"");
+        diagnostics[2].Id.ShouldBe("STT1004");
+        diagnostics[2].Severity.ShouldBe(Error);
+        diagnostics[2].GetText().ShouldBe("\"{{ StringConstantField:A:ja-JP }}\"");
     }
 
     [Fact]
@@ -171,15 +171,15 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             nameof(EnumContextTestData));
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(2);
+        diagnostics.Count.ShouldBe(2);
 
-        diagnostics[0].Id.Should().Be("STT1005");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("\"{{ EnumStaticField::ja-JP }}\"");
+        diagnostics[0].Id.ShouldBe("STT1005");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("\"{{ EnumStaticField::ja-JP }}\"");
 
-        diagnostics[1].Id.Should().Be("STT1005");
-        diagnostics[1].Severity.Should().Be(Error);
-        diagnostics[1].GetText().Should().Be("\"{{ EnumStaticField:A:ja-JP }}\"");
+        diagnostics[1].Id.ShouldBe("STT1005");
+        diagnostics[1].Severity.ShouldBe(Error);
+        diagnostics[1].GetText().ShouldBe("\"{{ EnumStaticField:A:ja-JP }}\"");
     }
 
     [Fact]
@@ -194,18 +194,18 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             nameof(ByteArrayContextTestData));
         var (_, diagnostics) = Run(sourceCode);
 
-        diagnostics.Should().HaveCount(3);
+        diagnostics.Count.ShouldBe(3);
 
-        diagnostics[0].Id.Should().Be("STT1006");
-        diagnostics[0].Severity.Should().Be(Error);
-        diagnostics[0].GetText().Should().Be("\"{{ BytesStaticField:A }}\"");
+        diagnostics[0].Id.ShouldBe("STT1006");
+        diagnostics[0].Severity.ShouldBe(Error);
+        diagnostics[0].GetText().ShouldBe("\"{{ BytesStaticField:A }}\"");
 
-        diagnostics[1].Id.Should().Be("STT1006");
-        diagnostics[1].Severity.Should().Be(Error);
-        diagnostics[1].GetText().Should().Be("\"{{ BytesStaticField::ja-JP }}\"");
+        diagnostics[1].Id.ShouldBe("STT1006");
+        diagnostics[1].Severity.ShouldBe(Error);
+        diagnostics[1].GetText().ShouldBe("\"{{ BytesStaticField::ja-JP }}\"");
 
-        diagnostics[2].Id.Should().Be("STT1006");
-        diagnostics[2].Severity.Should().Be(Error);
-        diagnostics[2].GetText().Should().Be("\"{{ BytesStaticField:A:ja-JP }}\"");
+        diagnostics[2].Id.ShouldBe("STT1006");
+        diagnostics[2].Severity.ShouldBe(Error);
+        diagnostics[2].GetText().ShouldBe("\"{{ BytesStaticField:A:ja-JP }}\"");
     }
 }

@@ -1,7 +1,8 @@
 ﻿using System.Buffers;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using System.Text;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace SimpleTextTemplate.Writer.Tests;
@@ -20,9 +21,8 @@ public sealed class TemplateWriterWriteValueTest
         writer.WriteValue(Value, "N3", CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("12341,234.0001.234,000"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("12341,234.0001.234,000");
     }
 
     [Fact]
@@ -37,9 +37,8 @@ public sealed class TemplateWriterWriteValueTest
         writer.WriteValue(Value, "F3", CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        bufferWriter.WrittenSpan.ToArray()
-            .Should()
-            .Equal("1234.5671234.571234,567"u8.ToArray());
+        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+            .ShouldBe("1234.5671234.571234,567");
     }
 
     [Fact]
@@ -54,9 +53,16 @@ public sealed class TemplateWriterWriteValueTest
         writer.WriteValue(value, "D", CultureInfo.GetCultureInfo("ja-JP", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日土曜日");
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日土曜日");
+        }
+        else
+        {
+            Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
+                .ShouldBe("01/01/2000 00:00:00 +09:0001/01/20002000年1月1日 土曜日");
+        }
     }
 
     [Fact]
@@ -76,8 +82,8 @@ public sealed class TemplateWriterWriteValueTest
         writer.Flush();
 
         var array = bufferWriter.WrittenSpan.ToArray();
-        array.Should().OnlyContain(static x => x == (byte)'1');
-        array.Should().HaveCount(20 * count);
+        array.ShouldAllBe(static x => x == (byte)'1');
+        array.Length.ShouldBe(20 * count);
     }
 
     [Fact]
@@ -97,8 +103,7 @@ public sealed class TemplateWriterWriteValueTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
+            .ShouldBe(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
     }
 
     [Fact]
@@ -118,8 +123,7 @@ public sealed class TemplateWriterWriteValueTest
         writer.Flush();
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .Should()
-            .Be(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
+            .ShouldBe(string.Concat(Enumerable.Repeat(value.ToString(null, CultureInfo.InvariantCulture), 20)));
     }
 
     sealed record FormattableRecord(DateTimeOffset Value) : IFormattable
