@@ -105,16 +105,14 @@ using System;
 using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
-using SimpleTextTemplate.Contexts;
-using Utf8Utility;
 
-var symbols = new Utf8ArrayDictionary<Utf8Array>();
-symbols.TryAdd((Utf8Array)"Identifier"u8.ToArray(), "Hello, World!"u8.ToArray());
+var symbols = Context.Create();
+symbols.Add("Identifier"u8.ToArray(), "Hello, World!"u8.ToArray());
 
 using var bufferWriter = new ArrayPoolBufferWriter<byte>();
 var source = "{{ Identifier }}"u8.ToArray();
 var template = Template.Parse(source);
-template.Render(bufferWriter, Context.Create(symbols));
+template.Render(bufferWriter, symbols);
 
 // Hello, World!
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
@@ -177,7 +175,6 @@ MIT
 
 - [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet)
 - [Microsoft.CodeAnalysis.CSharp](https://github.com/dotnet/roslyn)
-- [Utf8Utility](https://github.com/finphie/Utf8Utility)
 
 ### テスト
 

@@ -26,4 +26,13 @@ static class ThrowHelper
     [DoesNotReturn]
     public static void ThrowInvalidIdentifierException()
         => throw new TemplateException("invalid identifier");
+
+    /// <summary>
+    /// Compareが無効場合に例外をスローします。
+    /// </summary>
+    /// <exception cref="InvalidOperationException">常にこの例外をスローします。</exception>
+    [DebuggerHidden]
+    [DoesNotReturn]
+    public static void ThrowInvalidCompareException()
+        => throw new InvalidOperationException("The comparer is not IAlternateEqualityComparer<ReadOnlySpan<byte>, byte[]>.");
 }

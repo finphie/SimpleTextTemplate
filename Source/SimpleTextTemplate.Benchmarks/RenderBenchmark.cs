@@ -2,8 +2,6 @@
 using System.Text;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
-using SimpleTextTemplate.Contexts;
-using Utf8Utility;
 
 namespace SimpleTextTemplate.Benchmarks;
 
@@ -25,7 +23,7 @@ public partial class RenderBenchmark
     CompositeFormat _compositeFormat;
 
     SampleContext _generatorContext;
-    IContext _context;
+    Dictionary<byte[], object> _context;
     Dictionary<string, object> _scribanContext;
 
     [GlobalSetup]
@@ -37,11 +35,9 @@ public partial class RenderBenchmark
 
         _generatorContext = new("_StringValue", 567890);
 
-        var utf8Dict = new Utf8ArrayDictionary<object>();
-        utf8Dict.TryAdd(new("StringValue"), _generatorContext.StringValue);
-        utf8Dict.TryAdd(new("IntValue"), _generatorContext.IntValue);
-
-        _context = Context.Create(utf8Dict);
+        _context = Context.Create();
+        _context.Add("StringValue"u8.ToArray(), _generatorContext.StringValue);
+        _context.Add("IntValue"u8.ToArray(), _generatorContext.IntValue);
 
         _scribanContext = new()
         {
