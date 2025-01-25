@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using SimpleTextTemplate.Helpers;
 #endif
 
 using Block = (SimpleTextTemplate.BlockType Type, byte[] Value, string? Format, System.IFormatProvider? Culture);
@@ -141,21 +142,25 @@ public readonly struct Template
         return new([.. list]);
     }
 
-#if NET8_0_OR_GREATER
+#if NET9_0_OR_GREATER
     /// <summary>
     /// テンプレートをレンダリングして、バッファーライターに書き込みます。
     /// </summary>
     /// <typeparam name="TWriter">バッファーライターの型</typeparam>
-    /// <typeparam name="TContext">コンテキストの型</typeparam>
     /// <param name="bufferWriter">バッファーライター</param>
     /// <param name="context">コンテキスト</param>
     /// <param name="provider">カルチャー指定</param>
-    public readonly void Render<TWriter, TContext>(TWriter bufferWriter, TContext context, IFormatProvider? provider = null)
+    public readonly void Render<TWriter>(TWriter bufferWriter, Dictionary<byte[], object> context, IFormatProvider? provider = null)
         where TWriter : notnull, IBufferWriter<byte>, allows ref struct
-        where TContext : notnull, IContext, allows ref struct
     {
+        if (context.Comparer is not IAlternateEqualityComparer<ReadOnlySpan<byte>, byte[]>)
+        {
+            ThrowHelper.ThrowInvalidCompareException();
+        }
+
         provider ??= CultureInfo.InvariantCulture;
         var writer = TemplateWriter.Create(bufferWriter);
+        var lookup = context.GetAlternateLookup<ReadOnlySpan<byte>>();
 
         foreach (var (type, stringOrIdentifier, format, culture) in Blocks)
         {
@@ -168,7 +173,7 @@ public readonly struct Template
                     writer.WriteLiteral(span);
                     break;
                 case BlockType.Identifier:
-                    context.TryGetValue(span, out var value);
+                    lookup.TryGetValue(span, out var value);
 
                     if (value is byte[] utf8Value)
                     {

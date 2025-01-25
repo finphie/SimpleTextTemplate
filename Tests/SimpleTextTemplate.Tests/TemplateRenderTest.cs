@@ -4,13 +4,11 @@ using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using Shouldly;
-using SimpleTextTemplate.Contexts;
-using Utf8Utility;
 using Xunit;
 
 namespace SimpleTextTemplate.Tests;
 
-public sealed class TemplateExtensionsRenderTest
+public sealed class TemplateRenderTest
 {
     [Theory]
     [InlineData("{{A}}")]
@@ -21,10 +19,10 @@ public sealed class TemplateExtensionsRenderTest
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
+        var dic = Context.Create();
+        dic.TryAdd("A"u8.ToArray(), "Test1"u8.ToArray());
 
-        template.Render(bufferWriter, Context.Create(dic));
+        template.Render(bufferWriter, dic);
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("Test1");
     }
@@ -37,13 +35,13 @@ public sealed class TemplateExtensionsRenderTest
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
-        dic.TryAdd(new("AAA"u8), "Test1"u8.ToArray());
-        dic.TryAdd(new("B"u8), "Test2"u8.ToArray());
-        dic.TryAdd(new("BBB"u8), "Test2"u8.ToArray());
+        var dic = Context.Create();
+        dic.TryAdd("A"u8.ToArray(), "Test1"u8.ToArray());
+        dic.TryAdd("AAA"u8.ToArray(), "Test1"u8.ToArray());
+        dic.TryAdd("B"u8.ToArray(), "Test2"u8.ToArray());
+        dic.TryAdd("BBB"u8.ToArray(), "Test2"u8.ToArray());
 
-        template.Render(bufferWriter, Context.Create(dic));
+        template.Render(bufferWriter, dic);
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("Test1Test2");
     }
@@ -56,10 +54,10 @@ public sealed class TemplateExtensionsRenderTest
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
+        var dic = Context.Create();
+        dic.TryAdd("A"u8.ToArray(), "Test1"u8.ToArray());
 
-        template.Render(bufferWriter, Context.Create(dic));
+        template.Render(bufferWriter, dic);
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("zTest1z");
     }
@@ -72,13 +70,13 @@ public sealed class TemplateExtensionsRenderTest
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
-        dic.TryAdd(new("AAA"u8), "Test1"u8.ToArray());
-        dic.TryAdd(new("B"u8), "Test2"u8.ToArray());
-        dic.TryAdd(new("BBB"u8), "Test2"u8.ToArray());
+        var dic = Context.Create();
+        dic.TryAdd("A"u8.ToArray(), "Test1"u8.ToArray());
+        dic.TryAdd("AAA"u8.ToArray(), "Test1"u8.ToArray());
+        dic.TryAdd("B"u8.ToArray(), "Test2"u8.ToArray());
+        dic.TryAdd("BBB"u8.ToArray(), "Test2"u8.ToArray());
 
-        template.Render(bufferWriter, Context.Create(dic));
+        template.Render(bufferWriter, dic);
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("Test1zTest2");
     }
@@ -90,23 +88,13 @@ public sealed class TemplateExtensionsRenderTest
         var template = Template.Parse(Encoding.UTF8.GetBytes(input));
 
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), "Test1"u8.ToArray());
-        dic.TryAdd(new("B"u8), "Test2"u8.ToArray());
+        var dic = Context.Create();
+        dic.TryAdd("A"u8.ToArray(), "Test1"u8.ToArray());
+        dic.TryAdd("B"u8.ToArray(), "Test2"u8.ToArray());
 
-        template.Render(bufferWriter, Context.Create(dic));
+        template.Render(bufferWriter, dic);
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("xTest1123Test2x");
-    }
-
-    [Fact]
-    public void Utf8Array_識別子を置換()
-    {
-        var value = new Utf8Array("abc"u8);
-
-        Execute("{{ A }}"u8, value, "abc");
-        Execute("{{ A: }}"u8, value, "abc");
-        Execute("{{ A:: }}"u8, value, "abc");
     }
 
     [Fact]
@@ -190,10 +178,10 @@ public sealed class TemplateExtensionsRenderTest
     {
         var template = Template.Parse(source);
         var bufferWriter = new ArrayBufferWriter<byte>();
-        var dic = new Utf8ArrayDictionary<object>();
-        dic.TryAdd(new("A"u8), value);
+        var dic = Context.Create();
+        dic.TryAdd("A"u8.ToArray(), value);
 
-        template.Render(bufferWriter, Context.Create(dic), provider);
+        template.Render(bufferWriter, dic, provider);
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe(expectedValue);
     }
