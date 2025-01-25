@@ -122,33 +122,33 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## ベンチマーク
 
-| Method                       | Categories      | Mean         | Error     | Ratio  | Gen0   | Gen1   | Allocated |
-|----------------------------- |---------------- |-------------:|----------:|-------:|-------:|-------:|----------:|
-| SimpleTextTemplate.Generator | Constant String |     13.31 ns |  0.179 ns |   1.00 | 0.0067 |      - |      56 B |
-| (Utf8.TryWrite)              | Constant String |     23.42 ns |  0.205 ns |   1.76 | 0.0067 |      - |      56 B |
-| (InterpolatedStringHandler)  | Constant String |     39.87 ns |  0.268 ns |   3.00 | 0.0105 |      - |      88 B |
-| (CompositeFormat)            | Constant String |     34.57 ns |  0.322 ns |   2.60 | 0.0105 |      - |      88 B |
+| Method                       | Categories      | Mean        | Error      | Ratio  | Gen0   | Gen1   | Allocated |
+|----------------------------- |---------------- |------------:|-----------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate.Generator | Constant String |    13.92 ns |   0.155 ns |   1.00 | 0.0067 |      - |      56 B |
+| (Utf8.TryWrite)              | Constant String |    21.84 ns |   0.172 ns |   1.57 | 0.0067 |      - |      56 B |
+| (InterpolatedStringHandler)  | Constant String |    25.19 ns |   0.135 ns |   1.81 | 0.0105 |      - |      88 B |
+| (CompositeFormat)            | Constant String |    29.75 ns |   0.380 ns |   2.14 | 0.0105 |      - |      88 B |
 |                              |                 |              |           |        |        |        |           |
-| SimpleTextTemplate.Generator | Constant Int    |     12.52 ns |  0.189 ns |   1.00 | 0.0048 |      - |      40 B |
-| (Utf8.TryWrite)              | Constant Int    |     23.29 ns |  0.101 ns |   1.86 | 0.0048 |      - |      40 B |
-| (InterpolatedStringHandler)  | Constant Int    |     40.04 ns |  0.253 ns |   3.20 | 0.0067 |      - |      56 B |
-| (CompositeFormat)            | Constant Int    |     30.04 ns |  0.171 ns |   2.40 | 0.0067 |      - |      56 B |
+| SimpleTextTemplate.Generator | Constant Int    |    12.77 ns |   0.043 ns |   1.00 | 0.0048 |      - |      40 B |
+| (Utf8.TryWrite)              | Constant Int    |    12.86 ns |   0.086 ns |   1.01 | 0.0048 |      - |      40 B |
+| (InterpolatedStringHandler)  | Constant Int    |    27.47 ns |   0.302 ns |   2.15 | 0.0067 |      - |      56 B |
+| (CompositeFormat)            | Constant Int    |    28.08 ns |   0.147 ns |   2.20 | 0.0067 |      - |      56 B |
 |                              |                 |              |           |        |        |        |           |
-| SimpleTextTemplate.Generator | String          |     24.95 ns |  0.242 ns |   1.00 | 0.0057 |      - |      48 B |
-| SimpleTextTemplate           | String          |     79.17 ns |  0.150 ns |   3.17 | 0.0057 |      - |      48 B |
-| Scriban                      | String          |  8,751.57 ns | 39.993 ns | 350.74 | 3.6926 | 0.3357 |   31003 B |
-| Liquid                       | String          |  7,581.99 ns | 80.655 ns | 303.84 | 3.9902 | 0.4044 |   33418 B |
-| (Utf8.TryWrite)              | String          |     22.21 ns |  0.120 ns |   0.89 | 0.0057 |      - |      48 B |
-| (InterpolatedStringHandler)  | String          |     38.73 ns |  0.219 ns |   1.55 | 0.0086 |      - |      72 B |
-| (CompositeFormat)            | String          |     39.36 ns |  0.432 ns |   1.58 | 0.0086 |      - |      72 B |
+| SimpleTextTemplate.Generator | String          |    29.41 ns |   0.144 ns |   1.00 | 0.0057 |      - |      48 B |
+| SimpleTextTemplate           | String          |    59.91 ns |   0.247 ns |   2.04 | 0.0057 |      - |      48 B |
+| Scriban                      | String          | 8,455.09 ns |  69.601 ns | 287.50 | 3.6621 | 0.3052 |   31003 B |
+| Liquid                       | String          | 6,846.45 ns |  97.413 ns | 232.80 | 3.9902 | 0.4044 |   33418 B |
+| (Utf8.TryWrite)              | String          |    21.79 ns |   0.184 ns |   0.74 | 0.0057 |      - |      48 B |
+| (InterpolatedStringHandler)  | String          |    26.39 ns |   0.300 ns |   0.90 | 0.0086 |      - |      72 B |
+| (CompositeFormat)            | String          |    26.91 ns |   0.230 ns |   0.91 | 0.0086 |      - |      72 B |
 |                              |                 |              |           |        |        |        |           |
-| SimpleTextTemplate.Generator | Int             |     20.77 ns |  0.146 ns |   1.00 | 0.0057 |      - |      48 B |
-| SimpleTextTemplate           | Int             |     81.29 ns |  0.097 ns |   3.91 | 0.0057 |      - |      48 B |
-| Scriban                      | Int             |  9,066.34 ns | 81.421 ns | 436.55 | 3.6926 | 0.3357 |   31027 B |
-| Liquid                       | Int             |  6,999.40 ns | 18.696 ns | 337.04 | 3.9978 | 0.4425 |   33442 B |
-| (Utf8.TryWrite)              | Int             |     16.55 ns |  0.197 ns |   0.80 | 0.0057 |      - |      48 B |
-| (InterpolatedStringHandler)  | Int             |     39.82 ns |  0.246 ns |   1.92 | 0.0076 |      - |      64 B |
-| (CompositeFormat)            | Int             |     30.22 ns |  0.240 ns |   1.46 | 0.0076 |      - |      64 B |
+| SimpleTextTemplate.Generator | Int             |    20.93 ns |   0.142 ns |   1.00 | 0.0057 |      - |      48 B |
+| SimpleTextTemplate           | Int             |    56.40 ns |   0.185 ns |   2.69 | 0.0057 |      - |      48 B |
+| Scriban                      | Int             | 8,439.46 ns |  66.766 ns | 403.25 | 3.6621 | 0.3052 |   31027 B |
+| Liquid                       | Int             | 6,724.20 ns |  77.275 ns | 321.29 | 3.9978 | 0.4425 |   33442 B |
+| (Utf8.TryWrite)              | Int             |    15.45 ns |   0.094 ns |   0.74 | 0.0057 |      - |      48 B |
+| (InterpolatedStringHandler)  | Int             |    28.04 ns |   0.181 ns |   1.34 | 0.0076 |      - |      64 B |
+| (CompositeFormat)            | Int             |    32.21 ns |   0.330 ns |   1.54 | 0.0076 |      - |      64 B |
 
 > [!Note]
 > ()で囲まれているメソッドは正確には処理が異なるが、参考として記載。
