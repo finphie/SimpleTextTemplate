@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.4.0" />
-    <PackageReference Include="SimpleTextTemplate.Generator" Version="3.0.0" />
+    <PackageReference Include="CommunityToolkit.HighPerformance" />
+    <PackageReference Include="SimpleTextTemplate.Generator" />
   </ItemGroup>
 
 </Project>
