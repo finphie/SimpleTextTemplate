@@ -79,7 +79,7 @@ public sealed class TemplateIdentifierReaderTryReadTest
     }
 
     [Fact]
-    public void バイト列先頭がコロン_TemplateException()
+    public void バイト列先頭がコロン_falseを返す()
     {
         var reader = new TemplateIdentifierReader(":A"u8);
         reader.TryRead(out _, out _, out _).ShouldBeFalse();
