@@ -129,10 +129,27 @@ public ref struct TemplateWriter<T>
     /// <param name="value">UTF-8文字列</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteLiteral(scoped ReadOnlySpan<byte> value)
+        => WriteLiteral(ref MemoryMarshal.GetReference(value), value.Length);
+
+    /// <summary>
+    /// バッファーにUTF-8文字列を書き込みます。
+    /// </summary>
+    /// <param name="value">UTF-8文字列</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteLiteral(byte[] value)
+        => WriteLiteral(ref MemoryMarshal.GetArrayDataReference(value), value.Length);
+
+    /// <summary>
+    /// バッファーにUTF-8文字列を書き込みます。
+    /// </summary>
+    /// <param name="value">UTF-8文字列</param>
+    /// <param name="length">文字列の長さ</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void WriteLiteral(scoped ref byte value, int length)
     {
-        Grow(value.Length);
-        Unsafe.CopyBlockUnaligned(ref _destination, ref MemoryMarshal.GetReference(value), (uint)value.Length);
-        Advance(value.Length);
+        Grow(length);
+        Unsafe.CopyBlockUnaligned(ref _destination, ref value, (uint)length);
+        Advance(length);
     }
 
     /// <summary>
