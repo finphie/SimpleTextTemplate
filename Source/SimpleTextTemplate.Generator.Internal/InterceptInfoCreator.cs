@@ -28,6 +28,7 @@ ref struct InterceptInfoCreator
     readonly ExpressionSyntax _templateArgument;
 
     readonly List<TemplateWriterWriteInfo> _writerInfoList = [];
+    readonly Dictionary<int, TemplateWriterGrowInfo> _growInfoList = [];
     readonly List<Diagnostic> _diagnostics = [];
 
     readonly INamedTypeSymbol _readOnlySpanByteSymbol;
@@ -117,6 +118,7 @@ ref struct InterceptInfoCreator
         }
 
         AnalyzeTemplateWithContext(in template, cancellationToken);
+        AnalyzeDangerousMethod(cancellationToken);
     }
 
     readonly bool IsInvariantCulture(CancellationToken cancellationToken)
@@ -191,7 +193,7 @@ ref struct InterceptInfoCreator
 
             if (block == BlockType.Raw)
             {
-                AddConstantString(utf8Value);
+                AddConstantString(value);
                 continue;
             }
 
@@ -266,10 +268,8 @@ ref struct InterceptInfoCreator
         }
     }
 
-    void AddConstantString(byte[] utf8Value)
+    void AddConstantString(string value)
     {
-        var value = Encoding.UTF8.GetString(utf8Value);
-
         if (_isConstant)
         {
             _writerInfoList[^1] = new(WriteConstantLiteral, _writerInfoList[^1].Value + value, MethodAnnotation.None);
@@ -279,9 +279,6 @@ ref struct InterceptInfoCreator
         _writerInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.None));
         _isConstant = true;
     }
-
-    void AddConstantString(string value)
-        => AddConstantString(Encoding.UTF8.GetBytes(value));
 
     void AddValue(TemplateWriterWriteInfo info)
     {
@@ -320,5 +317,56 @@ ref struct InterceptInfoCreator
 
         AddConstantString(value.ToString());
         return true;
+    }
+
+    readonly void AnalyzeDangerousMethod(CancellationToken cancellationToken)
+    {
+        var index = 0;
+
+        while (index < _writerInfoList.Count)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var baseWriterInfo = _writerInfoList[index];
+
+            if (baseWriterInfo.WriteType is not WriteConstantLiteral or WriteLiteral or WriteString)
+            {
+                continue;
+            }
+
+            var constantCount = 0;
+            var memberNames = new List<string>();
+
+            while (++index < _writerInfoList.Count)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var writerInfo = _writerInfoList[index];
+
+                if (writerInfo.WriteType != baseWriterInfo.WriteType)
+                {
+                    break;
+                }
+
+                if (writerInfo.WriteType == WriteConstantLiteral)
+                {
+                    constantCount += writerInfo.Value.Length;
+                    continue;
+                }
+
+                if (writerInfo.WriteType is WriteLiteral or WriteString)
+                {
+                    memberNames.Add(writerInfo.Value);
+                    continue;
+                }
+
+                Debug.Fail($"予期しないWriteTypeです。{writerInfo.WriteType}");
+            }
+
+            if (constantCount == 0 && memberNames.Count == 0)
+            {
+                continue;
+            }
+
+            _growInfoList.Add(index, new(constantCount, memberNames));
+        }
     }
 }

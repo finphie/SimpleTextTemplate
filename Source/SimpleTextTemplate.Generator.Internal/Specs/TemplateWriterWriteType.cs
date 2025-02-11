@@ -28,10 +28,5 @@ enum TemplateWriterWriteType
     /// <summary>
     /// 任意型
     /// </summary>
-    WriteValue,
-
-    /// <summary>
-    /// バッファー拡張
-    /// </summary>
-    Grow
+    WriteValue
 }

@@ -130,7 +130,6 @@ static class Emitter
             WriteString => "WriteString",
             WriteEnum => "WriteEnum",
             WriteValue => "WriteValue",
-            Grow => "Grow",
             _ => throw new InvalidOperationException()
         };
 
@@ -160,7 +159,6 @@ static class Emitter
             (WriteValue, true) => $"{contextTypeName}.@{value}, {formatArgument}, {providerArgument}",
             (WriteEnum, false) => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}",
             (WriteEnum, true) => $"{contextTypeName}.@{value}, {formatArgument}",
-            (Grow, _) => value,
             _ => throw new InvalidOperationException()
         };
 

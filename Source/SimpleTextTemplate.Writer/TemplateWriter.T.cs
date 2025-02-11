@@ -52,6 +52,22 @@ public ref struct TemplateWriter<T>
     }
 
     /// <summary>
+    /// 指定されたサイズ以上にバッファーサイズを拡張します。
+    /// </summary>
+    /// <param name="length">最小バッファーサイズ</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Grow(int length)
+    {
+        if (_destinationLength >= length)
+        {
+            return;
+        }
+
+        GrowCore(length);
+    }
+
+    /// <summary>
     /// 書き込み処理を反映します。
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -70,7 +86,17 @@ public ref struct TemplateWriter<T>
     public void WriteConstantLiteral(scoped ReadOnlySpan<byte> value)
     {
         Grow(value.Length);
+        DangerousWriteConstantLiteral(value);
+    }
 
+    /// <summary>
+    /// バッファーにUTF-8文字列定数を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">UTF-8文字列定数</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DangerousWriteConstantLiteral(scoped ReadOnlySpan<byte> value)
+    {
         switch (value.Length)
         {
             case 1:
@@ -148,6 +174,36 @@ public ref struct TemplateWriter<T>
     public void WriteLiteral(scoped ref byte value, int length)
     {
         Grow(length);
+        DangerousWriteLiteral(ref value, length);
+    }
+
+    /// <summary>
+    /// バッファーにUTF-8文字列を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">UTF-8文字列</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DangerousWriteLiteral(scoped ReadOnlySpan<byte> value)
+        => DangerousWriteLiteral(ref MemoryMarshal.GetReference(value), value.Length);
+
+    /// <summary>
+    /// バッファーにUTF-8文字列を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">UTF-8文字列</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DangerousWriteLiteral(byte[] value)
+        => DangerousWriteLiteral(ref MemoryMarshal.GetArrayDataReference(value), value.Length);
+
+    /// <summary>
+    /// バッファーにUTF-8文字列を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">UTF-8文字列</param>
+    /// <param name="length">文字列の長さ</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DangerousWriteLiteral(scoped ref byte value, int length)
+    {
         Unsafe.CopyBlockUnaligned(ref _destination, ref value, (uint)length);
         Advance(length);
     }
@@ -161,7 +217,17 @@ public ref struct TemplateWriter<T>
     {
         var maxCount = Encoding.UTF8.GetMaxByteCount(value.Length);
         Grow(maxCount);
+        DangerousWriteString(value);
+    }
 
+    /// <summary>
+    /// バッファーに文字列を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">文字列</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DangerousWriteString(scoped ReadOnlySpan<char> value)
+    {
         var success = Encoding.UTF8.TryGetBytes(value, Destination, out var bytesWritten);
         Debug.Assert(success, "UTF-8への変換に失敗しました。");
 
@@ -340,21 +406,6 @@ public ref struct TemplateWriter<T>
         _destinationLength -= count;
 
         Debug.Assert(_destinationLength >= 0, "出力先サイズは0以上の数値である必要があります。");
-    }
-
-    /// <summary>
-    /// 指定されたサイズ以上にバッファーサイズを拡張します。
-    /// </summary>
-    /// <param name="length">最小バッファーサイズ</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    void Grow(int length)
-    {
-        if (_destinationLength >= length)
-        {
-            return;
-        }
-
-        GrowCore(length);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
