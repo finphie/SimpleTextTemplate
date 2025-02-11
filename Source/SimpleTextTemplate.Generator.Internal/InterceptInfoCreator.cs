@@ -326,7 +326,7 @@ ref struct InterceptInfoCreator
         while (index < _writerInfoList.Count)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var baseWriterInfo = _writerInfoList[index];
+            var baseWriterInfo = _writerInfoList[index++];
 
             if (baseWriterInfo.WriteType is not WriteConstantLiteral or WriteLiteral or WriteString)
             {
@@ -336,7 +336,7 @@ ref struct InterceptInfoCreator
             var constantCount = 0;
             var memberNames = new List<string>();
 
-            while (++index < _writerInfoList.Count)
+            while (index < _writerInfoList.Count)
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 var writerInfo = _writerInfoList[index];
