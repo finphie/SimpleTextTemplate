@@ -94,12 +94,13 @@ static class Emitter
                         {
                 """);
 
-            foreach (var (methodType, value, format, provider) in template)
+            foreach (var (methodType, value, annotation, format, provider) in template)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
+                var isDangerous = annotation.HasFlag(MethodAnnotation.Dangerous);
 
                 var contextTypeName = methodSymbol.Parameters.ElementAtOrDefault(2)?.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                builder.AppendLine($"            writer.{GetWriteMethodName(methodType)}({GetValue(methodType, value, format, provider, contextTypeName)});");
+                builder.AppendLine($"            writer.{GetWriteMethodName(methodType, isDangerous)}({GetValue(methodType, value, annotation, format, provider, contextTypeName)});");
             }
 
             builder.AppendLine("        }");
@@ -120,23 +121,28 @@ static class Emitter
         context.AddSource("SimpleTextTemplate.Generated.cs", SourceText.From(builder.ToString(), Encoding.UTF8));
     }
 
-    static string GetWriteMethodName(TemplateWriterWriteType type)
+    static string GetWriteMethodName(TemplateWriterWriteType type, bool isDangerous)
     {
-        return type switch
+        var result = type switch
         {
             WriteConstantLiteral => "WriteConstantLiteral",
-            WriteLiteral or WriteStaticLiteral => "WriteLiteral",
-            WriteString or WriteStaticString => "WriteString",
-            WriteEnum or WriteStaticEnum => "WriteEnum",
-            WriteValue or WriteStaticValue => "WriteValue",
+            WriteLiteral => "WriteLiteral",
+            WriteString => "WriteString",
+            WriteEnum => "WriteEnum",
+            WriteValue => "WriteValue",
+            Grow => "Grow",
             _ => throw new InvalidOperationException()
         };
+
+        return isDangerous ? "Dangerous" + result : result;
     }
 
-    static string GetValue(TemplateWriterWriteType type, string value, string? format, IFormatProvider? provider, string? contextTypeName)
+    static string GetValue(TemplateWriterWriteType type, string value, MethodAnnotation annotation, string? format, IFormatProvider? provider, string? contextTypeName)
     {
+        var isStatic = annotation.HasFlag(MethodAnnotation.Static);
+
         Debug.Assert(
-            !(contextTypeName is null && type is WriteStaticLiteral or WriteStaticString or WriteStaticValue),
+            !(contextTypeName is null && isStatic),
             $"{nameof(contextTypeName)}がnullかつ静的識別子の場合、コンテキストクラス名が必要となります。");
 
         var formatArgument = format is null
@@ -145,15 +151,16 @@ static class Emitter
 
         var providerArgument = GetProviderArgument(provider);
 
-        return type switch
+        return (type, isStatic) switch
         {
-            WriteConstantLiteral => value.ToUtf8Literal(),
-            WriteLiteral or WriteString => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
-            WriteValue => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}, {providerArgument}",
-            WriteEnum => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}",
-            WriteStaticLiteral or WriteStaticString => $"{contextTypeName}.@{value}",
-            WriteStaticValue => $"{contextTypeName}.@{value}, {formatArgument}, {providerArgument}",
-            WriteStaticEnum => $"{contextTypeName}.@{value}, {formatArgument}",
+            (WriteConstantLiteral, _) => value.ToUtf8Literal(),
+            (WriteLiteral or WriteString, false) => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}",
+            (WriteLiteral or WriteString, true) => $"{contextTypeName}.@{value}",
+            (WriteValue, false) => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}, {providerArgument}",
+            (WriteValue, true) => $"{contextTypeName}.@{value}, {formatArgument}, {providerArgument}",
+            (WriteEnum, false) => $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{value}, {formatArgument}",
+            (WriteEnum, true) => $"{contextTypeName}.@{value}, {formatArgument}",
+            (Grow, _) => value,
             _ => throw new InvalidOperationException()
         };
 

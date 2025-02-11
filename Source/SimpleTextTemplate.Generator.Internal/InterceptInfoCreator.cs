@@ -161,7 +161,7 @@ ref struct InterceptInfoCreator
                 return;
             }
 
-            _writerInfoList.Add(new(WriteConstantLiteral, value));
+            _writerInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.None));
         }
 
         _success = true;
@@ -191,7 +191,7 @@ ref struct InterceptInfoCreator
 
             if (block == BlockType.Raw)
             {
-                AddConstantString(value);
+                AddConstantString(utf8Value);
                 continue;
             }
 
@@ -217,6 +217,7 @@ ref struct InterceptInfoCreator
             }
 
             var type = identifier.Symbol.GetFieldOrPropertyType();
+            var annotation = identifier.Symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
 
             if (type.TypeKind == TypeKind.Enum)
             {
@@ -225,7 +226,7 @@ ref struct InterceptInfoCreator
                     _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidEnumIdentifierFormatProvider, _templateArgument.GetLocation()));
                 }
 
-                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticEnum : WriteEnum, value, format, provider));
+                AddValue(new(WriteEnum, value, annotation, format, provider));
                 continue;
             }
 
@@ -239,7 +240,7 @@ ref struct InterceptInfoCreator
             // ReadOnlySpan<byte>やbyte[]などが一致
             if (_compilation.ClassifyConversion(type, _readOnlySpanByteSymbol).IsImplicit)
             {
-                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticLiteral : WriteLiteral, value, format, provider));
+                AddValue(new(WriteLiteral, value, annotation, format, provider));
                 continue;
             }
 
@@ -247,11 +248,11 @@ ref struct InterceptInfoCreator
             // ReadOnlySpan<char>やstring、char[]などが一致
             if (_compilation.ClassifyConversion(type, _readOnlySpanCharSymbol).IsImplicit)
             {
-                AddValue(new(identifier.Symbol.IsStatic ? WriteStaticString : WriteString, value, format, provider));
+                AddValue(new(WriteString, value, annotation, format, provider));
                 continue;
             }
 
-            AddValue(new(identifier.Symbol.IsStatic ? WriteStaticValue : WriteValue, value, format, provider));
+            AddValue(new(WriteValue, value, annotation, format, provider));
         }
 
         _success = true;
@@ -265,17 +266,22 @@ ref struct InterceptInfoCreator
         }
     }
 
-    void AddConstantString(string value)
+    void AddConstantString(byte[] utf8Value)
     {
+        var value = Encoding.UTF8.GetString(utf8Value);
+
         if (_isConstant)
         {
-            _writerInfoList[^1] = new(WriteConstantLiteral, _writerInfoList[^1].Value + value);
+            _writerInfoList[^1] = new(WriteConstantLiteral, _writerInfoList[^1].Value + value, MethodAnnotation.None);
             return;
         }
 
-        _writerInfoList.Add(new(WriteConstantLiteral, value));
+        _writerInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.None));
         _isConstant = true;
     }
+
+    void AddConstantString(string value)
+        => AddConstantString(Encoding.UTF8.GetBytes(value));
 
     void AddValue(TemplateWriterWriteInfo info)
     {
