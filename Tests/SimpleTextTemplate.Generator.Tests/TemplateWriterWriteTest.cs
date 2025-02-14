@@ -94,22 +94,22 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[0].Methods.Count.ShouldBe(3);
         interceptInfoList[1].Methods.Count.ShouldBe(1);
 
-        interceptInfoList[0].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[0].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[0].Methods[0].Text.ShouldBe("\"A\"u8");
         interceptInfoList[0].Methods[0].Format.ShouldBeNull();
         interceptInfoList[0].Methods[0].Provider.ShouldBeNull();
 
-        interceptInfoList[0].Methods[1].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[1].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[1].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticField");
         interceptInfoList[0].Methods[1].Format.ShouldBeNull();
         interceptInfoList[0].Methods[1].Provider.ShouldBeNull();
 
-        interceptInfoList[0].Methods[2].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[0].Methods[2].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[0].Methods[2].Text.ShouldBe("\"B\"u8");
         interceptInfoList[0].Methods[2].Format.ShouldBeNull();
         interceptInfoList[0].Methods[2].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[1].Methods[0].Text.ShouldBe($"\"A{StringContextTestData.StringConstantField}{StringContextTestData.StringConstantField}B\"u8");
         interceptInfoList[1].Methods[0].Format.ShouldBeNull();
         interceptInfoList[1].Methods[0].Provider.ShouldBeNull();
@@ -133,67 +133,67 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[1].Methods.Count.ShouldBe(6);
 
         // BytesStaticField
-        interceptInfoList[0].Methods[0].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[0].Methods[0].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[0].Methods[0].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticField");
         interceptInfoList[0].Methods[0].Format.ShouldBeNull();
         interceptInfoList[0].Methods[0].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[0].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[1].Methods[0].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[1].Methods[0].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticField");
         interceptInfoList[1].Methods[0].Format.ShouldBeNull();
         interceptInfoList[1].Methods[0].Provider.ShouldBeNull();
 
         // BytesField
-        interceptInfoList[0].Methods[1].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[0].Methods[1].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[0].Methods[1].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesField");
         interceptInfoList[0].Methods[1].Format.ShouldBeNull();
         interceptInfoList[0].Methods[1].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[1].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[1].Methods[1].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[1].Methods[1].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesField");
         interceptInfoList[1].Methods[1].Format.ShouldBeNull();
         interceptInfoList[1].Methods[1].Provider.ShouldBeNull();
 
         // BytesSpanStaticProperty
-        interceptInfoList[0].Methods[2].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[0].Methods[2].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[0].Methods[2].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesSpanStaticProperty");
         interceptInfoList[0].Methods[2].Format.ShouldBeNull();
         interceptInfoList[0].Methods[2].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[2].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[1].Methods[2].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[1].Methods[2].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesSpanStaticProperty");
         interceptInfoList[1].Methods[2].Format.ShouldBeNull();
         interceptInfoList[1].Methods[2].Provider.ShouldBeNull();
 
         // BytesSpanProperty
-        interceptInfoList[0].Methods[3].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[0].Methods[3].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[0].Methods[3].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesSpanProperty");
         interceptInfoList[0].Methods[3].Format.ShouldBeNull();
         interceptInfoList[0].Methods[3].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[3].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[1].Methods[3].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[1].Methods[3].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesSpanProperty");
         interceptInfoList[1].Methods[3].Format.ShouldBeNull();
         interceptInfoList[1].Methods[3].Provider.ShouldBeNull();
 
         // BytesStaticProperty
-        interceptInfoList[0].Methods[4].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[0].Methods[4].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[0].Methods[4].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticProperty");
         interceptInfoList[0].Methods[4].Format.ShouldBeNull();
         interceptInfoList[0].Methods[4].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[4].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[1].Methods[4].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[1].Methods[4].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticProperty");
         interceptInfoList[1].Methods[4].Format.ShouldBeNull();
         interceptInfoList[1].Methods[4].Provider.ShouldBeNull();
 
         // BytesProperty
-        interceptInfoList[0].Methods[5].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[0].Methods[5].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[0].Methods[5].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesProperty");
         interceptInfoList[0].Methods[5].Format.ShouldBeNull();
         interceptInfoList[0].Methods[5].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[5].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[1].Methods[5].Name.ShouldBe(DangerousWriteLiteral);
         interceptInfoList[1].Methods[5].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@BytesProperty");
         interceptInfoList[1].Methods[5].Format.ShouldBeNull();
         interceptInfoList[1].Methods[5].Provider.ShouldBeNull();
@@ -217,67 +217,67 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[1].Methods.Count.ShouldBe(6);
 
         // CharsStaticField
-        interceptInfoList[0].Methods[0].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[0].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[0].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticField");
         interceptInfoList[0].Methods[0].Format.ShouldBeNull();
         interceptInfoList[0].Methods[0].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[0].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[0].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[0].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticField");
         interceptInfoList[1].Methods[0].Format.ShouldBeNull();
         interceptInfoList[1].Methods[0].Provider.ShouldBeNull();
 
         // CharsField
-        interceptInfoList[0].Methods[1].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[1].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[1].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsField");
         interceptInfoList[0].Methods[1].Format.ShouldBeNull();
         interceptInfoList[0].Methods[1].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[1].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[1].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[1].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsField");
         interceptInfoList[1].Methods[1].Format.ShouldBeNull();
         interceptInfoList[1].Methods[1].Provider.ShouldBeNull();
 
         // CharsSpanStaticProperty
-        interceptInfoList[0].Methods[2].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[2].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[2].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsSpanStaticProperty");
         interceptInfoList[0].Methods[2].Format.ShouldBeNull();
         interceptInfoList[0].Methods[2].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[2].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[2].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[2].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsSpanStaticProperty");
         interceptInfoList[1].Methods[2].Format.ShouldBeNull();
         interceptInfoList[1].Methods[2].Provider.ShouldBeNull();
 
         // CharsSpanProperty
-        interceptInfoList[0].Methods[3].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[3].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[3].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsSpanProperty");
         interceptInfoList[0].Methods[3].Format.ShouldBeNull();
         interceptInfoList[0].Methods[3].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[3].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[3].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[3].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsSpanProperty");
         interceptInfoList[1].Methods[3].Format.ShouldBeNull();
         interceptInfoList[1].Methods[3].Provider.ShouldBeNull();
 
         // CharsStaticProperty
-        interceptInfoList[0].Methods[4].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[4].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[4].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticProperty");
         interceptInfoList[0].Methods[4].Format.ShouldBeNull();
         interceptInfoList[0].Methods[4].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[4].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[4].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[4].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticProperty");
         interceptInfoList[1].Methods[4].Format.ShouldBeNull();
         interceptInfoList[1].Methods[4].Provider.ShouldBeNull();
 
         // CharsProperty
-        interceptInfoList[0].Methods[5].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[5].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[5].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsProperty");
         interceptInfoList[0].Methods[5].Format.ShouldBeNull();
         interceptInfoList[0].Methods[5].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[5].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[5].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[5].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsProperty");
         interceptInfoList[1].Methods[5].Format.ShouldBeNull();
         interceptInfoList[1].Methods[5].Provider.ShouldBeNull();
@@ -301,56 +301,56 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[1].Methods.Count.ShouldBe(5);
 
         // StringConstantField
-        interceptInfoList[0].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[0].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[0].Methods[0].Text.ShouldBe("\"_StringConstantField\"u8");
         interceptInfoList[0].Methods[0].Format.ShouldBeNull();
         interceptInfoList[0].Methods[0].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[1].Methods[0].Text.ShouldBe("\"_StringConstantField\"u8");
         interceptInfoList[1].Methods[0].Format.ShouldBeNull();
         interceptInfoList[1].Methods[0].Provider.ShouldBeNull();
 
         // StringStaticField
-        interceptInfoList[0].Methods[1].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[1].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[1].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticField");
         interceptInfoList[0].Methods[1].Format.ShouldBeNull();
         interceptInfoList[0].Methods[1].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[1].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[1].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[1].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticField");
         interceptInfoList[1].Methods[1].Format.ShouldBeNull();
         interceptInfoList[1].Methods[1].Provider.ShouldBeNull();
 
         // StringField
-        interceptInfoList[0].Methods[2].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[2].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[2].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringField");
         interceptInfoList[0].Methods[2].Format.ShouldBeNull();
         interceptInfoList[0].Methods[2].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[2].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[2].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[2].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringField");
         interceptInfoList[1].Methods[2].Format.ShouldBeNull();
         interceptInfoList[1].Methods[2].Provider.ShouldBeNull();
 
         // StringStaticProperty
-        interceptInfoList[0].Methods[3].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[3].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[3].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticProperty");
         interceptInfoList[0].Methods[3].Format.ShouldBeNull();
         interceptInfoList[0].Methods[3].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[3].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[3].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[3].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticProperty");
         interceptInfoList[1].Methods[3].Format.ShouldBeNull();
         interceptInfoList[1].Methods[3].Provider.ShouldBeNull();
 
         // StringProperty
-        interceptInfoList[0].Methods[4].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[4].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[4].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringProperty");
         interceptInfoList[0].Methods[4].Format.ShouldBeNull();
         interceptInfoList[0].Methods[4].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[4].Name.ShouldBe(WriteString);
+        interceptInfoList[1].Methods[4].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[1].Methods[4].Text.ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringProperty");
         interceptInfoList[1].Methods[4].Format.ShouldBeNull();
         interceptInfoList[1].Methods[4].Provider.ShouldBeNull();
@@ -438,17 +438,17 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[2].Methods.Count.ShouldBe(1);
 
         // IntConstantField
-        interceptInfoList[0].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[0].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[0].Methods[0].Text.ShouldBe("\"1234\"u8");
         interceptInfoList[0].Methods[0].Format.ShouldBeNull();
         interceptInfoList[0].Methods[0].Provider.ShouldBeNull();
 
-        interceptInfoList[1].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[1].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[1].Methods[0].Text.ShouldBe("\"1,234.000\"u8");
         interceptInfoList[1].Methods[0].Format.ShouldBeNull();
         interceptInfoList[1].Methods[0].Provider.ShouldBeNull();
 
-        interceptInfoList[2].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[2].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[2].Methods[0].Text.ShouldBe("\"1.234,000\"u8");
         interceptInfoList[2].Methods[0].Format.ShouldBeNull();
         interceptInfoList[2].Methods[0].Provider.ShouldBeNull();
@@ -528,7 +528,7 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[1].Methods[0].Format.ShouldBe("\"N3\"");
         interceptInfoList[1].Methods[0].Provider.ShouldBe("provider");
 
-        interceptInfoList[2].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[2].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[2].Methods[0].Text.ShouldBe("\"1.234,000\"u8");
         interceptInfoList[2].Methods[0].Format.ShouldBeNull();
         interceptInfoList[2].Methods[0].Provider.ShouldBeNull();
@@ -615,7 +615,7 @@ public sealed class TemplateWriterWriteTest
         diagnostics.ShouldBeEmpty();
         interceptInfoList.Length.ShouldBe(1);
         interceptInfoList[0].Methods.Count.ShouldBe(1);
-        interceptInfoList[0].Methods[0].Name.ShouldBe(WriteLiteral);
+        interceptInfoList[0].Methods[0].Name.ShouldBe(DangerousWriteLiteral);
     }
 
     [Fact]
@@ -849,7 +849,7 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[1].Methods.Count.ShouldBe(0);
         interceptInfoList[2].Methods.Count.ShouldBe(1);
 
-        interceptInfoList[0].Methods[0].Name.ShouldBe(WriteString);
+        interceptInfoList[0].Methods[0].Name.ShouldBe(DangerousWriteString);
         interceptInfoList[0].Methods[0].Text.ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.NullContextTestData.@NullStringStaticField");
         interceptInfoList[0].Methods[0].Format.ShouldBeNull();
         interceptInfoList[0].Methods[0].Provider.ShouldBeNull();
@@ -859,7 +859,7 @@ public sealed class TemplateWriterWriteTest
         interceptInfoList[0].Methods[1].Format.ShouldBe("default");
         interceptInfoList[0].Methods[1].Provider.ShouldBe("global::System.Globalization.CultureInfo.InvariantCulture");
 
-        interceptInfoList[2].Methods[0].Name.ShouldBe(WriteConstantLiteral);
+        interceptInfoList[2].Methods[0].Name.ShouldBe(DangerousWriteConstantLiteral);
         interceptInfoList[2].Methods[0].Text.ShouldBe("\"ABC\"u8");
         interceptInfoList[2].Methods[0].Format.ShouldBeNull();
         interceptInfoList[2].Methods[0].Provider.ShouldBeNull();
@@ -869,8 +869,11 @@ public sealed class TemplateWriterWriteTest
 file static class Constants
 {
     public const string WriteConstantLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.WriteConstantLiteral);
+    public const string DangerousWriteConstantLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.DangerousWriteConstantLiteral);
     public const string WriteLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.WriteLiteral);
+    public const string DangerousWriteLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.DangerousWriteLiteral);
     public const string WriteString = nameof(TemplateWriter<IBufferWriter<byte>>.WriteString);
+    public const string DangerousWriteString = nameof(TemplateWriter<IBufferWriter<byte>>.DangerousWriteString);
     public const string WriteEnum = nameof(TemplateWriter<IBufferWriter<byte>>.WriteEnum);
     public const string WriteValue = nameof(TemplateWriter<IBufferWriter<byte>>.WriteValue);
 }

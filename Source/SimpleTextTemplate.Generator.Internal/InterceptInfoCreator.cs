@@ -74,7 +74,7 @@ ref struct InterceptInfoCreator
     /// </summary>
     public readonly InterceptInfo? Intercept
         => _success && _interceptableLocation is not null
-        ? new(_interceptableLocation, [.. _writerInfoList], _methodSymbol)
+        ? new(_interceptableLocation, [.. _writerInfoList], _growInfoList, _methodSymbol)
         : null;
 
     /// <summary>
@@ -242,6 +242,7 @@ ref struct InterceptInfoCreator
             // ReadOnlySpan<byte>やbyte[]などが一致
             if (_compilation.ClassifyConversion(type, _readOnlySpanByteSymbol).IsImplicit)
             {
+                annotation |= MethodAnnotation.Dangerous;
                 AddValue(new(WriteLiteral, value, annotation, format, provider));
                 continue;
             }
@@ -250,6 +251,7 @@ ref struct InterceptInfoCreator
             // ReadOnlySpan<char>やstring、char[]などが一致
             if (_compilation.ClassifyConversion(type, _readOnlySpanCharSymbol).IsImplicit)
             {
+                annotation |= MethodAnnotation.Dangerous;
                 AddValue(new(WriteString, value, annotation, format, provider));
                 continue;
             }
@@ -272,11 +274,11 @@ ref struct InterceptInfoCreator
     {
         if (_isConstant)
         {
-            _writerInfoList[^1] = new(WriteConstantLiteral, _writerInfoList[^1].Value + value, MethodAnnotation.None);
+            _writerInfoList[^1] = new(WriteConstantLiteral, _writerInfoList[^1].Value + value, MethodAnnotation.Dangerous);
             return;
         }
 
-        _writerInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.None));
+        _writerInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.Dangerous));
         _isConstant = true;
     }
 
@@ -326,47 +328,51 @@ ref struct InterceptInfoCreator
         while (index < _writerInfoList.Count)
         {
             cancellationToken.ThrowIfCancellationRequested();
+
+            var baseIndex = index;
             var baseWriterInfo = _writerInfoList[index++];
 
-            if (baseWriterInfo.WriteType is not WriteConstantLiteral or WriteLiteral or WriteString)
+            if (!baseWriterInfo.Annotation.HasFlag(MethodAnnotation.Dangerous))
             {
                 continue;
             }
 
             var constantCount = 0;
-            var memberNames = new List<string>();
+            var members = new List<ContextMember>();
+
+            SetGrowLength(baseWriterInfo, ref constantCount, members);
 
             while (index < _writerInfoList.Count)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var writerInfo = _writerInfoList[index];
+                var writerInfo = _writerInfoList[index++];
 
                 if (writerInfo.WriteType != baseWriterInfo.WriteType)
                 {
                     break;
                 }
 
-                if (writerInfo.WriteType == WriteConstantLiteral)
-                {
-                    constantCount += writerInfo.Value.Length;
-                    continue;
-                }
-
-                if (writerInfo.WriteType is WriteLiteral or WriteString)
-                {
-                    memberNames.Add(writerInfo.Value);
-                    continue;
-                }
-
-                Debug.Fail($"予期しないWriteTypeです。{writerInfo.WriteType}");
+                SetGrowLength(writerInfo, ref constantCount, members);
             }
 
-            if (constantCount == 0 && memberNames.Count == 0)
+            _growInfoList.Add(baseIndex, new(constantCount, members));
+        }
+
+        static void SetGrowLength(TemplateWriterWriteInfo writeInfo, ref int constantCount, List<ContextMember> members)
+        {
+            if (writeInfo.WriteType == WriteConstantLiteral)
             {
-                continue;
+                constantCount += writeInfo.Value.Length;
+                return;
             }
 
-            _growInfoList.Add(index, new(constantCount, memberNames));
+            if (writeInfo.WriteType is WriteLiteral or WriteString)
+            {
+                members.Add(new(writeInfo.Value, writeInfo.WriteType, writeInfo.Annotation));
+                return;
+            }
+
+            throw new InvalidOperationException("予期しないWriteTypeです。");
         }
     }
 }

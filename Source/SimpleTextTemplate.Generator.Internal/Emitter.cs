@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System.Buffers;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -80,7 +81,7 @@ static class Emitter
         for (var i = 0; i < infoList.Length; i++)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
-            var (interceptsLocationInfo, template, methodSymbol) = infoList[i]!;
+            var (interceptsLocationInfo, writeInfo, grow, methodSymbol) = infoList[i]!;
 
             if (i != 0)
             {
@@ -94,13 +95,39 @@ static class Emitter
                         {
                 """);
 
-            foreach (var (methodType, value, annotation, format, provider) in template)
+            for (var writeInfoIndex = 0; writeInfoIndex < writeInfo.Count; writeInfoIndex++)
             {
                 context.CancellationToken.ThrowIfCancellationRequested();
-                var isDangerous = annotation.HasFlag(MethodAnnotation.Dangerous);
-
+                var (methodType, value, annotation, format, provider) = writeInfo[writeInfoIndex];
                 var contextTypeName = methodSymbol.Parameters.ElementAtOrDefault(2)?.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
-                builder.AppendLine($"            writer.{GetWriteMethodName(methodType, isDangerous)}({GetValue(methodType, value, annotation, format, provider, contextTypeName)});");
+
+                // Grow
+                if (grow.TryGetValue(writeInfoIndex, out var growInfo))
+                {
+                    if (growInfo.Members.Count == 0)
+                    {
+                        builder.AppendLine($"            writer.Grow({growInfo.ConstantCount});");
+                    }
+                    else
+                    {
+                        builder.AppendLine($"            writer.Grow({growInfo.ConstantCount}");
+
+                        foreach (var member in growInfo.Members)
+                        {
+                            var growArguments = GetGrowMethodArguments(member, contextTypeName);
+                            builder.AppendLine($"                + {growArguments}");
+                        }
+
+                        builder.AppendLine("            );");
+                    }
+                }
+
+                // Write
+                var isDangerous = annotation.HasFlag(MethodAnnotation.Dangerous);
+                var methodName = GetWriteMethodName(methodType, isDangerous);
+                var methodArguments = GetWriteMethodArguments(methodType, value, annotation, format, provider, contextTypeName);
+
+                builder.AppendLine($"            writer.{methodName}({methodArguments});");
             }
 
             builder.AppendLine("        }");
@@ -136,7 +163,7 @@ static class Emitter
         return isDangerous ? "Dangerous" + result : result;
     }
 
-    static string GetValue(TemplateWriterWriteType type, string value, MethodAnnotation annotation, string? format, IFormatProvider? provider, string? contextTypeName)
+    static string GetWriteMethodArguments(TemplateWriterWriteType type, string value, MethodAnnotation annotation, string? format, IFormatProvider? provider, string? contextTypeName)
     {
         var isStatic = annotation.HasFlag(MethodAnnotation.Static);
 
@@ -164,5 +191,25 @@ static class Emitter
 
         static string GetProviderArgument(IFormatProvider? provider)
             => provider is null ? "provider" : provider.ToFullString();
+    }
+
+    static string GetGrowMethodArguments(ContextMember member, string? contextTypeName)
+    {
+        var isStatic = member.Annotation.HasFlag(MethodAnnotation.Static);
+
+        Debug.Assert(
+            !(contextTypeName is null && isStatic),
+            $"{nameof(contextTypeName)}がnullかつ静的識別子の場合、コンテキストクラス名が必要となります。");
+
+        var variableName = isStatic
+            ? $"{contextTypeName}.@{member.Name}.Length"
+            : $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{member.Name}.Length";
+
+        return member.WriteType switch
+        {
+            WriteConstantLiteral or WriteLiteral => variableName,
+            WriteString => $"global::System.Text.Encoding.UTF8.GetMaxByteCount({variableName})",
+            WriteEnum or WriteValue or _ => throw new InvalidOperationException("不正なWriteTypeです。")
+        };
     }
 }
