@@ -27,7 +27,7 @@ ref struct InterceptInfoCreator
     readonly SeparatedSyntaxList<ArgumentSyntax> _arguments;
     readonly ExpressionSyntax _templateArgument;
 
-    readonly List<TemplateWriterWriteInfo> _writerInfoList = [];
+    readonly List<TemplateWriterWriteInfo> _writeInfoList = [];
     readonly Dictionary<int, TemplateWriterGrowInfo> _growInfoList = [];
     readonly List<Diagnostic> _diagnostics = [];
 
@@ -74,7 +74,7 @@ ref struct InterceptInfoCreator
     /// </summary>
     public readonly InterceptInfo? Intercept
         => _success && _interceptableLocation is not null
-        ? new(_interceptableLocation, [.. _writerInfoList], _growInfoList, _methodSymbol)
+        ? new(_interceptableLocation, [.. _writeInfoList], _growInfoList, _methodSymbol)
         : null;
 
     /// <summary>
@@ -163,7 +163,7 @@ ref struct InterceptInfoCreator
                 return;
             }
 
-            _writerInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.None));
+            _writeInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.None));
         }
 
         _success = true;
@@ -274,17 +274,17 @@ ref struct InterceptInfoCreator
     {
         if (_isConstant)
         {
-            _writerInfoList[^1] = new(WriteConstantLiteral, _writerInfoList[^1].Value + value, MethodAnnotation.Dangerous);
+            _writeInfoList[^1] = new(WriteConstantLiteral, _writeInfoList[^1].Value + value, MethodAnnotation.Dangerous);
             return;
         }
 
-        _writerInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.Dangerous));
+        _writeInfoList.Add(new(WriteConstantLiteral, value, MethodAnnotation.Dangerous));
         _isConstant = true;
     }
 
     void AddValue(TemplateWriterWriteInfo info)
     {
-        _writerInfoList.Add(info);
+        _writeInfoList.Add(info);
         _isConstant = false;
     }
 
@@ -325,12 +325,12 @@ ref struct InterceptInfoCreator
     {
         var index = 0;
 
-        while (index < _writerInfoList.Count)
+        while (index < _writeInfoList.Count)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var baseIndex = index;
-            var baseWriterInfo = _writerInfoList[index++];
+            var baseWriterInfo = _writeInfoList[index++];
 
             if (!baseWriterInfo.Annotation.HasFlag(MethodAnnotation.Dangerous))
             {
@@ -342,10 +342,10 @@ ref struct InterceptInfoCreator
 
             SetGrowLength(baseWriterInfo, ref constantCount, members);
 
-            while (index < _writerInfoList.Count)
+            while (index < _writeInfoList.Count)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var writerInfo = _writerInfoList[index++];
+                var writerInfo = _writeInfoList[index++];
 
                 if (writerInfo.WriteType != baseWriterInfo.WriteType)
                 {
