@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using SimpleTextTemplate.Generator.Extensions;
@@ -13,28 +12,17 @@ namespace SimpleTextTemplate.Generator;
 /// <summary>
 /// ソースコードを生成します。
 /// </summary>
-readonly ref struct Emitter : IDisposable
+/// <param name="context">インクリメンタルソースジェネレーターで使用するコンテキスト</param>
+/// <param name="infoList">インターセプター情報のリスト</param>
+readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<InterceptInfo> infoList) : IDisposable
 {
     static readonly string FullName = typeof(TemplateGenerator).FullName;
     static readonly string Version = typeof(TemplateGenerator).Assembly.GetName().Version.ToString();
 
-    readonly SourceCodeWriter _writer;
+    readonly SourceCodeWriter _writer = new();
 
-    readonly SourceProductionContext _context;
-    readonly ImmutableArray<InterceptInfo> _infoList;
-
-    /// <summary>
-    /// <see cref="Emitter"/>の新しいインスタンスを生成します。
-    /// </summary>
-    /// <param name="context">インクリメンタルソースジェネレーターで使用するコンテキスト</param>
-    /// <param name="infoList">インターセプター情報のリスト</param>
-    public Emitter(SourceProductionContext context, ImmutableArray<InterceptInfo> infoList)
-    {
-        _writer = new SourceCodeWriter();
-
-        _context = context;
-        _infoList = infoList;
-    }
+    readonly SourceProductionContext _context = context;
+    readonly ImmutableArray<InterceptInfo> _infoList = infoList;
 
     /// <inheritdoc/>
     public void Dispose()
