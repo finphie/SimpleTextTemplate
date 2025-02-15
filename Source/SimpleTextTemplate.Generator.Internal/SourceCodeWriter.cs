@@ -1,8 +1,5 @@
-﻿using System.Buffers;
-using System.ComponentModel;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Text;
 using CommunityToolkit.HighPerformance;
 using CommunityToolkit.HighPerformance.Buffers;
 
@@ -13,22 +10,24 @@ namespace SimpleTextTemplate.Generator;
 /// </summary>
 sealed class SourceCodeWriter : IDisposable
 {
-    const byte Space = (byte)' ';
+    const char Space = ' ';
     const int IndentSize = 4;
 
-    readonly ArrayPoolBufferWriter<byte> _bufferWriter = new();
-    readonly List<byte[]> _indentations = [[]];
+    readonly ArrayPoolBufferWriter<char> _bufferWriter = new();
+    readonly List<char[]> _indentations = [[]];
 
     int _currentIndentationLevel;
 
     /// <summary>
     /// 書き込み済みのバッファを取得します。
     /// </summary>
-    public ReadOnlySpan<byte> WrittenSpan => _bufferWriter.WrittenSpan;
+    public ReadOnlySpan<char> WrittenSpan => _bufferWriter.WrittenSpan;
 
-    static ReadOnlySpan<byte> DefaultNewLine => "\r\n"u8;
+    static ReadOnlySpan<char> DefaultNewLine => "\r\n".AsSpan();
 
-    ReadOnlySpan<byte> CurrentIndentation => _indentations[_currentIndentationLevel];
+    static ReadOnlySpan<char> OpenBlock => "{".AsSpan();
+
+    ReadOnlySpan<char> CurrentIndentation => _indentations[_currentIndentationLevel];
 
     /// <inheritdoc/>
     public void Dispose()
@@ -44,7 +43,7 @@ sealed class SourceCodeWriter : IDisposable
             return;
         }
 
-        var newIndentation = new byte[_indentations[^1].Length + IndentSize];
+        var newIndentation = new char[_indentations[^1].Length + IndentSize];
         newIndentation.AsSpan().Fill(Space);
 
         _indentations.Add(newIndentation);
@@ -62,7 +61,7 @@ sealed class SourceCodeWriter : IDisposable
     /// <returns>開いているブロックを閉じるために、<see cref="IDisposable"/>を実装した型のインスタンスを返します。</returns>
     public SourceCodeWriterBlock WriteBlock()
     {
-        WriteLine("{"u8);
+        WriteLine(OpenBlock);
         IncreaseIndent();
 
         return new(this);
@@ -78,14 +77,9 @@ sealed class SourceCodeWriter : IDisposable
     /// 文字列を書き込みます。
     /// </summary>
     /// <param name="text">文字列</param>
-    public void WriteLine(ReadOnlySpan<byte> text)
+    public void WriteLine(ReadOnlySpan<char> text)
     {
-        if (_bufferWriter.WrittenSpan.EndsWith(DefaultNewLine))
-        {
-            _bufferWriter.Write(CurrentIndentation);
-        }
-
-        _bufferWriter.Write(text);
+        Write(text);
         WriteLine();
     }
 
@@ -102,6 +96,13 @@ sealed class SourceCodeWriter : IDisposable
     /// <summary>
     /// 文字列を書き込みます。
     /// </summary>
+    /// <param name="text">文字列</param>
+    public void WriteLine(string text)
+        => WriteLine(text.AsSpan());
+
+    /// <summary>
+    /// 文字列を書き込みます。
+    /// </summary>
     /// <param name="handler">文字列補間ハンドラー</param>
     public void Write([InterpolatedStringHandlerArgument("")] ref WriteInterpolatedStringHandler handler)
     {
@@ -113,26 +114,22 @@ sealed class SourceCodeWriter : IDisposable
     /// 文字列を書き込みます。
     /// </summary>
     /// <param name="text">文字列</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    internal unsafe void Write(ReadOnlySpan<char> text)
+    public void Write(ReadOnlySpan<char> text)
     {
         if (_bufferWriter.WrittenSpan.EndsWith(DefaultNewLine))
         {
             _bufferWriter.Write(CurrentIndentation);
         }
 
-        var bufferLength = Encoding.UTF8.GetMaxByteCount(text.Length);
-        var buffer = _bufferWriter.GetSpan(bufferLength);
-
-        fixed (byte* bytes = buffer)
-        {
-            fixed (char* chars = text)
-            {
-                var writtenCount = Encoding.UTF8.GetBytes(chars, text.Length, bytes, bufferLength);
-                _bufferWriter.Advance(writtenCount);
-            }
-        }
+        _bufferWriter.Write(text);
     }
+
+    /// <summary>
+    /// 文字列を書き込みます。
+    /// </summary>
+    /// <param name="text">文字列</param>
+    public void Write(string text)
+        => Write(text.AsSpan());
 
     /// <summary>
     /// ソースコードのブロックを表します。
@@ -142,11 +139,13 @@ sealed class SourceCodeWriter : IDisposable
     {
         readonly SourceCodeWriter _writer = writer;
 
+        static ReadOnlySpan<char> CloseBlock => "}".AsSpan();
+
         /// <inheritdoc/>
         public void Dispose()
         {
             _writer.DecreaseIndent();
-            _writer.WriteLine("}"u8);
+            _writer.WriteLine(CloseBlock);
         }
     }
 
@@ -176,7 +175,7 @@ sealed class SourceCodeWriter : IDisposable
         /// </summary>
         /// <param name="value">文字列</param>
         public void AppendLiteral(string value)
-            => _writer.Write(value.AsSpan());
+            => _writer.Write(value);
 
         /// <summary>
         /// 文字列を追加します。
