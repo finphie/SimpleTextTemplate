@@ -66,6 +66,9 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
         _context.AddSource("SimpleTextTemplate.Generated.cs", sourceText);
     }
 
+    void WriteClosingParenthesisAndSemicolon()
+        => _writer.WriteLine(");");
+
     void WriteCultures()
     {
         var cultures = _infoList.SelectMany(static x => x.WriteInfoList.Select(static x => x.Provider))
@@ -151,22 +154,25 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
 
     void WriteGrowMethod(TemplateWriterGrowInfo growInfo, string? contextTypeName)
     {
+        _writer.Write($"writer.Grow({growInfo.ConstantCount}");
+
         if (growInfo.Members.Count == 0)
         {
-            _writer.WriteLine($"writer.Grow({growInfo.ConstantCount});");
+            WriteClosingParenthesisAndSemicolon();
             return;
         }
 
-        _writer.WriteLine($"writer.Grow({growInfo.ConstantCount}");
         _writer.IncreaseIndent();
 
         foreach (var member in growInfo.Members)
         {
             var growArguments = GetGrowMethodArguments(member, contextTypeName);
-            _writer.WriteLine($"+ {growArguments}");
+
+            _writer.WriteLine();
+            _writer.Write($"+ {growArguments}");
         }
 
-        _writer.WriteLine(");");
+        WriteClosingParenthesisAndSemicolon();
         _writer.DecreaseIndent();
 
         static string GetGrowMethodArguments(ContextMember member, string? contextTypeName)
