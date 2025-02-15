@@ -32,7 +32,13 @@ public sealed class TemplateGenerator : IIncrementalGenerator
         context.RegisterSourceOutput(diagnostics, static (context, diagnostic) => context.ReportDiagnostic(diagnostic));
 
         var infoList = provider.Where(static x => x.Info is not null).Select(static (x, _) => x.Info!).Collect();
-        context.RegisterSourceOutput(infoList, Emitter.Emit);
+        context.RegisterSourceOutput(
+            infoList,
+            static (context, infoList) =>
+            {
+                using var emitter = new Emitter(context, infoList);
+                emitter.Emit();
+            });
     }
 
     static bool IsPotentialRenderMethodInvocation(SyntaxNode node, CancellationToken cancellationToken)
