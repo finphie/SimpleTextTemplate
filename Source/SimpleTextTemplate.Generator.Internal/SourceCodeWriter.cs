@@ -103,16 +103,6 @@ sealed class SourceCodeWriter : IDisposable
     /// <summary>
     /// 文字列を書き込みます。
     /// </summary>
-    /// <param name="handler">文字列補間ハンドラー</param>
-    public void Write([InterpolatedStringHandlerArgument("")] ref WriteInterpolatedStringHandler handler)
-    {
-        _ = this;
-        _ = handler;
-    }
-
-    /// <summary>
-    /// 文字列を書き込みます。
-    /// </summary>
     /// <param name="text">文字列</param>
     public void Write(ReadOnlySpan<char> text)
     {
@@ -122,6 +112,16 @@ sealed class SourceCodeWriter : IDisposable
         }
 
         _bufferWriter.Write(text);
+    }
+
+    /// <summary>
+    /// 文字列を書き込みます。
+    /// </summary>
+    /// <param name="handler">文字列補間ハンドラー</param>
+    public void Write([InterpolatedStringHandlerArgument("")] ref WriteInterpolatedStringHandler handler)
+    {
+        _ = this;
+        _ = handler;
     }
 
     /// <summary>
