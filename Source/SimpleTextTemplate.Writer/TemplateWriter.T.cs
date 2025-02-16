@@ -97,7 +97,7 @@ public ref struct TemplateWriter<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void DangerousWriteConstantLiteral(scoped ReadOnlySpan<byte> value)
     {
-        Debug.Assert(_destinationLength < value.Length, "バッファーのサイズが不足しています。");
+        Debug.Assert(value.Length <= _destinationLength, "バッファーのサイズが不足しています。");
 
         switch (value.Length)
         {
@@ -206,7 +206,7 @@ public ref struct TemplateWriter<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void DangerousWriteLiteral(scoped ref byte value, int length)
     {
-        Debug.Assert(_destinationLength < length, "バッファーのサイズが不足しています。");
+        Debug.Assert(length <= _destinationLength, "バッファーのサイズが不足しています。");
 
         Unsafe.CopyBlockUnaligned(ref _destination, ref value, (uint)length);
         Advance(length);
@@ -232,7 +232,7 @@ public ref struct TemplateWriter<T>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void DangerousWriteString(scoped ReadOnlySpan<char> value)
     {
-        Debug.Assert(_destinationLength < Encoding.UTF8.GetMaxByteCount(value.Length), "バッファーのサイズが不足しています。");
+        Debug.Assert(Encoding.UTF8.GetMaxByteCount(value.Length) <= _destinationLength, "バッファーのサイズが不足しています。");
 
         var success = Encoding.UTF8.TryGetBytes(value, Destination, out var bytesWritten);
         Debug.Assert(success, "UTF-8への変換に失敗しました。");
