@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using SimpleTextTemplate.Generator.Buffers;
 using SimpleTextTemplate.Generator.Extensions;
 using SimpleTextTemplate.Generator.Specs;
 using static SimpleTextTemplate.Generator.Specs.TemplateWriterWriteType;

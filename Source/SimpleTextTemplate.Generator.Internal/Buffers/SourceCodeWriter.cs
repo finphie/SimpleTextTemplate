@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using CommunityToolkit.HighPerformance;
 using CommunityToolkit.HighPerformance.Buffers;
 
-namespace SimpleTextTemplate.Generator;
+namespace SimpleTextTemplate.Generator.Buffers;
 
 /// <summary>
 /// ソースコードを書き込むクラスです。
