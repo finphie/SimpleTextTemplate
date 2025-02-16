@@ -154,6 +154,11 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
 
     void WriteGrowMethod(TemplateWriterGrowInfo growInfo, string? contextTypeName)
     {
+        if (growInfo is { ConstantCount: 0, Members.Count: 0 })
+        {
+            return;
+        }
+
         _writer.Write($"writer.Grow({growInfo.ConstantCount}");
 
         if (growInfo.Members.Count == 0)
@@ -162,37 +167,50 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
             return;
         }
 
+        var members = growInfo.Members.ToLookup(static x => x.WriteType != WriteString);
+        var utf8Members = members[true].ToArray();
+        var utf16Members = members[false].ToArray().AsSpan();
+
         _writer.IncreaseIndent();
 
-        foreach (var member in growInfo.Members)
-        {
-            var growArguments = GetGrowMethodArguments(member, contextTypeName);
+        // 対象のメンバーはUTF-8のバイト列となるので、長さをそのまま追加
+        WriteContextMemberLengths(in this, utf8Members, contextTypeName);
 
+        // 対象のメンバーはUTF-16の文字列となるので、UTF-8での最大長を追加
+        if (utf16Members.Length > 0)
+        {
             _writer.WriteLine();
-            _writer.Write($"+ {growArguments}");
+            _writer.WriteLine("+ global::System.Text.Encoding.UTF8.GetMaxByteCount(");
+            _writer.IncreaseIndent();
+
+            WriteContextMemberLength(in this, utf16Members[0], contextTypeName);
+            WriteContextMemberLengths(in this, utf16Members[1..], contextTypeName);
+
+            _writer.Write(")");
+            _writer.DecreaseIndent();
         }
 
         WriteClosingParenthesisAndSemicolon();
         _writer.DecreaseIndent();
 
-        static string GetGrowMethodArguments(ContextMember member, string? contextTypeName)
+        static void WriteContextMemberLengths(in Emitter emitter, ReadOnlySpan<ContextMember> members, string? contextTypeName)
         {
-            var isStatic = member.Annotation.HasFlag(MethodAnnotation.Static);
+            var writer = emitter._writer;
 
-            Debug.Assert(
-                !(contextTypeName is null && isStatic),
-                $"{nameof(contextTypeName)}がnullかつ静的識別子の場合、コンテキストクラス名が必要となります。");
-
-            var variableName = isStatic
-                ? $"{contextTypeName}.@{member.Name}.Length"
-                : $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{member.Name}.Length";
-
-            return member.WriteType switch
+            foreach (var member in members)
             {
-                WriteConstantLiteral or WriteLiteral => variableName,
-                WriteString => $"global::System.Text.Encoding.UTF8.GetMaxByteCount({variableName})",
-                WriteEnum or WriteValue or _ => throw new InvalidOperationException("不正なWriteTypeです。")
-            };
+                writer.WriteLine();
+                writer.Write("+ ");
+                WriteContextMemberLength(in emitter, member, contextTypeName);
+            }
+        }
+
+        static void WriteContextMemberLength(in Emitter emitter, ContextMember member, string? contextTypeName)
+        {
+            var writer = emitter._writer;
+
+            emitter.WriteContextMemberName(member, contextTypeName);
+            writer.Write(".Length");
         }
     }
 
@@ -250,5 +268,23 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
             static string GetProviderArgument(IFormatProvider? provider)
                 => provider is null ? "provider" : provider.ToFullString();
         }
+    }
+
+    void WriteContextMemberName(ContextMember member, string? contextTypeName)
+    {
+        var isStatic = member.Annotation.HasFlag(MethodAnnotation.Static);
+
+        if (isStatic && string.IsNullOrEmpty(contextTypeName))
+        {
+            throw new ArgumentException("静的識別子の場合、コンテキストクラス名は必須です。", nameof(contextTypeName));
+        }
+
+        if (isStatic)
+        {
+            _writer.Write($"{contextTypeName!}.@{member.Name}");
+            return;
+        }
+
+        _writer.Write($"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{member.Name}");
     }
 }
