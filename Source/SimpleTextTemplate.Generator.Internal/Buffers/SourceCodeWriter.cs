@@ -1,7 +1,6 @@
-﻿using System.Globalization;
+﻿using System.Buffers;
+using System.Globalization;
 using System.Runtime.CompilerServices;
-using CommunityToolkit.HighPerformance;
-using CommunityToolkit.HighPerformance.Buffers;
 
 namespace SimpleTextTemplate.Generator.Buffers;
 
