@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace SimpleTextTemplate;
 
 /// <summary>
-/// テンプレート
+/// テンプレートをレンダリングするクラスです。
 /// </summary>
 public static class TemplateRenderer
 {
