@@ -160,7 +160,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
             info.Methods.ShouldBeEmpty();
             interceptInfoList.ShouldBeEmpty();
-        }  
+        }
     }
 
     [Fact]
