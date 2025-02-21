@@ -2,5 +2,10 @@
 
 public enum EnumTestData
 {
-    A
+    None,
+    A,
+    B,
+    C,
+    D,
+    E
 }
