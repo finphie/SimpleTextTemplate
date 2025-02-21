@@ -1,4 +1,5 @@
 ﻿using System.Buffers;
+using System.Linq.Expressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,7 +16,7 @@ static class CompilationExtensions
     /// </summary>
     /// <param name="compilation">コンパイル情報</param>
     /// <returns>インターセプター情報を返します。</returns>
-    public static InterceptInfo[] GetInterceptInfo(this Compilation compilation)
+    public static Queue<InterceptInfo> GetInterceptInfo(this Compilation compilation)
     {
         var generatedSyntaxTrees = compilation.SyntaxTrees.Last();
         var root = generatedSyntaxTrees.GetCompilationUnitRoot();
@@ -33,18 +34,54 @@ static class CompilationExtensions
                         var writer = (InvocationExpressionSyntax)statement.Expression;
                         var writerMethod = (MemberAccessExpressionSyntax)writer.Expression;
                         var identifier = ((IdentifierNameSyntax)writerMethod.Name).Identifier.ValueText;
-                        var arguments = writer.ArgumentList.Arguments.Select(static x => x.ToFullString()).ToArray();
+                        var arguments = writer.ArgumentList.Arguments.ToArray();
 
                         return new MethodInfo(
                             identifier,
-                            arguments[0],
-                            arguments.Length > 1 ? arguments[1] : null,
-                            arguments.Length > 2 ? arguments[2] : null);
+                            GetExpressionParts(arguments[0].Expression).ToArray(),
+                            arguments.Length > 1 ? arguments[1].ToString() : null,
+                            arguments.Length > 2 ? arguments[2].ToString() : null);
                     });
 
-                return new InterceptInfo([.. statements]);
+                return new InterceptInfo(new(statements));
             });
 
-        return [.. blocks];
+        return new(blocks);
+    }
+
+    static IEnumerable<string> GetExpressionParts(ExpressionSyntax expression)
+    {
+        return expression switch
+        {
+            BinaryExpressionSyntax binaryExpression => GetBinaryExpressionParts(binaryExpression),
+            InvocationExpressionSyntax invocationExpression => GetInvocationExpressionParts(invocationExpression),
+            _ => [expression.ToString()]
+        };
+    }
+
+    static IEnumerable<string> GetBinaryExpressionParts(BinaryExpressionSyntax binaryExpression)
+    {
+        foreach (var part in GetExpressionParts(binaryExpression.Left))
+        {
+            yield return part;
+        }
+
+        foreach (var part in GetExpressionParts(binaryExpression.Right))
+        {
+            yield return part;
+        }
+    }
+
+    static IEnumerable<string> GetInvocationExpressionParts(InvocationExpressionSyntax invocationExpression)
+    {
+        yield return invocationExpression.Expression.ToString();
+
+        foreach (var argument in invocationExpression.ArgumentList.Arguments)
+        {
+            foreach (var part in GetExpressionParts(argument.Expression))
+            {
+                yield return part;
+            }
+        }
     }
 }
