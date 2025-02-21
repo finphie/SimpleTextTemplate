@@ -3,9 +3,9 @@
 public enum EnumTestData
 {
     None,
-    A,
-    B,
-    C,
-    D,
-    E
+    Test1,
+    Test2,
+    Test3,
+    Test4,
+    Test5
 }
