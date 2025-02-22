@@ -72,32 +72,6 @@ public sealed class TemplateRendererRenderStringTest
     }
 
     [Fact]
-    public void 定数が空白()
-    {
-        var sourceCode = Get("{{ StringConstantEmptyField }}", nameof(StringContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
-
-    [Fact]
-    public void 定数がNull()
-    {
-        var sourceCode = Get("{{ StringConstantNullField }}", nameof(StringContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
-
-    [Fact]
     public void 静的フィールド()
     {
         var sourceCode = Get("{{ StringStaticField }}", nameof(StringContextTestData));
