@@ -44,7 +44,7 @@ public sealed class TemplateRendererRenderStringTest
     [Fact]
     public void 複数の定数()
     {
-        var sourceCode = Get("{{ StringConstantField }}{{ StringStaticField }}", nameof(StringContextTestData));
+        var sourceCode = Get("{{ StringConstantField }}{{ StringConstantField }}", nameof(StringContextTestData));
         var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
