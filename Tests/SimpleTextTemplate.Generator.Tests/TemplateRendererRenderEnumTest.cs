@@ -111,7 +111,7 @@ public sealed class TemplateRendererRenderEnumTest
     }
 
     [Fact]
-    public void 無効な値の定数()
+    public void 定数が無効な値()
     {
         var sourceCode = Get("{{ EnumConstantFieldInvalidNumber }}", nameof(EnumContextTestData));
         var (compilation, diagnostics) = Run(sourceCode);
