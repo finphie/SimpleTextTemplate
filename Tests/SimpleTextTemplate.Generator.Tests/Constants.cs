@@ -27,6 +27,7 @@ static class Constants
 
     public const string Grow = nameof(TemplateWriter<IBufferWriter<byte>>.Grow);
 
+    public static readonly string InvariantInfo = "System.Globalization." + DateTimeFormatInfo.InvariantInfo.ToExpressionString();
     public static readonly string JaJpCulture = "System.Globalization." + CultureInfo.GetCultureInfo("ja-JP").ToExpressionString();
     public static readonly IReadOnlyList<string> InvariantCultureList = [InvariantCulture, NullCulture, DefaultCulture];
 }
