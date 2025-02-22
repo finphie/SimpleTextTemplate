@@ -206,19 +206,49 @@ ref struct InterceptInfoCreator
                 continue;
             }
 
-            // 識別子が定数かつIFormatProviderの指定がある場合は、定数書き込み
-            if (identifier.Symbol is IFieldSymbol { HasConstantValue: true, ConstantValue: var constantValue } && TryAddConstantValue(constantValue, format, provider))
+            var type = identifier.Symbol.GetFieldOrPropertyType();
+
+            // 識別子が定数かつIFormatProviderの指定がある場合
+            if (identifier.Symbol is IFieldSymbol { HasConstantValue: true, ConstantValue: var constantValue } fieldSymbol)
             {
                 // IFormattableを実装していない識別子で、formatまたはproviderが設定されている場合
-                if (!identifier.Formattable.HasFlag(FormattableType.IFormattable) && (format is not null || identifierProvider is not null))
+                if (!identifier.Formattable.HasFlag(FormattableType.IFormattable) && (format is not null || identifierProvider is not null) && type.TypeKind != TypeKind.Enum)
                 {
                     _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidConstantIdentifierFormatProvider, _templateArgument.GetLocation()));
                 }
 
-                continue;
+                if (type.TypeKind != TypeKind.Enum)
+                {
+                    // IFormattableを実装している識別子で、IFormatProviderの指定がある場合のみ定数書き込み
+                    if (TryAddConstantValue(constantValue, format, provider))
+                    {
+                        continue;
+                    }
+                }
+                else if (format is null)
+                {
+                    var enumMember = fieldSymbol.Type.GetMembers()
+                        .OfType<IFieldSymbol>()
+                        .FirstOrDefault(x => x.HasConstantValue && x.ConstantValue.Equals(constantValue));
+
+                    constantValue = enumMember is not null
+                        ? enumMember.Name
+                        : constantValue;
+
+                    if (TryAddConstantValue(constantValue, null, provider))
+                    {
+                        continue;
+                    }
+                }
+                else if (format is "D" or "d")
+                {
+                    if (TryAddConstantValue(constantValue, null, provider))
+                    {
+                        continue;
+                    }
+                }
             }
 
-            var type = identifier.Symbol.GetFieldOrPropertyType();
             var annotation = identifier.Symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
 
             if (type.TypeKind == TypeKind.Enum)
@@ -242,7 +272,11 @@ ref struct InterceptInfoCreator
             // ReadOnlySpan<byte>やbyte[]などが一致
             if (_compilation.ClassifyConversion(type, _readOnlySpanByteSymbol).IsImplicit)
             {
-                annotation |= MethodAnnotation.Dangerous;
+                if (SymbolEqualityComparer.Default.Equals(type, _readOnlySpanByteSymbol))
+                {
+                    annotation |= MethodAnnotation.Dangerous;
+                }
+
                 AddValue(new(WriteLiteral, value, annotation, format, provider));
                 continue;
             }
@@ -251,7 +285,11 @@ ref struct InterceptInfoCreator
             // ReadOnlySpan<char>やstring、char[]などが一致
             if (_compilation.ClassifyConversion(type, _readOnlySpanCharSymbol).IsImplicit)
             {
-                annotation |= MethodAnnotation.Dangerous;
+                if (SymbolEqualityComparer.Default.Equals(type, _readOnlySpanCharSymbol))
+                {
+                    annotation |= MethodAnnotation.Dangerous;
+                }
+
                 AddValue(new(WriteString, value, annotation, format, provider));
                 continue;
             }
