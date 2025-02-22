@@ -52,7 +52,6 @@ public sealed class TemplateRendererRenderEnumTest
             """);
     }
 
-
     [Fact]
     public void Flags属性を付与したEnumの定数()
     {

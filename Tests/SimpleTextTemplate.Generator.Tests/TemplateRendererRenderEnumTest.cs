@@ -302,7 +302,6 @@ public sealed class TemplateRendererRenderEnumTest
         interceptInfoList.ShouldBeEmpty();
     }
 
-
     [Fact]
     public void 静的プロパティ()
     {

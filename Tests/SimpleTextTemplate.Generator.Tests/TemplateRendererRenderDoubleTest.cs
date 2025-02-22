@@ -490,7 +490,6 @@ public sealed class TemplateRendererRenderDoubleTest
         interceptInfoList.ShouldBeEmpty();
     }
 
-
     [Fact]
     public void フィールド_メソッド引数でInvariantCulture指定()
     {
