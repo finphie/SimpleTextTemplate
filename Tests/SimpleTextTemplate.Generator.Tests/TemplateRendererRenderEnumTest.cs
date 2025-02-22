@@ -8,8 +8,6 @@ using static SimpleTextTemplate.Generator.Tests.SourceCode;
 
 namespace SimpleTextTemplate.Generator.Tests;
 
-// 範囲外
-// Flag
 public sealed class TemplateRendererRenderEnumTest
 {
     [Fact]
@@ -136,6 +134,50 @@ public sealed class TemplateRendererRenderEnumTest
         method.Text.Count.ShouldBe(1);
         method.Text[0].ShouldBe("\"99\"u8");
         method.Format.ShouldBeNull();
+        method.Provider.ShouldBeNull();
+
+        info.Methods.ShouldBeEmpty();
+        interceptInfoList.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Flags属性を付与したEnumの定数()
+    {
+        var sourceCode = Get("{{ FlagEnumConstantField }}", nameof(EnumContextTestData));
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.ShouldBeEmpty();
+
+        var info = interceptInfoList.Dequeue();
+        var method = info.Methods.Dequeue();
+
+        method.Name.ShouldBe(WriteEnum);
+        method.Text.Count.ShouldBe(1);
+        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.EnumContextTestData.@FlagEnumConstantField");
+        method.Format.ShouldBe(DefaultKeyword);
+        method.Provider.ShouldBeNull();
+
+        info.Methods.ShouldBeEmpty();
+        interceptInfoList.ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Flags属性を付与したEnumの定数_Format指定()
+    {
+        var sourceCode = Get("{{ FlagEnumConstantField:D }}", nameof(EnumContextTestData));
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.ShouldBeEmpty();
+
+        var info = interceptInfoList.Dequeue();
+        var method = info.Methods.Dequeue();
+
+        method.Name.ShouldBe(WriteEnum);
+        method.Text.Count.ShouldBe(1);
+        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.EnumContextTestData.@FlagEnumConstantField");
+        method.Format.ShouldBe("\"D\"");
         method.Provider.ShouldBeNull();
 
         info.Methods.ShouldBeEmpty();

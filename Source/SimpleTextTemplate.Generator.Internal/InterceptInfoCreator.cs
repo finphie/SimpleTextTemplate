@@ -17,6 +17,8 @@ namespace SimpleTextTemplate.Generator;
 /// </summary>
 ref struct InterceptInfoCreator
 {
+    static readonly string FlagsAttributeFullName = typeof(FlagsAttribute).FullName;
+
     readonly GeneratorSyntaxContext _context;
     readonly SemanticModel _semanticModel;
     readonly Compilation _compilation;
@@ -33,6 +35,7 @@ ref struct InterceptInfoCreator
 
     readonly INamedTypeSymbol _readOnlySpanByteSymbol;
     readonly INamedTypeSymbol _readOnlySpanCharSymbol;
+    readonly INamedTypeSymbol _flagsAttributeSymbol;
 
 #pragma warning disable RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
     InterceptableLocation? _interceptableLocation;
@@ -67,6 +70,8 @@ ref struct InterceptInfoCreator
 
         _readOnlySpanByteSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
         _readOnlySpanCharSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
+        _flagsAttributeSymbol = _compilation.GetTypeByMetadataName(FlagsAttributeFullName)
+            ?? throw new InvalidOperationException("Type System.FlagsAttribute is not found.");
     }
 
     /// <summary>
@@ -225,26 +230,35 @@ ref struct InterceptInfoCreator
                         continue;
                     }
                 }
-                else if (format is null)
+                else
                 {
-                    var enumMember = fieldSymbol.Type.GetMembers()
-                        .OfType<IFieldSymbol>()
-                        .FirstOrDefault(x => x.HasConstantValue && x.ConstantValue.Equals(constantValue));
+                    var enumAttributes = fieldSymbol.Type.GetAttributes();
+                    var flagsAttributeSymbol = _flagsAttributeSymbol;
 
-                    constantValue = enumMember is not null
-                        ? enumMember.Name
-                        : constantValue;
+                    if (!enumAttributes.Any(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, flagsAttributeSymbol)))
+                    {
+                        if (format is null)
+                        {
+                            var enumMember = fieldSymbol.Type.GetMembers()
+                                .OfType<IFieldSymbol>()
+                                .FirstOrDefault(x => x.HasConstantValue && x.ConstantValue.Equals(constantValue));
 
-                    if (TryAddConstantValue(constantValue, null, provider))
-                    {
-                        continue;
-                    }
-                }
-                else if (format is "D" or "d")
-                {
-                    if (TryAddConstantValue(constantValue, null, provider))
-                    {
-                        continue;
+                            constantValue = enumMember is not null
+                                ? enumMember.Name
+                                : constantValue;
+
+                            if (TryAddConstantValue(constantValue, null, provider))
+                            {
+                                continue;
+                            }
+                        }
+                        else if (format is "D" or "d")
+                        {
+                            if (TryAddConstantValue(constantValue, null, provider))
+                            {
+                                continue;
+                            }
+                        }
                     }
                 }
             }
