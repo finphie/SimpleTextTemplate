@@ -185,7 +185,7 @@ public sealed class TemplateRendererRenderDoubleTest
     }
 
     [Fact]
-    public void フィールド_InvariantCultureを指定()
+    public void フィールド_InvariantCulture指定()
     {
         const string Text = """
             {{ DoubleField }}
@@ -210,7 +210,7 @@ public sealed class TemplateRendererRenderDoubleTest
     }
 
     [Fact]
-    public void フィールド_特定カルチャーを指定()
+    public void フィールド_特定カルチャー指定()
     {
         const string Text = """
             {{ DoubleField }}
