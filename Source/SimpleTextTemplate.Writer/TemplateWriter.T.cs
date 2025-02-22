@@ -157,26 +157,9 @@ public ref struct TemplateWriter<T>
     /// <param name="value">UTF-8文字列</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void WriteLiteral(scoped ReadOnlySpan<byte> value)
-        => WriteLiteral(ref MemoryMarshal.GetReference(value), value.Length);
-
-    /// <summary>
-    /// バッファーにUTF-8文字列を書き込みます。
-    /// </summary>
-    /// <param name="value">UTF-8文字列</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void WriteLiteral(byte[] value)
-        => WriteLiteral(ref MemoryMarshal.GetArrayDataReference(value), value.Length);
-
-    /// <summary>
-    /// バッファーにUTF-8文字列を書き込みます。
-    /// </summary>
-    /// <param name="value">UTF-8文字列</param>
-    /// <param name="length">文字列の長さ</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void WriteLiteral(scoped ref byte value, int length)
     {
-        Grow(length);
-        DangerousWriteLiteral(ref value, length);
+        Grow(value.Length);
+        DangerousWriteLiteral(value);
     }
 
     /// <summary>
@@ -186,30 +169,11 @@ public ref struct TemplateWriter<T>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void DangerousWriteLiteral(scoped ReadOnlySpan<byte> value)
-        => DangerousWriteLiteral(ref MemoryMarshal.GetReference(value), value.Length);
-
-    /// <summary>
-    /// バッファーにUTF-8文字列を書き込みます。バッファーサイズの事前拡張は行いません。
-    /// </summary>
-    /// <param name="value">UTF-8文字列</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DangerousWriteLiteral(byte[] value)
-        => DangerousWriteLiteral(ref MemoryMarshal.GetArrayDataReference(value), value.Length);
-
-    /// <summary>
-    /// バッファーにUTF-8文字列を書き込みます。バッファーサイズの事前拡張は行いません。
-    /// </summary>
-    /// <param name="value">UTF-8文字列</param>
-    /// <param name="length">文字列の長さ</param>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DangerousWriteLiteral(scoped ref byte value, int length)
     {
-        Debug.Assert(length <= _destinationLength, "バッファーのサイズが不足しています。");
+        Debug.Assert(value.Length <= _destinationLength, "バッファーのサイズが不足しています。");
 
-        Unsafe.CopyBlockUnaligned(ref _destination, ref value, (uint)length);
-        Advance(length);
+        Unsafe.CopyBlockUnaligned(ref _destination, ref MemoryMarshal.GetReference(value), (uint)value.Length);
+        Advance(value.Length);
     }
 
     /// <summary>
