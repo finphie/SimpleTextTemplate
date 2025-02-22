@@ -185,6 +185,36 @@ public sealed class TemplateRendererRenderEnumTest
     }
 
     [Fact]
+    public void 複数の定数()
+    {
+        var sourceCode = Get("{{ EnumConstantField }}{{ EnumConstantField }}", nameof(EnumContextTestData));
+        var (compilation, diagnostics) = Run(sourceCode);
+        var interceptInfoList = compilation.GetInterceptInfo();
+
+        diagnostics.ShouldBeEmpty();
+
+        var info = interceptInfoList.Dequeue();
+        var method = info.Methods.Dequeue();
+
+        method.Name.ShouldBe(Grow);
+        method.Text.Count.ShouldBe(1);
+        method.Text[0].ShouldBe("10");
+        method.Format.ShouldBeNull();
+        method.Provider.ShouldBeNull();
+
+        method = info.Methods.Dequeue();
+
+        method.Name.ShouldBe(DangerousWriteConstantLiteral);
+        method.Text.Count.ShouldBe(1);
+        method.Text[0].ShouldBe("\"Test1Test1\"u8");
+        method.Format.ShouldBeNull();
+        method.Provider.ShouldBeNull();
+
+        info.Methods.ShouldBeEmpty();
+        interceptInfoList.ShouldBeEmpty();
+    }
+
+    [Fact]
     public void 静的フィールド()
     {
         var sourceCode = Get("{{ EnumStaticField }}", nameof(EnumContextTestData));
