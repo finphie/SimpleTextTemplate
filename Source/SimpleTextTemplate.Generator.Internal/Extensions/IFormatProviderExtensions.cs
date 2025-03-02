@@ -52,4 +52,18 @@ static class IFormatProviderExtensions
             ? throw new InvalidOperationException("カルチャー名を取得できませんでした。")
             : name;
     }
+
+    /// <summary>
+    /// <see cref="IFormatProvider"/>を取得します。
+    /// </summary>
+    /// <param name="provider">カルチャー</param>
+    /// <param name="isDefaultInvariantCulture"><paramref name="provider"/>がnullの場合に<see cref="InvariantCulture"/>を返すかどうか</param>
+    /// <returns></returns>
+    public static IFormatProvider? GetFormatProvider(this IFormatProvider? provider, bool isDefaultInvariantCulture)
+    {
+        return provider is not null ? provider : GetDefaultFormatProvider(isDefaultInvariantCulture);
+
+        static IFormatProvider? GetDefaultFormatProvider(bool isDefaultInvariantCulture)
+            => isDefaultInvariantCulture ? CultureInfo.InvariantCulture : null;
+    }
 }

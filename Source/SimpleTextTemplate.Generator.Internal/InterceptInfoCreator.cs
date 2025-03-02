@@ -26,8 +26,11 @@ ref struct InterceptInfoCreator
 
     readonly InvocationExpressionSyntax _invocationExpression;
 
-    readonly SeparatedSyntaxList<ArgumentSyntax> _arguments;
     readonly ExpressionSyntax _templateArgument;
+    readonly ExpressionSyntax? _contextArgument;
+    readonly ExpressionSyntax? _providerArgument;
+
+    readonly bool _isConstantTemplateString;
 
     readonly List<TemplateWriterWriteInfo> _writeInfoList = [];
     readonly Dictionary<int, TemplateWriterGrowInfo> _growInfoList = [];
@@ -41,6 +44,7 @@ ref struct InterceptInfoCreator
     InterceptableLocation? _interceptableLocation;
 #pragma warning restore RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
 
+    bool _isInvariantCulture;
     bool _success;
     bool _isConstant;
 
@@ -59,14 +63,18 @@ ref struct InterceptInfoCreator
         _invocationExpression = _context.Node as InvocationExpressionSyntax
             ?? throw new ArgumentException($"{nameof(context)}.{nameof(context.Node)}が{nameof(InvocationExpressionSyntax)}ではありません。");
 
-        _arguments = _invocationExpression.ArgumentList.Arguments;
+        var arguments = _invocationExpression.ArgumentList.Arguments;
 
-        if (_arguments.Count is < TemplateRenderParameterCount or > TemplateRenderParameterCountWithContext)
+        if (arguments.Count is < TemplateRenderParameterCount or > TemplateRenderParameterCountWithContext)
         {
             throw new ArgumentException("Template.Renderの引数は、2～4個である必要があります。");
         }
 
-        _templateArgument = _arguments[TemplateRenderTextIndex].Expression;
+        _templateArgument = arguments[TemplateRenderTextIndex].Expression;
+        _contextArgument = arguments.ElementAtOrDefault(TemplateRenderContextIndex)?.Expression;
+        _providerArgument = arguments.ElementAtOrDefault(TemplateRenderIFormatProviderIndex)?.Expression;
+
+        _isConstantTemplateString = arguments.Count == TemplateRenderParameterCount;
 
         _readOnlySpanByteSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
         _readOnlySpanCharSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
@@ -116,11 +124,13 @@ ref struct InterceptInfoCreator
             return;
         }
 
-        if (_arguments.Count == TemplateRenderParameterCount)
+        if (_isConstantTemplateString)
         {
             AnalyzeTemplate(in template, cancellationToken);
             return;
         }
+
+        _isInvariantCulture = IsInvariantCulture(cancellationToken);
 
         AnalyzeTemplateWithContext(in template, cancellationToken);
         AnalyzeDangerousMethod(cancellationToken);
@@ -128,21 +138,19 @@ ref struct InterceptInfoCreator
 
     readonly bool IsInvariantCulture(CancellationToken cancellationToken)
     {
-        // IFormatProvider指定なしの場合、InvariantCultureとする。
-        if (_arguments.Count < TemplateRenderIFormatProviderIndex + 1)
+        // provider指定なしの場合、InvariantCultureとする。
+        if (_providerArgument is null)
         {
             return true;
         }
 
-        var providerExpression = _arguments[TemplateRenderIFormatProviderIndex].Expression;
-
-        // IFormatProviderがnullの場合、InvariantCultureとする。
-        if (_semanticModel.GetConstantValue(providerExpression, cancellationToken) is { HasValue: true, Value: var constantProvider } && constantProvider is null)
+        // providerがnullの場合、InvariantCultureとする。
+        if (_semanticModel.GetConstantValue(_providerArgument, cancellationToken) is { HasValue: true, Value: null })
         {
             return true;
         }
 
-        var operation = _semanticModel.GetOperation(providerExpression, cancellationToken);
+        var operation = _semanticModel.GetOperation(_providerArgument, cancellationToken);
 
         return operation is IPropertyReferenceOperation { Property.ContainingNamespace: { Name: nameof(System.Globalization), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } } providerOperation
             && providerOperation switch
@@ -176,15 +184,14 @@ ref struct InterceptInfoCreator
 
     void AnalyzeTemplateWithContext(in Template template, CancellationToken cancellationToken)
     {
-        var contextArgument = _arguments[TemplateRenderContextIndex].Expression;
-        var contextType = _semanticModel.GetTypeInfo(contextArgument, cancellationToken).Type;
-
-        if (contextArgument is null || contextType is null)
+        if (_contextArgument is null)
         {
-            throw new InvalidOperationException("コンテキストの型情報が取得できません。");
+            throw new InvalidOperationException("コンテキストが取得できません。");
         }
 
-        var isInvariantCulture = IsInvariantCulture(cancellationToken);
+        var contextType = _semanticModel.GetTypeInfo(_contextArgument, cancellationToken).Type
+            ?? throw new InvalidOperationException("コンテキストの型情報が取得できません。");
+
         var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(
             static x => x.Name,
             static x => (Symbol: x, Formattable: x.GetFieldOrPropertyType().Interfaces.GetFormattableType()));
@@ -194,7 +201,6 @@ ref struct InterceptInfoCreator
             cancellationToken.ThrowIfCancellationRequested();
 
             var value = Encoding.UTF8.GetString(utf8Value);
-            var provider = GetFormatProvider(identifierProvider, isInvariantCulture);
 
             if (block == BlockType.Raw)
             {
@@ -207,119 +213,170 @@ ref struct InterceptInfoCreator
             // 識別子がコンテキストに存在しない
             if (!contextMembers.TryGetValue(value, out var identifier))
             {
-                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifier, contextArgument.GetLocation(), value));
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifier, _contextArgument.GetLocation(), value));
                 continue;
             }
 
-            var type = identifier.Symbol.GetFieldOrPropertyType();
-
-            // 識別子が定数かつIFormatProviderの指定がある場合
-            if (identifier.Symbol is IFieldSymbol { HasConstantValue: true, ConstantValue: var constantValue } fieldSymbol)
-            {
-                // IFormattableを実装していない識別子で、formatまたはproviderが設定されている場合
-                if (!identifier.Formattable.HasFlag(FormattableType.IFormattable) && (format is not null || identifierProvider is not null) && type.TypeKind != TypeKind.Enum)
-                {
-                    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidConstantIdentifierFormatProvider, _templateArgument.GetLocation()));
-                }
-
-                if (type.TypeKind != TypeKind.Enum)
-                {
-                    // IFormattableを実装している識別子で、IFormatProviderの指定がある場合のみ定数書き込み
-                    if (TryAddConstantValue(constantValue, format, provider))
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    var enumAttributes = fieldSymbol.Type.GetAttributes();
-                    var flagsAttributeSymbol = _flagsAttributeSymbol;
-
-                    if (!enumAttributes.Any(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, flagsAttributeSymbol)))
-                    {
-                        if (format is null)
-                        {
-                            var enumMember = fieldSymbol.Type.GetMembers()
-                                .OfType<IFieldSymbol>()
-                                .FirstOrDefault(x => x.HasConstantValue && x.ConstantValue.Equals(constantValue));
-
-                            constantValue = enumMember is not null
-                                ? enumMember.Name
-                                : constantValue;
-
-                            if (TryAddConstantValue(constantValue, null, provider))
-                            {
-                                continue;
-                            }
-                        }
-                        else if (format is "D" or "d")
-                        {
-                            if (TryAddConstantValue(constantValue, null, provider))
-                            {
-                                continue;
-                            }
-                        }
-                    }
-                }
-            }
-
-            var annotation = identifier.Symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
-
-            if (type.TypeKind == TypeKind.Enum)
-            {
-                if (identifierProvider is not null)
-                {
-                    _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidEnumIdentifierFormatProvider, _templateArgument.GetLocation()));
-                }
-
-                AddValue(new(WriteEnum, value, annotation, format, provider));
-                continue;
-            }
-
-            // IFormattable/ISpanFormattable/IUtf8Formattableを実装していない識別子で、formatまたはproviderが設定されている場合
-            if (identifier.Formattable == FormattableType.None && (format is not null || identifierProvider is not null))
-            {
-                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifierFormatProvider, _templateArgument.GetLocation()));
-            }
-
-            // 識別子の型をReadOnlySpan<byte>に暗黙的変換できるどうか
-            // ReadOnlySpan<byte>やbyte[]などが一致
-            if (_compilation.ClassifyConversion(type, _readOnlySpanByteSymbol).IsImplicit)
-            {
-                if (SymbolEqualityComparer.Default.Equals(type, _readOnlySpanByteSymbol))
-                {
-                    annotation |= MethodAnnotation.Dangerous;
-                }
-
-                AddValue(new(WriteLiteral, value, annotation, format, provider));
-                continue;
-            }
-
-            // 識別子の型をReadOnlySpan<char>に暗黙的変換できるどうか
-            // ReadOnlySpan<char>やstring、char[]などが一致
-            if (_compilation.ClassifyConversion(type, _readOnlySpanCharSymbol).IsImplicit)
-            {
-                if (SymbolEqualityComparer.Default.Equals(type, _readOnlySpanCharSymbol))
-                {
-                    annotation |= MethodAnnotation.Dangerous;
-                }
-
-                AddValue(new(WriteString, value, annotation, format, provider));
-                continue;
-            }
-
-            AddValue(new(WriteValue, value, annotation, format, provider));
+            AddIdentifier(identifier.Symbol, identifier.Formattable, value, format, identifierProvider);
         }
 
         _success = true;
+    }
 
-        static IFormatProvider? GetFormatProvider(IFormatProvider? provider, bool isDefaultInvariantCulture)
+    void AddIdentifier(ISymbol symbol, FormattableType formattableType, string value, string? format, IFormatProvider? identifierProvider)
+    {
+        // 識別子が定数の場合
+        if (TryAddConstantIdentifier(symbol, formattableType, format, identifierProvider))
         {
-            return provider is not null ? provider : GetDefaultFormatProvider(isDefaultInvariantCulture);
-
-            static IFormatProvider? GetDefaultFormatProvider(bool isDefaultInvariantCulture)
-                => isDefaultInvariantCulture ? CultureInfo.InvariantCulture : null;
+            return;
         }
+
+        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
+
+        // 識別子がenumの場合
+        if (TryAddEnumIdentifier(symbol, value, format, identifierProvider))
+        {
+            return;
+        }
+
+        // IFormattable/ISpanFormattable/IUtf8Formattableを実装していない識別子で、formatまたはproviderが設定されている場合
+        if (formattableType == FormattableType.None && (format is not null || identifierProvider is not null))
+        {
+            _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidIdentifierFormatProvider, _templateArgument.GetLocation()));
+        }
+
+        // 識別子がbyte配列の場合
+        if (TryAddLiteralIdentifier(symbol, value, format, identifierProvider))
+        {
+            return;
+        }
+
+        // 識別子がchar配列の場合
+        if (TryAddStringIdentifier(symbol, value, format, identifierProvider))
+        {
+            return;
+        }
+
+        var annotation = symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
+        AddValue(new(WriteValue, value, annotation, format, provider));
+    }
+
+    bool TryAddConstantIdentifier(ISymbol symbol, FormattableType formattableType, string? format, IFormatProvider? identifierProvider)
+    {
+        // 識別子が定数かどうか
+        if (symbol is not IFieldSymbol { HasConstantValue: true, ConstantValue: var constantValue } fieldSymbol)
+        {
+            return false;
+        }
+
+        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
+
+        if (fieldSymbol.Type.TypeKind != TypeKind.Enum)
+        {
+            // IFormattableを実装していない識別子で、formatまたはproviderが設定されている場合
+            if (!formattableType.HasFlag(FormattableType.IFormattable) && (format is not null || identifierProvider is not null))
+            {
+                _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidConstantIdentifierFormatProvider, _templateArgument.GetLocation()));
+            }
+
+            // IFormattableを実装している識別子で、IFormatProviderの指定がある場合のみ定数書き込み
+            return TryAddConstantValue(constantValue, format, provider);
+        }
+
+        // FormatにD以外を指定している場合は定数展開しない
+        if (format is not (null or "D" or "d"))
+        {
+            return false;
+        }
+
+        var enumAttributes = fieldSymbol.Type.GetAttributes();
+        var flagsAttributeSymbol = _flagsAttributeSymbol;
+
+        // Flags属性がある場合は定数展開しない
+        if (enumAttributes.Any(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, flagsAttributeSymbol)))
+        {
+            return false;
+        }
+
+        if (format is null)
+        {
+            var enumMember = fieldSymbol.Type.GetMembers()
+                .OfType<IFieldSymbol>()
+                .FirstOrDefault(x => x.HasConstantValue && x.ConstantValue.Equals(constantValue));
+
+            constantValue = enumMember is not null
+                ? enumMember.Name
+                : constantValue;
+        }
+
+        return TryAddConstantValue(constantValue, null, provider);
+    }
+
+    bool TryAddEnumIdentifier(ISymbol symbol, string value, string? format, IFormatProvider? identifierProvider)
+    {
+        var type = symbol.GetFieldOrPropertyType();
+
+        if (type.TypeKind != TypeKind.Enum)
+        {
+            return false;
+        }
+
+        if (identifierProvider is not null)
+        {
+            _diagnostics.Add(Diagnostic.Create(DiagnosticDescriptors.InvalidEnumIdentifierFormatProvider, _templateArgument.GetLocation()));
+        }
+
+        var annotation = symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
+        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
+
+        AddValue(new(WriteEnum, value, annotation, format, provider));
+        return true;
+    }
+
+    bool TryAddLiteralIdentifier(ISymbol symbol, string value, string? format, IFormatProvider? identifierProvider)
+    {
+        var type = symbol.GetFieldOrPropertyType();
+
+        // 識別子の型をReadOnlySpan<byte>に暗黙的変換できるどうか
+        // ReadOnlySpan<byte>やbyte[]などが一致
+        if (!_compilation.ClassifyConversion(type, _readOnlySpanByteSymbol).IsImplicit)
+        {
+            return false;
+        }
+
+        var annotation = symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
+        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
+
+        if (SymbolEqualityComparer.Default.Equals(type, _readOnlySpanByteSymbol))
+        {
+            annotation |= MethodAnnotation.Dangerous;
+        }
+
+        AddValue(new(WriteLiteral, value, annotation, format, provider));
+        return true;
+    }
+
+    bool TryAddStringIdentifier(ISymbol symbol, string value, string? format, IFormatProvider? identifierProvider)
+    {
+        var type = symbol.GetFieldOrPropertyType();
+
+        // 識別子の型をReadOnlySpan<char>に暗黙的変換できるどうか
+        // ReadOnlySpan<char>やstring、char[]などが一致
+        if (!_compilation.ClassifyConversion(type, _readOnlySpanCharSymbol).IsImplicit)
+        {
+            return false;
+        }
+
+        var annotation = symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
+        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
+
+        if (SymbolEqualityComparer.Default.Equals(type, _readOnlySpanCharSymbol))
+        {
+            annotation |= MethodAnnotation.Dangerous;
+        }
+
+        AddValue(new(WriteString, value, annotation, format, provider));
+        return true;
     }
 
     void AddConstantString(string value)
@@ -342,6 +399,12 @@ ref struct InterceptInfoCreator
 
     bool TryAddConstantValue(object value, string? format, IFormatProvider? provider)
     {
+        // nullの場合はWriteConstantLiteralメソッドの呼び出しは不要。
+        if (value is null)
+        {
+            return true;
+        }
+
         if (value is IFormattable formattableValue)
         {
             if (provider is null)
@@ -360,12 +423,6 @@ ref struct InterceptInfoCreator
                 AddConstantString(valueString);
             }
 
-            return true;
-        }
-
-        // nullの場合はWriteConstantLiteralメソッドの呼び出しは不要。
-        if (value is null)
-        {
             return true;
         }
 
