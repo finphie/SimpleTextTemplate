@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -31,6 +32,7 @@ ref struct InterceptInfoCreator
     readonly ExpressionSyntax? _providerArgument;
 
     readonly bool _isConstantTemplateString;
+    readonly Dictionary<ITypeSymbol, EnumInfo> _enumList = new(SymbolEqualityComparer.Default);
 
     readonly List<TemplateWriterWriteInfo> _writeInfoList = [];
     readonly Dictionary<int, TemplateWriterGrowInfo> _growInfoList = [];
@@ -289,24 +291,38 @@ ref struct InterceptInfoCreator
             return false;
         }
 
-        var enumAttributes = fieldSymbol.Type.GetAttributes();
-        var flagsAttributeSymbol = _flagsAttributeSymbol;
+        var enumType = fieldSymbol.Type;
 
-        // Flags属性がある場合は定数展開しない
-        if (enumAttributes.Any(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, flagsAttributeSymbol)))
+        // enum関連のキャッシュがない場合は作成する
+        if (!_enumList.TryGetValue(enumType, out var enumInfo))
+        {
+            // enumの各定数値から、該当する名前を取得するためのテーブルを作成
+            var constantValueToNameTable = fieldSymbol.Type.GetMembers()
+                .OfType<IFieldSymbol>()
+                .Where(x => x.HasConstantValue)
+                .ToFrozenDictionary(x => x.ConstantValue!, x => x.Name);
+
+            // 属性を取得
+            var enumAttributes = fieldSymbol.Type.GetAttributes();
+            var flagsAttributeSymbol = _flagsAttributeSymbol;
+
+            // Flags属性が設定されているか
+            var isFlag = enumAttributes.Any(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, flagsAttributeSymbol));
+
+            enumInfo = new(constantValueToNameTable, isFlag);
+            _enumList.Add(enumType, enumInfo);
+        }
+
+        // Flags属性が設定されている場合、定数展開しない
+        if (enumInfo.IsFlag)
         {
             return false;
         }
 
-        if (format is null)
+        // Format指定がない場合、メンバー名を定数値とする
+        if (format is null && enumInfo.ConstantValueToNameTable.TryGetValue(constantValue, out var enumMemberName))
         {
-            var enumMember = fieldSymbol.Type.GetMembers()
-                .OfType<IFieldSymbol>()
-                .FirstOrDefault(x => x.HasConstantValue && x.ConstantValue.Equals(constantValue));
-
-            constantValue = enumMember is not null
-                ? enumMember.Name
-                : constantValue;
+            constantValue = enumMemberName;
         }
 
         return TryAddConstantValue(constantValue, null, provider);
