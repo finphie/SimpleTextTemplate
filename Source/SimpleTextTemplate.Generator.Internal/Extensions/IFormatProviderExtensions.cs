@@ -58,7 +58,10 @@ static class IFormatProviderExtensions
     /// </summary>
     /// <param name="provider">カルチャー</param>
     /// <param name="isDefaultInvariantCulture"><paramref name="provider"/>がnullの場合に<see cref="InvariantCulture"/>を返すかどうか</param>
-    /// <returns></returns>
+    /// <returns>
+    /// <paramref name="provider"/>がnull以外の場合は<paramref name="provider"/>を返します。
+    /// <paramref name="provider"/>がnullかつ<paramref name="isDefaultInvariantCulture"/>がtrueの場合は<see cref="InvariantCulture"/>を返します。
+    /// </returns>
     public static IFormatProvider? GetFormatProvider(this IFormatProvider? provider, bool isDefaultInvariantCulture)
     {
         return provider is not null ? provider : GetDefaultFormatProvider(isDefaultInvariantCulture);
