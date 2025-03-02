@@ -194,7 +194,7 @@ ref struct InterceptInfoCreator
         var contextType = _semanticModel.GetTypeInfo(_contextArgument, cancellationToken).Type
             ?? throw new InvalidOperationException("コンテキストの型情報が取得できません。");
 
-        var contextMembers = contextType.GetFieldsAndProperties().ToDictionary(
+        var contextMembers = contextType.GetFieldsAndProperties().ToFrozenDictionary(
             static x => x.Name,
             static x => (Symbol: x, Formattable: x.GetFieldOrPropertyType().Interfaces.GetFormattableType()));
 
@@ -299,8 +299,8 @@ ref struct InterceptInfoCreator
             // enumの各定数値から、該当する名前を取得するためのテーブルを作成
             var constantValueToNameTable = fieldSymbol.Type.GetMembers()
                 .OfType<IFieldSymbol>()
-                .Where(x => x.HasConstantValue)
-                .ToFrozenDictionary(x => x.ConstantValue!, x => x.Name);
+                .Where(static x => x.HasConstantValue)
+                .ToFrozenDictionary(static x => x.ConstantValue!, static x => x.Name);
 
             // 属性を取得
             var enumAttributes = fieldSymbol.Type.GetAttributes();
