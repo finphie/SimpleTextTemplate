@@ -85,7 +85,7 @@ public sealed class TemplateGenerator : IIncrementalGenerator
     static bool IsTemplateClass(Compilation compilation, IMethodSymbol methodSymbol)
     {
         var targetType = compilation.GetTypeByMetadataName("SimpleTextTemplate.TemplateRenderer");
-        return targetType is not null && SymbolEqualityComparer.Default.Equals(methodSymbol.ContainingType, targetType);
+        return targetType is not null && methodSymbol.ContainingType.Equals(targetType, SymbolEqualityComparer.Default);
     }
 
     static bool IsValidRenderMethodParameters(Compilation compilation, ImmutableArray<IParameterSymbol> parameters)
@@ -140,7 +140,7 @@ public sealed class TemplateGenerator : IIncrementalGenerator
         }
 
         var templateWriterType = compilation.GetTypeByMetadataName("SimpleTextTemplate.TemplateWriter`1");
-        return templateWriterType is not null && SymbolEqualityComparer.Default.Equals(parameterType.ConstructedFrom, templateWriterType);
+        return templateWriterType is not null && parameterType.ConstructedFrom.Equals(templateWriterType, SymbolEqualityComparer.Default);
     }
 
     static bool IsContextType(IParameterSymbol parameter) => parameter.RefKind.Equals(RefKind.In);
@@ -153,6 +153,6 @@ public sealed class TemplateGenerator : IIncrementalGenerator
         }
 
         var providerType = compilation.GetTypeByMetadataName("System.IFormatProvider");
-        return providerType is not null && SymbolEqualityComparer.Default.Equals(parameter.Type, providerType);
+        return providerType is not null && parameter.Type.Equals(providerType, SymbolEqualityComparer.Default);
     }
 }
