@@ -49,10 +49,21 @@ static class RoslynExtensions
     /// <returns>指定された型パラメーターとなる<see cref="ReadOnlySpan{T}"/>の型情報を返します。</returns>
     /// <exception cref="InvalidOperationException">型情報を取得できませんでした。</exception>
     public static INamedTypeSymbol GetReadOnlySpanTypeSymbol(this Compilation compilation, SpecialType specialType)
+        => compilation.GetGenericTypeSymbol("System.ReadOnlySpan`1", specialType);
+
+    /// <summary>
+    /// ジェネリック型の型情報を取得します。
+    /// </summary>
+    /// <param name="compilation">コンパイルオブジェクト</param>
+    /// <param name="typeName">型名</param>
+    /// <param name="specialType">型パラメーターの型</param>
+    /// <returns>指定された型パラメーターとなるジェネリック型の型情報を返します。</returns>
+    /// <exception cref="InvalidOperationException">型情報を取得できませんでした。</exception>
+    public static INamedTypeSymbol GetGenericTypeSymbol(this Compilation compilation, string typeName, SpecialType specialType)
     {
-        var readOnlySpanSymbol = compilation.GetTypeByMetadataName("System.ReadOnlySpan`1");
-        var symbol = readOnlySpanSymbol?.Construct(compilation.GetSpecialType(specialType))
-            ?? throw new InvalidOperationException($"Type System.ReadOnlySpan<{specialType}> is not found.");
+        var baseSymbol = compilation.GetTypeByMetadataName(typeName);
+        var symbol = baseSymbol?.Construct(compilation.GetSpecialType(specialType))
+            ?? throw new InvalidOperationException($"Type ${typeName}{specialType} is not found.");
 
         return symbol;
     }
