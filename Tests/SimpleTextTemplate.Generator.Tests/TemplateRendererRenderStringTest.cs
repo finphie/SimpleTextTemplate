@@ -73,74 +73,26 @@ public sealed class TemplateRendererRenderStringTest
 
     [Fact]
     public void 静的フィールド()
-    {
-        var sourceCode = Get("{{ StringStaticField }}", nameof(StringContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticField");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(StringContextTestData.StringStaticField), true);
 
     [Fact]
     public void フィールド()
-    {
-        var sourceCode = Get("{{ StringField }}", nameof(StringContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringField");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(StringContextTestData.StringField), false);
 
     [Fact]
     public void 静的プロパティ()
-    {
-        var sourceCode = Get("{{ StringStaticProperty }}", nameof(StringContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.StringContextTestData.@StringStaticProperty");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(StringContextTestData.StringStaticProperty), true);
 
     [Fact]
     public void プロパティ()
+        => Test(nameof(StringContextTestData.StringProperty), false);
+
+    static void Test(string memberName, bool isStatic)
     {
-        var sourceCode = Get("{{ StringProperty }}", nameof(StringContextTestData));
+        var templateText = $$$"""{{ {{{memberName}}} }}""";
+        var contextArgument = GetContextArgumentString<StringContextTestData>(memberName, isStatic);
+
+        var sourceCode = Get(templateText, nameof(StringContextTestData));
         var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -149,9 +101,19 @@ public sealed class TemplateRendererRenderStringTest
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteString);
+        method.Name.ShouldBe(Grow);
+        method.Text.Count.ShouldBe(3);
+        method.Text[0].ShouldBe("0");
+        method.Text[1].ShouldBe(Utf8GetMaxByteCount);
+        method.Text[2].ShouldBe($"{contextArgument}.Length");
+        method.Format.ShouldBeNull();
+        method.Provider.ShouldBeNull();
+
+        method = info.Methods.Dequeue();
+
+        method.Name.ShouldBe(DangerousWriteString);
         method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringProperty");
+        method.Text[0].ShouldBe(contextArgument);
         method.Format.ShouldBeNull();
         method.Provider.ShouldBeNull();
 

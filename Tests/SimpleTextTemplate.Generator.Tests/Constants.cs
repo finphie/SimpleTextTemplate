@@ -30,4 +30,15 @@ static class Constants
     public static readonly string InvariantInfo = "System.Globalization." + DateTimeFormatInfo.InvariantInfo.ToExpressionString();
     public static readonly string JaJpCulture = "System.Globalization." + CultureInfo.GetCultureInfo("ja-JP").ToExpressionString();
     public static readonly IReadOnlyList<string> InvariantCultureList = [InvariantCulture, NullCulture, DefaultCulture];
+
+    public static string GetContextArgumentString<T>(string memberName, bool isStatic)
+    {
+        if (isStatic)
+        {
+            var typeName = typeof(T).FullName;
+            return $"global::{typeName}.@{memberName}";
+        }
+
+        return $"global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@{memberName}";
+    }
 }

@@ -12,128 +12,34 @@ public sealed class TemplateRendererRenderCharArrayTest
 {
     [Fact]
     public void 静的フィールド()
-    {
-        var sourceCode = Get("{{ CharsStaticField }}", nameof(CharArrayContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticField");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(CharArrayContextTestData.CharsStaticField), true);
 
     [Fact]
     public void フィールド()
-    {
-        var sourceCode = Get("{{ CharsField }}", nameof(CharArrayContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsField");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(CharArrayContextTestData.CharsField), false);
 
     [Fact]
     public void 静的プロパティ()
-    {
-        var sourceCode = Get("{{ CharsStaticProperty }}", nameof(CharArrayContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsStaticProperty");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(CharArrayContextTestData.CharsStaticProperty), true);
 
     [Fact]
     public void プロパティ()
-    {
-        var sourceCode = Get("{{ CharsProperty }}", nameof(CharArrayContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsProperty");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(CharArrayContextTestData.CharsProperty), false);
 
     [Fact]
     public void 静的ReadOnlySpanプロパティ()
-    {
-        var sourceCode = Get("{{ CharsSpanStaticProperty }}", nameof(CharArrayContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(Grow);
-        method.Text.Count.ShouldBe(3);
-        method.Text[0].ShouldBe("0");
-        method.Text[1].ShouldBe(Utf8GetMaxByteCount);
-        method.Text[2].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsSpanStaticProperty.Length");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(DangerousWriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.CharArrayContextTestData.@CharsSpanStaticProperty");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(CharArrayContextTestData.CharsSpanStaticProperty), true);
 
     [Fact]
     public void ReadOnlySpanプロパティ()
+        => Test(nameof(CharArrayContextTestData.CharsSpanProperty), false);
+
+    static void Test(string memberName, bool isStatic)
     {
-        var sourceCode = Get("{{ CharsSpanProperty }}", nameof(CharArrayContextTestData));
+        var templateText = $$$"""{{ {{{memberName}}} }}""";
+        var contextArgument = GetContextArgumentString<CharArrayContextTestData>(memberName, isStatic);
+
+        var sourceCode = Get(templateText, nameof(CharArrayContextTestData));
         var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -146,7 +52,7 @@ public sealed class TemplateRendererRenderCharArrayTest
         method.Text.Count.ShouldBe(3);
         method.Text[0].ShouldBe("0");
         method.Text[1].ShouldBe(Utf8GetMaxByteCount);
-        method.Text[2].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsSpanProperty.Length");
+        method.Text[2].ShouldBe($"{contextArgument}.Length");
         method.Format.ShouldBeNull();
         method.Provider.ShouldBeNull();
 
@@ -154,7 +60,7 @@ public sealed class TemplateRendererRenderCharArrayTest
 
         method.Name.ShouldBe(DangerousWriteString);
         method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@CharsSpanProperty");
+        method.Text[0].ShouldBe(contextArgument);
         method.Format.ShouldBeNull();
         method.Provider.ShouldBeNull();
 
