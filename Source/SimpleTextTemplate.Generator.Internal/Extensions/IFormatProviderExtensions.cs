@@ -67,6 +67,6 @@ static class IFormatProviderExtensions
         return provider is not null ? provider : GetDefaultFormatProvider(isDefaultInvariantCulture);
 
         static IFormatProvider? GetDefaultFormatProvider(bool isDefaultInvariantCulture)
-            => isDefaultInvariantCulture ? CultureInfo.InvariantCulture : null;
+            => isDefaultInvariantCulture ? InvariantCulture : null;
     }
 }
