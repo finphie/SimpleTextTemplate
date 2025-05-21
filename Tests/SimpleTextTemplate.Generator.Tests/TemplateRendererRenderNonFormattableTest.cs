@@ -12,74 +12,26 @@ public sealed class TemplateRendererRenderNonFormattableTest
 {
     [Fact]
     public void 静的フィールド()
-    {
-        var sourceCode = Get("{{ NonFormattableStaticField }}", nameof(NonFormattableContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.NonFormattableContextTestData.@NonFormattableStaticField");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(NonFormattableContextTestData.NonFormattableStaticField), true);
 
     [Fact]
     public void フィールド()
-    {
-        var sourceCode = Get("{{ NonFormattableField }}", nameof(NonFormattableContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@NonFormattableField");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(NonFormattableContextTestData.NonFormattableField), false);
 
     [Fact]
     public void 静的プロパティ()
-    {
-        var sourceCode = Get("{{ NonFormattableStaticProperty }}", nameof(NonFormattableContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
-        var interceptInfoList = compilation.GetInterceptInfo();
-
-        diagnostics.ShouldBeEmpty();
-
-        var info = interceptInfoList.Dequeue();
-        var method = info.Methods.Dequeue();
-
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.NonFormattableContextTestData.@NonFormattableStaticProperty");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
-
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
-    }
+        => Test(nameof(NonFormattableContextTestData.NonFormattableStaticProperty), true);
 
     [Fact]
     public void プロパティ()
+        => Test(nameof(NonFormattableContextTestData.NonFormattableProperty), false);
+
+    static void Test(string memberName, bool isStatic)
     {
-        var sourceCode = Get("{{ NonFormattableProperty }}", nameof(NonFormattableContextTestData));
+        var templateText = $$$"""{{ {{{memberName}}} }}""";
+        var contextArgument = GetContextArgumentString<NonFormattableContextTestData>(memberName, isStatic);
+
+        var sourceCode = Get(templateText, nameof(NonFormattableContextTestData));
         var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -90,7 +42,7 @@ public sealed class TemplateRendererRenderNonFormattableTest
 
         method.Name.ShouldBe(WriteValue);
         method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@NonFormattableProperty");
+        method.Text[0].ShouldBe(contextArgument);
         method.Format.ShouldBe(DefaultKeyword);
         method.Provider.ShouldBe(GlobalInvariantCulture);
 
