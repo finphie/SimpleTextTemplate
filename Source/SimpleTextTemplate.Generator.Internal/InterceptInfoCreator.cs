@@ -40,6 +40,7 @@ ref struct InterceptInfoCreator
 
     readonly INamedTypeSymbol _readOnlySpanByteSymbol;
     readonly INamedTypeSymbol _readOnlySpanCharSymbol;
+
     readonly INamedTypeSymbol _flagsAttributeSymbol;
 
 #pragma warning disable RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
@@ -80,6 +81,7 @@ ref struct InterceptInfoCreator
 
         _readOnlySpanByteSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Byte);
         _readOnlySpanCharSymbol = _compilation.GetReadOnlySpanTypeSymbol(SpecialType.System_Char);
+
         _flagsAttributeSymbol = _compilation.GetTypeByMetadataName(FlagsAttributeFullName)
             ?? throw new InvalidOperationException("Type System.FlagsAttribute is not found.");
     }
@@ -307,7 +309,7 @@ ref struct InterceptInfoCreator
             var flagsAttributeSymbol = _flagsAttributeSymbol;
 
             // Flags属性が設定されているか
-            var isFlag = enumAttributes.Any(x => SymbolEqualityComparer.Default.Equals(x.AttributeClass, flagsAttributeSymbol));
+            var isFlag = enumAttributes.Any(x => x.AttributeClass?.Equals(flagsAttributeSymbol, SymbolEqualityComparer.Default) == true);
 
             enumInfo = new(constantValueToNameTable, isFlag);
             _enumList.Add(enumType, enumInfo);
@@ -354,19 +356,20 @@ ref struct InterceptInfoCreator
         var type = symbol.GetFieldOrPropertyType();
 
         // 識別子の型をReadOnlySpan<byte>に暗黙的変換できるどうか
-        // ReadOnlySpan<byte>やbyte[]などが一致
+        // ReadOnlySpan<byte>/Span<byte>/byte[]などが一致
         if (!_compilation.ClassifyConversion(type, _readOnlySpanByteSymbol).IsImplicit)
         {
             return false;
         }
 
-        var annotation = symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
-        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
+        var annotation = MethodAnnotation.Dangerous;
 
-        if (SymbolEqualityComparer.Default.Equals(type, _readOnlySpanByteSymbol))
+        if (symbol.IsStatic)
         {
-            annotation |= MethodAnnotation.Dangerous;
+            annotation |= MethodAnnotation.Static;
         }
+
+        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
 
         AddValue(new(WriteLiteral, value, annotation, format, provider));
         return true;
@@ -377,19 +380,20 @@ ref struct InterceptInfoCreator
         var type = symbol.GetFieldOrPropertyType();
 
         // 識別子の型をReadOnlySpan<char>に暗黙的変換できるどうか
-        // ReadOnlySpan<char>やstring、char[]などが一致
+        // ReadOnlySpan<char>/Span<char>/char[]/stringなどが一致
         if (!_compilation.ClassifyConversion(type, _readOnlySpanCharSymbol).IsImplicit)
         {
             return false;
         }
 
-        var annotation = symbol.IsStatic ? MethodAnnotation.Static : MethodAnnotation.None;
-        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
+        var annotation = MethodAnnotation.Dangerous;
 
-        if (SymbolEqualityComparer.Default.Equals(type, _readOnlySpanCharSymbol))
+        if (symbol.IsStatic)
         {
-            annotation |= MethodAnnotation.Dangerous;
+            annotation |= MethodAnnotation.Static;
         }
+
+        var provider = identifierProvider.GetFormatProvider(_isInvariantCulture);
 
         AddValue(new(WriteString, value, annotation, format, provider));
         return true;
