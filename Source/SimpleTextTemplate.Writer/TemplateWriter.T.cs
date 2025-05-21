@@ -169,12 +169,16 @@ public ref struct TemplateWriter<T>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void DangerousWriteLiteral(scoped ReadOnlySpan<byte> value)
-    {
-        Debug.Assert(value.Length <= _destinationLength, "バッファーのサイズが不足しています。");
+        => DangerousWriteLiteral(ref MemoryMarshal.GetReference(value), value.Length);
 
-        Unsafe.CopyBlockUnaligned(ref _destination, ref MemoryMarshal.GetReference(value), (uint)value.Length);
-        Advance(value.Length);
-    }
+    /// <summary>
+    /// バッファーにUTF-8文字列を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">UTF-8文字列</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DangerousWriteLiteral(byte[] value)
+        => DangerousWriteLiteral(ref MemoryMarshal.GetArrayDataReference(value), value.Length);
 
     /// <summary>
     /// バッファーに文字列を書き込みます。
@@ -203,6 +207,24 @@ public ref struct TemplateWriter<T>
 
         Advance(bytesWritten);
     }
+
+    /// <summary>
+    /// バッファーに文字列を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">文字列</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DangerousWriteString(string value)
+        => DangerousWriteString(MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in value.GetPinnableReference()), value.Length));
+
+    /// <summary>
+    /// バッファーに文字列を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">文字列</param>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DangerousWriteString(char[] value)
+        => DangerousWriteString(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(value), value.Length));
 
     /// <summary>
     /// バッファーに列挙型の値に対応する名前を書き込みます。
@@ -361,6 +383,20 @@ public ref struct TemplateWriter<T>
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// バッファーにUTF-8文字列を書き込みます。バッファーサイズの事前拡張は行いません。
+    /// </summary>
+    /// <param name="value">UTF-8文字列</param>
+    /// <param name="length">長さ</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    void DangerousWriteLiteral(scoped ref byte value, int length)
+    {
+        Debug.Assert(length <= _destinationLength, "バッファーのサイズが不足しています。");
+
+        Unsafe.CopyBlockUnaligned(ref _destination, ref value, (uint)length);
+        Advance(length);
     }
 
     /// <summary>
