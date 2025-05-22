@@ -476,7 +476,7 @@ ref struct InterceptInfoCreator
                 cancellationToken.ThrowIfCancellationRequested();
                 var writerInfo = _writeInfoList[index++];
 
-                if (writerInfo.WriteType != baseWriterInfo.WriteType)
+                if (writerInfo.WriteType is not WriteConstantLiteral and not WriteLiteral and not WriteString)
                 {
                     break;
                 }
