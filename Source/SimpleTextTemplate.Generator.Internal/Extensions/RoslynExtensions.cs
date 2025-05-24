@@ -63,7 +63,7 @@ static class RoslynExtensions
     {
         var baseSymbol = compilation.GetTypeByMetadataName(typeName);
         var symbol = baseSymbol?.Construct(compilation.GetSpecialType(specialType))
-            ?? throw new InvalidOperationException($"Type ${typeName}{specialType} is not found.");
+            ?? throw new InvalidOperationException($"Type {typeName}{specialType} is not found.");
 
         return symbol;
     }
