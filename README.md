@@ -70,23 +70,28 @@ readonly record struct SampleContext(
 
 ```csharp
 using System.Runtime.CompilerServices;
+using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
 file static class Intercept
 {
     [InterceptsLocation(1, "...")]
-    public static void Write0(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
+    public static void Render0(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
     {
         writer.WriteValue(Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", CultureInfo.InvariantCulture);
-        writer.WriteConstantLiteral("_"u8);
-        writer.WriteString(Unsafe.AsRef(in context).@StringValue);
-        writer.WriteConstantLiteral("!"u8);
+        writer.Grow(2
+            + Encoding.UTF8.GetMaxByteCount(
+                Unsafe.AsRef(in context).@StringValue.Length));
+        writer.DangerousWriteConstantLiteral("_"u8);
+        writer.DangerousWriteString(Unsafe.AsRef(in context).@StringValue);
+        writer.DangerousWriteConstantLiteral("!"u8);
     }
 
     [InterceptsLocation(1, "...")]
-    public static void Write1(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
+    public static void Render1(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
     {
+        writer.Grow(15);
         writer.WriteConstantLiteral("_Hello_999.000_"u8);
         writer.WriteValue(Unsafe.AsRef(in context).@IntValue, default, CultureInfo.InvariantCulture);
     }
