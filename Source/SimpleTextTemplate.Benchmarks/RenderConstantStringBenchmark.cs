@@ -1,17 +1,32 @@
-﻿using System.Globalization;
+﻿using System.Buffers;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Unicode;
 using BenchmarkDotNet.Attributes;
+using static SimpleTextTemplate.Benchmarks.Constants;
 
 namespace SimpleTextTemplate.Benchmarks;
 
-partial class RenderBenchmark
+public class RenderConstantStringBenchmark
 {
-    const string ConstantStringCategory = "Constant String";
     const string ConstantStringTemplate = "abcdef{{ ConstantStringValue }}abcdef";
 
+    readonly ArrayBufferWriter<byte> _bufferWriter = new();
+
+    CompositeFormat _compositeFormat;
+
+    SampleContext _generatorContext;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        _compositeFormat = CompositeFormat.Parse(Format);
+
+        _generatorContext = new();
+    }
+
     [Benchmark(Baseline = true, Description = DescriptionSimpleTextTemplateGenerator)]
-    [BenchmarkCategory(ConstantStringCategory)]
     public byte[] SimpleTextTemplate_Generator_ConstantString()
     {
         var writer = TemplateWriter.Create(_bufferWriter);
@@ -25,7 +40,6 @@ partial class RenderBenchmark
     }
 
     [Benchmark(Description = DescriptionUtf8TryWrite)]
-    [BenchmarkCategory(ConstantStringCategory)]
     public byte[] Utf8TryWrite_ConstantString()
     {
         Utf8.TryWrite(_bufferWriter.GetSpan(), $"abcdef{SampleContext.ConstantStringValue}abcdef", out var bytesWritten);
@@ -38,7 +52,6 @@ partial class RenderBenchmark
     }
 
     [Benchmark(Description = DescriptionInterpolatedStringHandler)]
-    [BenchmarkCategory(ConstantStringCategory)]
     public string InterpolatedStringHandler_ConstantString()
     {
         DefaultInterpolatedStringHandler handler = $"abcdef{SampleContext.ConstantStringValue}abcdef";
@@ -46,6 +59,6 @@ partial class RenderBenchmark
     }
 
     [Benchmark(Description = DescriptionCompositeFormat)]
-    [BenchmarkCategory(ConstantStringCategory)]
-    public string CompositeFormat_ConstantString() => string.Format(CultureInfo.InvariantCulture, _compositeFormat, SampleContext.ConstantStringValue);
+    public string CompositeFormat_ConstantString()
+        => string.Format(CultureInfo.InvariantCulture, _compositeFormat, SampleContext.ConstantStringValue);
 }

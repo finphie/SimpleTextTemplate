@@ -63,12 +63,6 @@ static class SourceCode
                 continue;
             }
 
-            if (provider.StartsWith("CultureInfo", StringComparison.Ordinal) || provider.StartsWith("DateTimeFormatInfo", StringComparison.Ordinal))
-            {
-                builder.AppendLine(value: $"        TemplateRenderer.Render(ref writer, {source}, in context, System.Globalization.{provider});");
-                continue;
-            }
-
             builder.AppendLine(value: $"        TemplateRenderer.Render(ref writer, {source}, in context, {provider});");
         }
 

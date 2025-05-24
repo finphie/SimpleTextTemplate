@@ -1,23 +1,47 @@
-﻿using System.Globalization;
+﻿using System.Buffers;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Unicode;
 using BenchmarkDotNet.Attributes;
+using static SimpleTextTemplate.Benchmarks.Constants;
 using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;
 
-partial class RenderBenchmark
+public class RenderIntBenchmark
 {
-    const string IntCategory = "Int";
     const string IntTemplate = "abcdef{{ IntValue }}abcdef";
+
+    readonly ArrayBufferWriter<byte> _bufferWriter = new();
 
     Template _intTemplate;
     ScribanTemplate _intScribanTemplate;
     ScribanTemplate _intScribanLiquidTemplate;
+    CompositeFormat _compositeFormat;
+
+    SampleContext _generatorContext;
+    Dictionary<byte[], object> _context;
+    Dictionary<string, object> _scribanContext;
+
+    [GlobalSetup]
+    public void Setup()
+    {
+        _intTemplate = Template.Parse(Encoding.UTF8.GetBytes(IntTemplate));
+        _intScribanTemplate = ScribanTemplate.Parse(IntTemplate);
+        _intScribanLiquidTemplate = ScribanTemplate.ParseLiquid(IntTemplate);
+        _compositeFormat = CompositeFormat.Parse(Format);
+
+        _generatorContext = new();
+        _context = Context.Create();
+        _context.Add("IntValue"u8.ToArray(), _generatorContext.IntValue);
+        _scribanContext = new()
+        {
+            { "IntValue", _generatorContext.IntValue }
+        };
+    }
 
     [Benchmark(Baseline = true, Description = DescriptionSimpleTextTemplateGenerator)]
-    [BenchmarkCategory(IntCategory)]
     public byte[] SimpleTextTemplate_Generator_Int()
     {
         var writer = TemplateWriter.Create(_bufferWriter);
@@ -31,7 +55,6 @@ partial class RenderBenchmark
     }
 
     [Benchmark(Description = DescriptionSimpleTextTemplate)]
-    [BenchmarkCategory(IntCategory)]
     public byte[] SimpleTextTemplate_Int()
     {
         _intTemplate.Render(_bufferWriter, _context);
@@ -43,15 +66,12 @@ partial class RenderBenchmark
     }
 
     [Benchmark(Description = DescriptionScriban)]
-    [BenchmarkCategory(IntCategory)]
     public string Scriban_Int() => _intScribanTemplate.Render(_scribanContext);
 
     [Benchmark(Description = DescriptionScribanLiquid)]
-    [BenchmarkCategory(IntCategory)]
     public string ScribanLiquid_Int() => _intScribanLiquidTemplate.Render(_scribanContext);
 
     [Benchmark(Description = DescriptionUtf8TryWrite)]
-    [BenchmarkCategory(IntCategory)]
     public byte[] Utf8TryWrite_Int()
     {
         Utf8.TryWrite(_bufferWriter.GetSpan(), $"abcdef{_generatorContext.IntValue}abcdef", out var bytesWritten);
@@ -64,7 +84,6 @@ partial class RenderBenchmark
     }
 
     [Benchmark(Description = DescriptionInterpolatedStringHandler)]
-    [BenchmarkCategory(IntCategory)]
     public string InterpolatedStringHandler_Int()
     {
         DefaultInterpolatedStringHandler handler = $"abcdef{_generatorContext.IntValue}abcdef";
@@ -72,14 +91,6 @@ partial class RenderBenchmark
     }
 
     [Benchmark(Description = DescriptionCompositeFormat)]
-    [BenchmarkCategory(IntCategory)]
     public string CompositeFormat_Int()
         => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _generatorContext.IntValue);
-
-    void SetupInt()
-    {
-        _intTemplate = Template.Parse(Encoding.UTF8.GetBytes(IntTemplate));
-        _intScribanTemplate = ScribanTemplate.Parse(IntTemplate);
-        _intScribanLiquidTemplate = ScribanTemplate.ParseLiquid(IntTemplate);
-    }
 }
