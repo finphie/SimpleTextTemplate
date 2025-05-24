@@ -1,5 +1,4 @@
-﻿using System.Buffers;
-using System.Globalization;
+﻿using System.Globalization;
 using SimpleTextTemplate.Generator.Tests.Extensions;
 
 namespace SimpleTextTemplate.Generator.Tests;
@@ -16,16 +15,16 @@ static class Constants
 
     public const string Utf8GetMaxByteCount = "global::System.Text.Encoding.UTF8.GetMaxByteCount";
 
-    public const string WriteConstantLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.WriteConstantLiteral);
-    public const string DangerousWriteConstantLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.DangerousWriteConstantLiteral);
-    public const string WriteLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.WriteLiteral);
-    public const string DangerousWriteLiteral = nameof(TemplateWriter<IBufferWriter<byte>>.DangerousWriteLiteral);
-    public const string WriteString = nameof(TemplateWriter<IBufferWriter<byte>>.WriteString);
-    public const string DangerousWriteString = nameof(TemplateWriter<IBufferWriter<byte>>.DangerousWriteString);
-    public const string WriteEnum = nameof(TemplateWriter<IBufferWriter<byte>>.WriteEnum);
-    public const string WriteValue = nameof(TemplateWriter<IBufferWriter<byte>>.WriteValue);
+    public const string WriteConstantLiteral = nameof(TemplateWriter<>.WriteConstantLiteral);
+    public const string DangerousWriteConstantLiteral = nameof(TemplateWriter<>.DangerousWriteConstantLiteral);
+    public const string WriteLiteral = nameof(TemplateWriter<>.WriteLiteral);
+    public const string DangerousWriteLiteral = nameof(TemplateWriter<>.DangerousWriteLiteral);
+    public const string WriteString = nameof(TemplateWriter<>.WriteString);
+    public const string DangerousWriteString = nameof(TemplateWriter<>.DangerousWriteString);
+    public const string WriteEnum = nameof(TemplateWriter<>.WriteEnum);
+    public const string WriteValue = nameof(TemplateWriter<>.WriteValue);
 
-    public const string Grow = nameof(TemplateWriter<IBufferWriter<byte>>.Grow);
+    public const string Grow = nameof(TemplateWriter<>.Grow);
 
     public static readonly string InvariantInfo = "System.Globalization." + DateTimeFormatInfo.InvariantInfo.ToExpressionString();
     public static readonly string JaJpCulture = "System.Globalization." + CultureInfo.GetCultureInfo("ja-JP").ToExpressionString();
