@@ -70,23 +70,28 @@ readonly record struct SampleContext(
 
 ```csharp
 using System.Runtime.CompilerServices;
+using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
 file static class Intercept
 {
     [InterceptsLocation(1, "...")]
-    public static void Write0(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
+    public static void Render0(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
     {
         writer.WriteValue(Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", CultureInfo.InvariantCulture);
-        writer.WriteConstantLiteral("_"u8);
-        writer.WriteString(Unsafe.AsRef(in context).@StringValue);
-        writer.WriteConstantLiteral("!"u8);
+        writer.Grow(2
+            + Encoding.UTF8.GetMaxByteCount(
+                Unsafe.AsRef(in context).@StringValue.Length));
+        writer.DangerousWriteConstantLiteral("_"u8);
+        writer.DangerousWriteString(Unsafe.AsRef(in context).@StringValue);
+        writer.DangerousWriteConstantLiteral("!"u8);
     }
 
     [InterceptsLocation(1, "...")]
-    public static void Write1(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
+    public static void Render1(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
     {
+        writer.Grow(15);
         writer.WriteConstantLiteral("_Hello_999.000_"u8);
         writer.WriteValue(Unsafe.AsRef(in context).@IntValue, default, CultureInfo.InvariantCulture);
     }
@@ -122,36 +127,50 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## ベンチマーク
 
-| Method                       | Categories      | Mean        | Error      | Ratio  | Gen0   | Gen1   | Allocated |
-|----------------------------- |---------------- |------------:|-----------:|-------:|-------:|-------:|----------:|
-| SimpleTextTemplate.Generator | Constant String |    13.92 ns |   0.155 ns |   1.00 | 0.0067 |      - |      56 B |
-| (Utf8.TryWrite)              | Constant String |    21.84 ns |   0.172 ns |   1.57 | 0.0067 |      - |      56 B |
-| (InterpolatedStringHandler)  | Constant String |    25.19 ns |   0.135 ns |   1.81 | 0.0105 |      - |      88 B |
-| (CompositeFormat)            | Constant String |    29.75 ns |   0.380 ns |   2.14 | 0.0105 |      - |      88 B |
-|                              |                 |              |           |        |        |        |           |
-| SimpleTextTemplate.Generator | Constant Int    |    12.77 ns |   0.043 ns |   1.00 | 0.0048 |      - |      40 B |
-| (Utf8.TryWrite)              | Constant Int    |    12.86 ns |   0.086 ns |   1.01 | 0.0048 |      - |      40 B |
-| (InterpolatedStringHandler)  | Constant Int    |    27.47 ns |   0.302 ns |   2.15 | 0.0067 |      - |      56 B |
-| (CompositeFormat)            | Constant Int    |    28.08 ns |   0.147 ns |   2.20 | 0.0067 |      - |      56 B |
-|                              |                 |              |           |        |        |        |           |
-| SimpleTextTemplate.Generator | String          |    29.41 ns |   0.144 ns |   1.00 | 0.0057 |      - |      48 B |
-| SimpleTextTemplate           | String          |    59.91 ns |   0.247 ns |   2.04 | 0.0057 |      - |      48 B |
-| Scriban                      | String          | 8,455.09 ns |  69.601 ns | 287.50 | 3.6621 | 0.3052 |   31003 B |
-| Liquid                       | String          | 6,846.45 ns |  97.413 ns | 232.80 | 3.9902 | 0.4044 |   33418 B |
-| (Utf8.TryWrite)              | String          |    21.79 ns |   0.184 ns |   0.74 | 0.0057 |      - |      48 B |
-| (InterpolatedStringHandler)  | String          |    26.39 ns |   0.300 ns |   0.90 | 0.0086 |      - |      72 B |
-| (CompositeFormat)            | String          |    26.91 ns |   0.230 ns |   0.91 | 0.0086 |      - |      72 B |
-|                              |                 |              |           |        |        |        |           |
-| SimpleTextTemplate.Generator | Int             |    20.93 ns |   0.142 ns |   1.00 | 0.0057 |      - |      48 B |
-| SimpleTextTemplate           | Int             |    56.40 ns |   0.185 ns |   2.69 | 0.0057 |      - |      48 B |
-| Scriban                      | Int             | 8,439.46 ns |  66.766 ns | 403.25 | 3.6621 | 0.3052 |   31027 B |
-| Liquid                       | Int             | 6,724.20 ns |  77.275 ns | 321.29 | 3.9978 | 0.4425 |   33442 B |
-| (Utf8.TryWrite)              | Int             |    15.45 ns |   0.094 ns |   0.74 | 0.0057 |      - |      48 B |
-| (InterpolatedStringHandler)  | Int             |    28.04 ns |   0.181 ns |   1.34 | 0.0076 |      - |      64 B |
-| (CompositeFormat)            | Int             |    32.21 ns |   0.330 ns |   1.54 | 0.0076 |      - |      64 B |
+### 定数（string）
+
+| Method                       | Mean     | Error    | Ratio | Gen0   | Allocated |
+|----------------------------- |---------:|---------:|------:|-------:|----------:|
+| SimpleTextTemplate.Generator | 13.53 ns | 0.110 ns |  1.00 | 0.0067 |      56 B |
+| (Utf8.TryWrite)              | 25.12 ns | 0.164 ns |  1.86 | 0.0067 |      56 B |
+| (InterpolatedStringHandler)  | 30.96 ns | 0.357 ns |  2.29 | 0.0105 |      88 B |
+| (CompositeFormat)            | 29.98 ns | 0.468 ns |  2.22 | 0.0105 |      88 B |
+
+### 定数（int）
+
+| Method                       | Mean     | Error    | Ratio | Gen0   | Allocated |
+|----------------------------- |---------:|---------:|------:|-------:|----------:|
+| SimpleTextTemplate.Generator | 12.18 ns | 0.051 ns |  1.00 | 0.0048 |      40 B |
+| (Utf8.TryWrite)              | 13.54 ns | 0.234 ns |  1.11 | 0.0048 |      40 B |
+| (InterpolatedStringHandler)  | 32.67 ns | 0.487 ns |  2.68 | 0.0067 |      56 B |
+| (CompositeFormat)            | 28.76 ns | 0.412 ns |  2.36 | 0.0067 |      56 B |
+
+### string
+
+| Method                       | Mean        | Error     | Ratio  | Gen0   | Gen1   | Allocated |
+|----------------------------- |------------:|----------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate.Generator |    25.32 ns |  0.062 ns |   1.00 | 0.0057 |      - |      48 B |
+| SimpleTextTemplate           |    61.39 ns |  0.530 ns |   2.42 | 0.0057 |      - |      48 B |
+| Scriban                      | 8,339.53 ns | 46.900 ns | 329.31 | 3.7842 | 0.3662 |   32071 B |
+| Scriban_Liquid               | 6,670.99 ns | 66.825 ns | 263.43 | 4.0131 | 0.3815 |   33602 B |
+| (Utf8.TryWrite)              |    22.73 ns |  0.346 ns |   0.90 | 0.0057 |      - |      48 B |
+| (InterpolatedStringHandler)  |    30.22 ns |  0.393 ns |   1.19 | 0.0086 |      - |      72 B |
+| (CompositeFormat)            |    27.75 ns |  0.348 ns |   1.10 | 0.0086 |      - |      72 B |
+
+### int
+
+| Method                       | Mean        | Error     | Ratio  | Gen0   | Gen1   | Allocated |
+|----------------------------- |------------:|----------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate.Generator |    19.00 ns |  0.067 ns |   1.00 | 0.0057 |      - |      48 B |
+| SimpleTextTemplate           |    60.97 ns |  0.690 ns |   3.21 | 0.0057 |      - |      48 B |
+| Scriban                      | 8,600.22 ns | 78.630 ns | 452.65 | 3.7842 | 0.3662 |   32095 B |
+| Scriban_Liquid               | 6,794.65 ns | 98.124 ns | 357.62 | 4.0131 | 0.3967 |   33626 B |
+| (Utf8.TryWrite)              |    17.98 ns |  0.313 ns |   0.95 | 0.0057 |      - |      48 B |
+| (InterpolatedStringHandler)  |    34.09 ns |  0.439 ns |   1.79 | 0.0076 |      - |      64 B |
+| (CompositeFormat)            |    29.13 ns |  0.352 ns |   1.53 | 0.0076 |      - |      64 B |
 
 > [!Note]
-> ()で囲まれているメソッドは正確には処理が異なるが、参考として記載。
+> ()で囲まれているメソッドは参考として記載。
 
 [ベンチマークプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Benchmarks)
 
