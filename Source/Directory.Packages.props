@@ -5,10 +5,10 @@
   <ItemGroup>
     <PackageVersion Include="CommunityToolkit.HighPerformance" Version="8.4.0" />
     <PackageVersion Include="Scriban" Version="6.2.1" />
-    <PackageVersion Include="SimpleTextTemplate.Generator" Version="3.0.0" />
+    <PackageVersion Include="SimpleTextTemplate.Generator" Version="3.1.0" />
     <PackageVersion Include="System.IO.Hashing" Version="9.0.5" />
-    <PackageVersion Include="System.Memory" Version="4.5.5" />
-    <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+    <PackageVersion Include="System.Memory" Version="4.6.3" />
+    <PackageVersion Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.2" />
   </ItemGroup>
 
 </Project>
