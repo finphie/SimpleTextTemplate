@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using FToolkit.Analyzers;
 
 namespace SimpleTextTemplate;
 
@@ -177,7 +178,7 @@ public ref struct TemplateWriter<T>
     /// <param name="value">UTF-8文字列</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DangerousWriteLiteral(byte[] value)
+    public void DangerousWriteLiteral([ValidatedNotNull] byte[] value)
         => DangerousWriteLiteral(ref MemoryMarshal.GetArrayDataReference(value), value.Length);
 
     /// <summary>
@@ -214,7 +215,7 @@ public ref struct TemplateWriter<T>
     /// <param name="value">文字列</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DangerousWriteString(string value)
+    public void DangerousWriteString([ValidatedNotNull] string value)
         => DangerousWriteString(MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in value.GetPinnableReference()), value.Length));
 
     /// <summary>
@@ -223,7 +224,7 @@ public ref struct TemplateWriter<T>
     /// <param name="value">文字列</param>
     [EditorBrowsable(EditorBrowsableState.Never)]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DangerousWriteString(char[] value)
+    public void DangerousWriteString([ValidatedNotNull] char[] value)
         => DangerousWriteString(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(value), value.Length));
 
     /// <summary>
