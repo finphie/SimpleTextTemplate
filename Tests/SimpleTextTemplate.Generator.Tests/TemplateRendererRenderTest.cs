@@ -222,7 +222,7 @@ public sealed class TemplateRendererRenderTest
             A{{ ConstantValue }}{{ ConstantValue }}B{{ ConstantValue }}{{ StringValue }}{{ ConstantValue }}{{ ConstantValue }}{{ Utf16Value }}{{ ConstantValue }}{{ Utf8Value }}{{ DoubleValue }}
             A{{ ConstantValue }}{{ ConstantValue }}B{{ ConstantValue }}{{ StringValue }}{{ ConstantValue }}{{ ConstantValue }}{{ Utf16Value }}{{ ConstantValue }}{{ Utf8Value }}
             """;
-        var sourceCode = Get(Text.Replace("\r\n", string.Empty), nameof(ContextTestData));
+        var sourceCode = Get(Text.Replace("\r\n", string.Empty, StringComparison.Ordinal), nameof(ContextTestData));
         var (compilation, diagnostics) = Run(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
