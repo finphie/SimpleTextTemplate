@@ -86,7 +86,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
         foreach (var culture in cultures)
         {
             _context.CancellationToken.ThrowIfCancellationRequested();
-            _writer.WriteLine($"static global::System.Globalization.CultureInfo {culture!.Replace("-", string.Empty)};");
+            _writer.WriteLine($"static global::System.Globalization.CultureInfo {culture!.Replace("-", string.Empty, StringComparison.Ordinal)};");
         }
 
         _writer.WriteLine();
@@ -98,7 +98,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
             foreach (var culture in cultures)
             {
                 _context.CancellationToken.ThrowIfCancellationRequested();
-                _writer.WriteLine($"""{culture!.Replace("-", string.Empty)} = global::System.Globalization.CultureInfo.GetCultureInfo("{culture}", true);""");
+                _writer.WriteLine($"""{culture!.Replace("-", string.Empty, StringComparison.Ordinal)} = global::System.Globalization.CultureInfo.GetCultureInfo("{culture}", true);""");
             }
         }
 

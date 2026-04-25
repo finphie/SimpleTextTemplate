@@ -46,7 +46,7 @@ static class IFormatProviderExtensions
             return "global::System.Globalization.CultureInfo.CurrentUICulture";
         }
 
-        var name = culture.GetName().Replace("-", string.Empty);
+        var name = culture.GetName().Replace("-", string.Empty, StringComparison.Ordinal);
 
         return string.IsNullOrEmpty(name)
             ? throw new InvalidOperationException("カルチャー名を取得できませんでした。")
