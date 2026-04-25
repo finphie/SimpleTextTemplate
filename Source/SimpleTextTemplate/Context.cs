@@ -1,5 +1,4 @@
-﻿#if NET10_0_OR_GREATER
-namespace SimpleTextTemplate;
+﻿namespace SimpleTextTemplate;
 
 /// <summary>
 /// コンテキスト作成クラスです。
@@ -13,4 +12,3 @@ public static class Context
     public static Dictionary<byte[], object> Create()
         => new(Utf8StringEqualityComparer.Default);
 }
-#endif
