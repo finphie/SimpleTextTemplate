@@ -32,7 +32,7 @@ ref struct InterceptInfoCreator
     readonly ExpressionSyntax? _providerArgument;
 
     readonly bool _isConstantTemplateString;
-    readonly Dictionary<ITypeSymbol, EnumInfo> _enumList = new(SymbolEqualityComparer.Default);
+    readonly Dictionary<ITypeSymbol, EnumInfo> _enumList = [with(SymbolEqualityComparer.Default)];
 
     readonly List<TemplateWriterWriteInfo> _writeInfoList = [];
     readonly Dictionary<int, TemplateWriterGrowInfo> _growInfoList = [];

@@ -10,5 +10,5 @@ public static class Context
     /// </summary>
     /// <returns>UTF-8エンコーディングの<see cref="byte"/>配列をキーとする<see cref="Dictionary{TKey, TValue}"/>の新しいインスタンス。</returns>
     public static Dictionary<byte[], object> Create()
-        => new(Utf8StringEqualityComparer.Default);
+        => [with(Utf8StringEqualityComparer.Default)];
 }
