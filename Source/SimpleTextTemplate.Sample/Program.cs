@@ -1,22 +1,24 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-var context = new SampleContext("Hello, World", new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
+using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+var context = new SampleContext("Hello, World", 1000, new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
-var bufferWriter = new ArrayPoolBufferWriter<byte>();
 var writer = TemplateWriter.Create(bufferWriter);
-
-TemplateRenderer.Render(ref writer, "{{ DateTime }}_{{ Identifier }}!!!", context);
+TemplateRenderer.Render(ref writer, "{{ DateTimeOffsetValue:o }}_{{ StringValue }}!", in context);
+TemplateRenderer.Render(ref writer, "_{{ ConstantString }}_{{ ConstantInt:N3:ja-JP }}_{{ IntValue }}", in context, CultureInfo.InvariantCulture);
 writer.Flush();
 
+// 2000-01-01T00:00:00.0000000+00:00_Hello, World!_Hello_999.000_1000
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
-bufferWriter.Dispose();
-
-/// <summary>
-/// コンテキスト
-/// </summary>
-/// <param name="Identifier">文字列</param>
-/// <param name="DateTime">時刻</param>
-readonly record struct SampleContext(string Identifier, DateTimeOffset DateTime);
+readonly record struct SampleContext(
+    string StringValue,
+    int IntValue,
+    DateTimeOffset DateTimeOffsetValue)
+{
+    public const string ConstantString = "Hello";
+    public const int ConstantInt = 999;
+}
