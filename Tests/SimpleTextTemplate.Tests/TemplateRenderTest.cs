@@ -1,5 +1,4 @@
-﻿#if NET10_0_OR_GREATER
-using System.Buffers;
+﻿using System.Buffers;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -186,4 +185,3 @@ public sealed class TemplateRenderTest
             .ShouldBe(expectedValue);
     }
 }
-#endif
