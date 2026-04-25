@@ -1,12 +1,9 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using SimpleTextTemplate.Helpers;
-
-#if NET8_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 
 namespace SimpleTextTemplate;
 
@@ -15,14 +12,10 @@ namespace SimpleTextTemplate;
 /// </summary>
 public ref struct TemplateIdentifierReader
 {
-#if NET8_0_OR_GREATER
     ref byte _buffer;
 
     [SuppressMessage("Style", "IDE0032:自動プロパティを使用する", Justification = "誤検知")]
     int _length;
-#else
-    ReadOnlySpan<byte> _buffer;
-#endif
 
     /// <summary>
     /// <see cref="TemplateIdentifierReader"/>構造体の新しいインスタンスを初期化します。
@@ -34,27 +27,15 @@ public ref struct TemplateIdentifierReader
         Debug.Assert(input[0] != ' ', "バイト列先頭には空白以外の文字が必要です。");
         Debug.Assert(input[^1] != ' ', "バイト列末尾には空白以外の文字が必要です。");
 
-#if NET8_0_OR_GREATER
         _buffer = ref MemoryMarshal.GetReference(input);
         _length = input.Length;
-#else
-        _buffer = input;
-#endif
     }
 
     readonly ref byte Buffer =>
-#if NET8_0_OR_GREATER
         ref _buffer;
-#else
-        ref MemoryMarshal.GetReference(_buffer);
-#endif
 
     readonly int Length =>
-#if NET8_0_OR_GREATER
         _length;
-#else
-        _buffer.Length;
-#endif
 
     /// <summary>
     /// 識別子を読み込みます。
@@ -138,11 +119,7 @@ public ref struct TemplateIdentifierReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void Advance(int count)
     {
-#if NET8_0_OR_GREATER
         _buffer = ref Unsafe.AddByteOffset(ref _buffer, (nint)(uint)count);
         _length -= count;
-#else
-        _buffer = BinaryHelper.CreateReadOnlySpan(ref Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(_buffer), (nint)(uint)count), _buffer.Length - count);
-#endif
     }
 }
