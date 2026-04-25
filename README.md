@@ -69,31 +69,27 @@ readonly record struct SampleContext(
 #### 生成コード
 
 ```csharp
-using System.Runtime.CompilerServices;
-using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
-using SimpleTextTemplate;
-
+[global::System.CodeDom.Compiler.GeneratedCode("SimpleTextTemplate.Generator.TemplateGenerator", "3.1.0.0")]
 file static class Intercept
 {
-    [InterceptsLocation(1, "...")]
-    public static void Render0(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
+    [global::System.Runtime.CompilerServices.InterceptsLocation(1, "...")]
+    public static void Render0(ref global::SimpleTextTemplate.TemplateWriter<global::CommunityToolkit.HighPerformance.Buffers.ArrayPoolBufferWriter<byte>> writer, string text, in global::SampleContext context, global::System.IFormatProvider provider = null)
     {
-        writer.WriteValue(Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", CultureInfo.InvariantCulture);
+        writer.WriteValue(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", global::System.Globalization.CultureInfo.InvariantCulture);
         writer.Grow(2
-            + Encoding.UTF8.GetMaxByteCount(
-                Unsafe.AsRef(in context).@StringValue.Length));
+            + global::System.Text.Encoding.UTF8.GetMaxByteCount(
+                global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringValue.Length));
         writer.DangerousWriteConstantLiteral("_"u8);
-        writer.DangerousWriteString(Unsafe.AsRef(in context).@StringValue);
+        writer.DangerousWriteString(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringValue);
         writer.DangerousWriteConstantLiteral("!"u8);
     }
 
-    [InterceptsLocation(1, "...")]
-    public static void Render1(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
+    [global::System.Runtime.CompilerServices.InterceptsLocation(1, "...")]
+    public static void Render1(ref global::SimpleTextTemplate.TemplateWriter<global::CommunityToolkit.HighPerformance.Buffers.ArrayPoolBufferWriter<byte>> writer, string text, in global::SampleContext context, global::System.IFormatProvider provider = null)
     {
         writer.Grow(15);
-        writer.WriteConstantLiteral("_Hello_999.000_"u8);
-        writer.WriteValue(Unsafe.AsRef(in context).@IntValue, default, CultureInfo.InvariantCulture);
+        writer.DangerousWriteConstantLiteral("_Hello_999.000_"u8);
+        writer.WriteValue(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@IntValue, default, global::System.Globalization.CultureInfo.InvariantCulture);
     }
 }
 ```
