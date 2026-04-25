@@ -12,6 +12,7 @@ jobs:
   check:
     name: Check
     uses: finphie/Actions/.github/workflows/get-version.yml@main
+    permissions: {}
 
   release:
     name: Release
@@ -35,13 +36,14 @@ jobs:
     needs: check
     if: needs.check.outputs.dotnet == 'true' && needs.check.outputs.version != ''
     uses: finphie/Actions/.github/workflows/deploy-dotnet.yml@main
+    permissions: {}
     with:
       version: ${{ needs.check.outputs.version }}
-      release: ${{ needs.check.outputs.release == 'true' }}
+      release: ${{ needs.check.outputs.release == 'true' && !startsWith(github.repository, 'finphie/FToolkit') }}
       suffix: ${{ needs.check.outputs.tag }}
     secrets:
-      AZURE_ARTIFACT_PAT: ${{ secrets.AZURE_ARTIFACT_PAT }}
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+      AZURE_ARTIFACT_PAT: ${{ secrets.AZURE_ARTIFACT_PAT }}
 
   docker:
     name: Deploy(Docker)
