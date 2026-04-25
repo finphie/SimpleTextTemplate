@@ -142,7 +142,7 @@ public readonly struct Template
         return new([.. list]);
     }
 
-#if NET9_0_OR_GREATER
+#if NET10_0_OR_GREATER
     /// <summary>
     /// テンプレートをレンダリングして、バッファーライターに書き込みます。
     /// </summary>

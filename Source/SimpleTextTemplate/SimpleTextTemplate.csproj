@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net10.0;netstandard2.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
     <Description>シンプルなテキストテンプレートエンジンです。</Description>
   </PropertyGroup>
@@ -11,7 +11,7 @@
     <PackageTags>templating</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <PackageReference Include="System.IO.Hashing" />
   </ItemGroup>
 
@@ -20,7 +20,7 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <ProjectReference Include="..\SimpleTextTemplate.Writer\SimpleTextTemplate.Writer.csproj" />
   </ItemGroup>
 
