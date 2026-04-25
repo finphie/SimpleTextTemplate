@@ -33,10 +33,7 @@ sealed class ArrayPoolBufferWriter<T> : IBufferWriter<T>, IDisposable
     /// <inheritdoc/>
     public void Advance(int count)
     {
-        if (count < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(count));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
 
         _index += count;
     }
@@ -64,10 +61,7 @@ sealed class ArrayPoolBufferWriter<T> : IBufferWriter<T>, IDisposable
 
     void EnsureCapacity(int sizeHint)
     {
-        if (sizeHint < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(sizeHint));
-        }
+        ArgumentOutOfRangeException.ThrowIfNegative(sizeHint);
 
         if (sizeHint == 0)
         {
