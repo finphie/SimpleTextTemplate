@@ -31,9 +31,6 @@ public ref struct TemplateIdentifierReader
         _length = input.Length;
     }
 
-    readonly ref byte Buffer =>
-        ref _buffer;
-
     /// <summary>
     /// 識別子を読み込みます。
     /// </summary>
@@ -67,7 +64,7 @@ public ref struct TemplateIdentifierReader
     {
         Debug.Assert(_length > 0, "バッファーの長さは0より大きい値である必要があります。");
 
-        if (Buffer == (byte)':')
+        if (_buffer == (byte)':')
         {
             value = default;
             format = null;
@@ -75,35 +72,35 @@ public ref struct TemplateIdentifierReader
             return false;
         }
 
-        var formatIndex = BinaryHelper.IndexOf(ref Buffer, _length, (byte)':');
+        var formatIndex = BinaryHelper.IndexOf(ref _buffer, _length, (byte)':');
 
         if (formatIndex <= 0)
         {
-            value = MemoryMarshal.CreateReadOnlySpan(ref Buffer, _length);
+            value = MemoryMarshal.CreateReadOnlySpan(ref _buffer, _length);
             format = null;
             culture = null;
             return true;
         }
 
-        value = MemoryMarshal.CreateReadOnlySpan(ref Buffer, formatIndex);
+        value = MemoryMarshal.CreateReadOnlySpan(ref _buffer, formatIndex);
         Advance(formatIndex + 1);
 
-        var cultureIndex = BinaryHelper.IndexOf(ref Buffer, _length, (byte)':');
+        var cultureIndex = BinaryHelper.IndexOf(ref _buffer, _length, (byte)':');
 
         if (cultureIndex < 0)
         {
             format = _length != 0
-                ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), _length)
+                ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref _buffer), _length)
                 : null;
             culture = null;
             return true;
         }
 
-        format = cultureIndex != 0 ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), cultureIndex) : null;
+        format = cultureIndex != 0 ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref _buffer), cultureIndex) : null;
         Advance(cultureIndex + 1);
 
         culture = _length != 0
-            ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), _length)
+            ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref _buffer), _length)
             : null;
 
         return true;
