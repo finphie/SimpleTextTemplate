@@ -24,7 +24,7 @@ static class BinaryHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int IndexOf(scoped ref readonly byte searchSpace, int length, byte value)
     {
-        var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
+        var span = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
         return span.IndexOf(value);
     }
 
@@ -41,7 +41,7 @@ static class BinaryHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int IndexOf(scoped ref readonly byte searchSpace, int length, ReadOnlySpan<byte> value)
     {
-        var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
+        var span = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
         return span.IndexOf(value);
     }
 
@@ -58,20 +58,8 @@ static class BinaryHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int IndexOfAnyExcept(scoped ref readonly byte searchSpace, int length, byte value)
     {
-#if NET8_0_OR_GREATER
-        var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
+        var span = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
         return span.IndexOfAnyExcept(value);
-#else
-        for (nint index = 0; index < length; index++)
-        {
-            if (Unsafe.AddByteOffset(ref Unsafe.AsRef(in searchSpace), index) != value)
-            {
-                return (int)index;
-            }
-        }
-
-        return -1;
-#endif
     }
 
     /// <summary>
@@ -87,37 +75,7 @@ static class BinaryHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int LastIndexOfAnyExcept(scoped ref readonly byte searchSpace, int length, byte value)
     {
-#if NET8_0_OR_GREATER
-        var span = CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
+        var span = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in searchSpace), length);
         return span.LastIndexOfAnyExcept(value);
-#else
-        for (var index = (nint)length - 1; index >= 0; index--)
-        {
-            if (Unsafe.AddByteOffset(ref Unsafe.AsRef(in searchSpace), index) != value)
-            {
-                return (int)index;
-            }
-        }
-
-        return -1;
-#endif
-    }
-
-    /// <summary>
-    /// 読み取り専用spanを作成します。
-    /// </summary>
-    /// <param name="value">データへの参照</param>
-    /// <param name="length">データの長さ</param>
-    /// <returns>指定された長さの読み取り専用spanを返します。</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static unsafe ReadOnlySpan<byte> CreateReadOnlySpan(scoped ref readonly byte value, int length)
-    {
-#if NET8_0_OR_GREATER
-        var span = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in value), length);
-#else
-        var span = new ReadOnlySpan<byte>((byte*)Unsafe.AsPointer(ref Unsafe.AsRef(in value)), length);
-#endif
-
-        return span;
     }
 }

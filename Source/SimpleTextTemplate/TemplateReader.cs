@@ -156,7 +156,7 @@ public ref struct TemplateReader
             index = Length;
         }
 
-        value = BinaryHelper.CreateReadOnlySpan(ref Buffer, index);
+        value = MemoryMarshal.CreateReadOnlySpan(ref Buffer, index);
         Advance(index);
 
         return true;
@@ -205,7 +205,7 @@ public ref struct TemplateReader
             endIndex = index;
         }
 
-        value = BinaryHelper.CreateReadOnlySpan(ref Unsafe.SubtractByteOffset(ref Buffer, (nint)(uint)index), endIndex + 1);
+        value = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.SubtractByteOffset(ref Buffer, (nint)(uint)index), endIndex + 1);
 
         Advance(EndIdentifier.Length);
         return true;

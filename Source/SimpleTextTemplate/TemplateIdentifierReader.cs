@@ -101,13 +101,13 @@ public ref struct TemplateIdentifierReader
 
         if (formatIndex <= 0)
         {
-            value = BinaryHelper.CreateReadOnlySpan(ref Buffer, Length);
+            value = MemoryMarshal.CreateReadOnlySpan(ref Buffer, Length);
             format = null;
             culture = null;
             return true;
         }
 
-        value = BinaryHelper.CreateReadOnlySpan(ref Buffer, formatIndex);
+        value = MemoryMarshal.CreateReadOnlySpan(ref Buffer, formatIndex);
         Advance(formatIndex + 1);
 
         var cultureIndex = BinaryHelper.IndexOf(ref Buffer, Length, (byte)':');
