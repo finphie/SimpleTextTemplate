@@ -19,7 +19,7 @@ static class GeneratorRunner
     [ModuleInitializer]
     public static void Initialize()
     {
-        var baseAssemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location)!;
+        var baseAssemblyPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
         var assemblies = new[]
         {
             "System.Private.CoreLib.dll",

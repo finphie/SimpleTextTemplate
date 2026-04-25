@@ -17,8 +17,8 @@ namespace SimpleTextTemplate.Generator;
 /// <param name="infoList">インターセプター情報のリスト</param>
 readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<InterceptInfo> infoList) : IDisposable
 {
-    static readonly string FullName = typeof(TemplateGenerator).FullName;
-    static readonly string Version = typeof(TemplateGenerator).Assembly.GetName().Version.ToString();
+    static readonly string FullName = typeof(TemplateGenerator).FullName!;
+    static readonly string Version = typeof(TemplateGenerator).Assembly.GetName().Version!.ToString();
 
     readonly SourceCodeWriter _writer = new();
 
@@ -126,7 +126,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
 
     void WriteRenderMethod(int number)
     {
-        var (interceptsLocationInfo, writeInfo, grow, methodSymbol) = _infoList[number]!;
+        var (interceptsLocationInfo, writeInfo, grow, methodSymbol) = _infoList[number];
 
         var parameters = string.Join(", ", methodSymbol.Parameters.Select(static x => x.GetParameterText()));
         _writer.WriteLine($"""[global::System.Runtime.CompilerServices.InterceptsLocation({interceptsLocationInfo.Version}, "{interceptsLocationInfo.Data}")]""");

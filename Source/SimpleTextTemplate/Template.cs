@@ -134,9 +134,12 @@ public readonly struct Template
     /// <param name="bufferWriter">バッファーライター</param>
     /// <param name="context">コンテキスト</param>
     /// <param name="provider">カルチャー指定</param>
+    /// <exception cref="ArgumentNullException"><paramref name="context"/>が<see langword="null"/>です。</exception>
     public readonly void Render<TWriter>(TWriter bufferWriter, Dictionary<byte[], object> context, IFormatProvider? provider = null)
         where TWriter : notnull, IBufferWriter<byte>, allows ref struct
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         if (context.Comparer is not IAlternateEqualityComparer<ReadOnlySpan<byte>, byte[]>)
         {
             ThrowHelper.ThrowInvalidCompareException();

@@ -18,7 +18,7 @@ namespace SimpleTextTemplate.Generator;
 /// </summary>
 ref struct InterceptInfoCreator
 {
-    static readonly string FlagsAttributeFullName = typeof(FlagsAttribute).FullName;
+    static readonly string FlagsAttributeFullName = typeof(FlagsAttribute).FullName!;
 
     readonly GeneratorSyntaxContext _context;
     readonly SemanticModel _semanticModel;
