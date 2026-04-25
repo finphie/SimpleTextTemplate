@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using SimpleTextTemplate.Helpers;
@@ -14,7 +13,6 @@ public ref struct TemplateReader
     readonly ref readonly byte _start;
     ref byte _buffer;
 
-    [SuppressMessage("Style", "IDE0032:自動プロパティを使用する", Justification = "誤検知")]
     int _length;
 
     /// <summary>
@@ -47,10 +45,6 @@ public ref struct TemplateReader
     readonly ref byte Buffer =>
         ref _buffer;
 
-    [SuppressMessage("Style", "IDE0032:自動プロパティを使用する", Justification = "誤検知")]
-    readonly int Length =>
-        _length;
-
     /// <summary>
     /// 文字列または識別子を読み込みます。
     /// </summary>
@@ -59,7 +53,7 @@ public ref struct TemplateReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BlockType TryRead(out ReadOnlySpan<byte> value)
     {
-        if (Length <= 0)
+        if (_length <= 0)
         {
             value = default;
             return BlockType.End;
@@ -109,14 +103,14 @@ public ref struct TemplateReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryReadString(out ReadOnlySpan<byte> value)
     {
-        if (Length == 0)
+        if (_length == 0)
         {
             value = default;
             return false;
         }
 
         // "{{"がある位置までは文字列となる。
-        var index = BinaryHelper.IndexOf(ref Buffer, Length, StartIdentifier);
+        var index = BinaryHelper.IndexOf(ref Buffer, _length, StartIdentifier);
 
         if (index == 0)
         {
@@ -126,7 +120,7 @@ public ref struct TemplateReader
 
         if (index == -1)
         {
-            index = Length;
+            index = _length;
         }
 
         value = MemoryMarshal.CreateReadOnlySpan(ref Buffer, index);
@@ -147,7 +141,7 @@ public ref struct TemplateReader
     public bool TryReadIdentifier(out ReadOnlySpan<byte> value)
     {
         // "{{"で始まらない場合
-        if (Length < StartIdentifier.Length || Unsafe.ReadUnaligned<ushort>(ref Buffer) != MemoryMarshal.Read<ushort>(StartIdentifier))
+        if (_length < StartIdentifier.Length || Unsafe.ReadUnaligned<ushort>(ref Buffer) != MemoryMarshal.Read<ushort>(StartIdentifier))
         {
             value = default;
             return false;
@@ -157,7 +151,7 @@ public ref struct TemplateReader
         SkipSpace();
 
         // "}}"がある位置までは識別子
-        var index = BinaryHelper.IndexOf(ref Buffer, Length, EndIdentifier);
+        var index = BinaryHelper.IndexOf(ref Buffer, _length, EndIdentifier);
 
         // "{{"と"}}"の間に1文字もないか、"}}"が見つからない場合
         if (index <= 0)
@@ -200,12 +194,12 @@ public ref struct TemplateReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void SkipSpace()
     {
-        var count = BinaryHelper.IndexOfAnyExcept(ref Buffer, Length, (byte)' ');
+        var count = BinaryHelper.IndexOfAnyExcept(ref Buffer, _length, (byte)' ');
 
         // 末尾まで空白の場合は、末尾までスキップ対象とする。
         if (count == -1)
         {
-            count = Length;
+            count = _length;
         }
 
         // 先頭が空白または既に末尾まで読み取り済みの場合
