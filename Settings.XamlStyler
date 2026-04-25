@@ -12,7 +12,7 @@
   "EnableAttributeReordering": true,
   "AttributeOrderingRuleGroups": [
     "x:Class",
-    "xmlns, xmlns:x, xmlns:mc, xmlns:d, xmlns:i, xmlns:ui",
+    "xmlns, xmlns:x, xmlns:mc, xmlns:d, xmlns:b, xmlns:i, xmlns:ui",
     "xmlns:*",
     "x:Key, Key, x:Name, Name, x:Uid, Uid, Title",
     "Grid.Row, Grid.RowSpan, Grid.Column, Grid.ColumnSpan, Canvas.Left, Canvas.Top, Canvas.Right, Canvas.Bottom",
@@ -21,7 +21,9 @@
     "*:*, *",
     "PageSource, PageIndex, Offset, Color, TargetName, Property, Value, StartPoint, EndPoint",
     "mc:Ignorable, d:DataContext, d:IsDataSource, d:LayoutOverrides, d:IsStaticText, d:DesignWidth, d:DesignHeight",
-    "Storyboard.*, From, To, Duration"
+    "Storyboard.*, From, To, Duration",
+    "Start, End",
+    "*Command, CommandParameter"
   ],
   "FirstLineAttributes": "",
   "OrderAttributesByName": true,
