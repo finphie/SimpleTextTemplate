@@ -34,7 +34,7 @@ dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/fi
 
 次の例では、外部のライブラリである[CommunityToolkit.HighPerformance](https://www.nuget.org/packages/CommunityToolkit.HighPerformance/)を参照しています。
 
-### SimpleTextTemplate.Generator（推奨）
+### SimpleTextTemplate.Generator
 
 ```csharp
 using System;
@@ -101,7 +101,7 @@ file static class Intercept
 <details>
 <summary>SimpleTextTemplate（非推奨）</summary>
 
-### SimpleTextTemplate.Renderer（非推奨）
+### SimpleTextTemplate.Renderer
 
 [SimpleTextTemplate](https://www.nuget.org/packages/SimpleTextTemplate/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)への参照が必要です。
 
@@ -176,7 +176,7 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## サポートフレームワーク
 
-.NET 9
+.NET 10
 
 ## 作者
 
@@ -205,8 +205,8 @@ MIT
 
 - [DocumentationAnalyzers](https://github.com/DotNetAnalyzers/DocumentationAnalyzers)
 - [IDisposableAnalyzers](https://github.com/DotNetAnalyzers/IDisposableAnalyzers)
-- [Microsoft.CodeAnalysis.Analyzers](https://github.com/dotnet/roslyn-analyzers)
-- [Microsoft.CodeAnalysis.NetAnalyzers](https://github.com/dotnet/roslyn-analyzers)
+- [Microsoft.CodeAnalysis.Analyzers](https://github.com/dotnet/roslyn)
+- [Microsoft.CodeAnalysis.NetAnalyzers](https://github.com/dotnet/sdk)
 - [Microsoft.VisualStudio.Threading.Analyzers](https://github.com/Microsoft/vs-threading)
 - [Roslynator.Analyzers](https://github.com/dotnet/roslynator)
 - [Roslynator.Formatting.Analyzers](https://github.com/dotnet/roslynator)
@@ -215,13 +215,6 @@ MIT
 ### ベンチマーク
 
 - [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
-- [CommandLineParser](https://github.com/commandlineparser/commandline)
-- [Iced](https://github.com/icedland/iced)
-- [Microsoft.CodeAnalysis.CSharp](https://github.com/dotnet/roslyn)
-- [Microsoft.Diagnostics.NETCore.Client](https://github.com/dotnet/diagnostics)
-- [Microsoft.Diagnostics.Runtime](https://github.com/Microsoft/clrmd)
-- [Microsoft.Diagnostics.Tracing.TraceEvent](https://github.com/Microsoft/perfview)
-- [Perfolizer](https://github.com/AndreyAkinshin/perfolizer)
 - [Scriban](https://github.com/scriban/scriban)
 
 ### その他
