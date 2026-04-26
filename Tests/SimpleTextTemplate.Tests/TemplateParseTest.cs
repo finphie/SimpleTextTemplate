@@ -69,7 +69,7 @@ public sealed class TemplateParseTest
 
     [Fact]
     public void 無効なカルチャー_TemplateException()
-        => Should.Throw<CultureNotFoundException>(() => Template.Parse("{{ A::B }}"u8));
+        => Should.Throw<CultureNotFoundException>(static () => Template.Parse("{{ A::B }}"u8));
 
     static void Execute(string input) => Template.Parse(Encoding.UTF8.GetBytes(input));
 }
