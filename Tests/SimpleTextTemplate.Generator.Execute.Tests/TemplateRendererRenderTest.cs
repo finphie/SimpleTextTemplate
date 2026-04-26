@@ -10,7 +10,7 @@ namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderTest
 {
-    [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1122:Use string.Empty for empty strings", Justification = "テスト")]
+    [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1122:Use string.Empty for empty strings")]
     [Fact]
     public void 空白_出力なし()
     {
@@ -52,8 +52,8 @@ public sealed class TemplateRendererRenderTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
-            """);
+                Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
+                """);
     }
 
     [Fact]
@@ -75,13 +75,13 @@ public sealed class TemplateRendererRenderTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
-            Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
-            Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
-            Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
-            Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
+                Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
+                Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
+                Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
+                Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
+                Minim eos vel labore eos consectetuer invidunt diam labore. Accumsan eirmod dolore kasd sed laoreet sadipscing consetetur est rebum dolore lorem. Accumsan vulputate laoreet enim iusto amet dolore ut tempor stet gubergren lorem no in facilisis justo sit. Augue ut eirmod elit ut. Ut clita at ea mazim consetetur. Iusto ad at takimata consectetuer amet justo amet ullamcorper id. Sanctus quod facer nonummy justo tempor. At ex justo velit aliquip sadipscing diam lorem lorem erat ullamcorper sea tation stet consetetur labore tempor. Labore nulla dolore erat. Sadipscing lorem et takimata clita kasd sed.
 
-            """);
+                """);
     }
 
     [Fact]
@@ -102,11 +102,11 @@ public sealed class TemplateRendererRenderTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            A_ConstantValue_ConstantValueB_ConstantValue_StringValue_ConstantValue_ConstantValue_Utf16Value_ConstantValue_Utf8Value1
-            A_ConstantValue_ConstantValueB_ConstantValue_StringValue_ConstantValue_ConstantValue_Utf16Value_ConstantValue_Utf8Value
-            A_ConstantValue_ConstantValueB_ConstantValue_StringValue_ConstantValue_ConstantValue_Utf16Value_ConstantValue_Utf8Value1
-            A_ConstantValue_ConstantValueB_ConstantValue_StringValue_ConstantValue_ConstantValue_Utf16Value_ConstantValue_Utf8Value
+                A_ConstantValue_ConstantValueB_ConstantValue_StringValue_ConstantValue_ConstantValue_Utf16Value_ConstantValue_Utf8Value1
+                A_ConstantValue_ConstantValueB_ConstantValue_StringValue_ConstantValue_ConstantValue_Utf16Value_ConstantValue_Utf8Value
+                A_ConstantValue_ConstantValueB_ConstantValue_StringValue_ConstantValue_ConstantValue_Utf16Value_ConstantValue_Utf8Value1
+                A_ConstantValue_ConstantValueB_ConstantValue_StringValue_ConstantValue_ConstantValue_Utf16Value_ConstantValue_Utf8Value
 
-            """);
+                """);
     }
 }

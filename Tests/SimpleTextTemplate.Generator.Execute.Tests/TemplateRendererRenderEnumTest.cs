@@ -25,10 +25,10 @@ public sealed class TemplateRendererRenderEnumTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            Test1
-            1
-            00000001
-            """);
+                Test1
+                1
+                00000001
+                """);
     }
 
     [Fact]
@@ -47,9 +47,9 @@ public sealed class TemplateRendererRenderEnumTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            99
-            99
-            """);
+                99
+                99
+                """);
     }
 
     [Fact]
@@ -68,9 +68,9 @@ public sealed class TemplateRendererRenderEnumTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            Test1, Test2
-            3
-            """);
+                Test1, Test2
+                3
+                """);
     }
 
     [Fact]
@@ -89,9 +89,9 @@ public sealed class TemplateRendererRenderEnumTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            Test2
-            2
-            """);
+                Test2
+                2
+                """);
     }
 
     [Fact]
@@ -110,9 +110,9 @@ public sealed class TemplateRendererRenderEnumTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            Test3
-            3
-            """);
+                Test3
+                3
+                """);
     }
 
     [Fact]
@@ -131,9 +131,9 @@ public sealed class TemplateRendererRenderEnumTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            Test4
-            4
-            """);
+                Test4
+                4
+                """);
     }
 
     [Fact]
@@ -152,8 +152,8 @@ public sealed class TemplateRendererRenderEnumTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            Test5
-            5
-            """);
+                Test5
+                5
+                """);
     }
 }

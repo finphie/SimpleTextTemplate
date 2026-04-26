@@ -1,5 +1,4 @@
 ﻿using System.Buffers;
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,7 +15,6 @@ static class CompilationExtensions
     /// </summary>
     /// <param name="compilation">コンパイル情報</param>
     /// <returns>インターセプター情報を返します。</returns>
-    [SuppressMessage("Style", "IDE0306:コレクションの初期化を簡略化します", Justification = "Roslynの不具合 https://github.com/dotnet/roslyn/issues/77174")]
     public static Queue<InterceptInfo> GetInterceptInfo(this Compilation compilation)
     {
         var generatedSyntaxTrees = compilation.SyntaxTrees.Last();

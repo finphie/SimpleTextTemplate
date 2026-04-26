@@ -27,11 +27,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            1234.567
-            1,234.567
-            1234,567
-            1.234,567
-            """);
+                1234.567
+                1,234.567
+                1234,567
+                1.234,567
+                """);
     }
 
     [Fact]
@@ -52,11 +52,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            1234.567
-            1,234.567
-            1234,567
-            1.234,567
-            """);
+                1234.567
+                1,234.567
+                1234,567
+                1.234,567
+                """);
     }
 
     [Fact]
@@ -77,11 +77,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            1234,567
-            1.234,567
-            1234.567
-            1,234.567
-            """);
+                1234,567
+                1.234,567
+                1234.567
+                1,234.567
+                """);
     }
 
     [Fact]
@@ -102,11 +102,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            2345.678
-            2,345.678
-            2345,678
-            2.345,678
-            """);
+                2345.678
+                2,345.678
+                2345,678
+                2.345,678
+                """);
     }
 
     [Fact]
@@ -127,11 +127,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            2345.678
-            2,345.678
-            2345,678
-            2.345,678
-            """);
+                2345.678
+                2,345.678
+                2345,678
+                2.345,678
+                """);
     }
 
     [Fact]
@@ -152,11 +152,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            2345,678
-            2.345,678
-            2345.678
-            2,345.678
-            """);
+                2345,678
+                2.345,678
+                2345.678
+                2,345.678
+                """);
     }
 
     [Fact]
@@ -177,11 +177,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            3456.789
-            3,456.789
-            3456,789
-            3.456,789
-            """);
+                3456.789
+                3,456.789
+                3456,789
+                3.456,789
+                """);
     }
 
     [Fact]
@@ -202,11 +202,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            3456.789
-            3,456.789
-            3456,789
-            3.456,789
-            """);
+                3456.789
+                3,456.789
+                3456,789
+                3.456,789
+                """);
     }
 
     [Fact]
@@ -227,11 +227,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            3456,789
-            3.456,789
-            3456.789
-            3,456.789
-            """);
+                3456,789
+                3.456,789
+                3456.789
+                3,456.789
+                """);
     }
 
     [Fact]
@@ -252,11 +252,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            4567.891
-            4,567.891
-            4567,891
-            4.567,891
-            """);
+                4567.891
+                4,567.891
+                4567,891
+                4.567,891
+                """);
     }
 
     [Fact]
@@ -277,11 +277,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            4567.891
-            4,567.891
-            4567,891
-            4.567,891
-            """);
+                4567.891
+                4,567.891
+                4567,891
+                4.567,891
+                """);
     }
 
     [Fact]
@@ -302,11 +302,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            4567,891
-            4.567,891
-            4567.891
-            4,567.891
-            """);
+                4567,891
+                4.567,891
+                4567.891
+                4,567.891
+                """);
     }
 
     [Fact]
@@ -327,11 +327,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            5678.912
-            5,678.912
-            5678,912
-            5.678,912
-            """);
+                5678.912
+                5,678.912
+                5678,912
+                5.678,912
+                """);
     }
 
     [Fact]
@@ -352,11 +352,11 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            5678.912
-            5,678.912
-            5678,912
-            5.678,912
-            """);
+                5678.912
+                5,678.912
+                5678,912
+                5.678,912
+                """);
     }
 
     [Fact]
@@ -377,10 +377,10 @@ public sealed class TemplateRendererRenderDoubleTest
 
         Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
             .ShouldBe("""
-            5678,912
-            5.678,912
-            5678.912
-            5,678.912
-            """);
+                5678,912
+                5.678,912
+                5678.912
+                5,678.912
+                """);
     }
 }
