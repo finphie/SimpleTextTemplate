@@ -442,7 +442,14 @@ ref struct InterceptInfoCreator
             return true;
         }
 
-        AddConstantString(value.ToString());
+        var constantString = value.ToString();
+
+        if (string.IsNullOrEmpty(constantString))
+        {
+            return true;
+        }
+
+        AddConstantString(constantString);
         return true;
     }
 
