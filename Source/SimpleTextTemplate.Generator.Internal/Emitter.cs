@@ -165,7 +165,6 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
         if (growInfo.Members.Count == 0)
         {
             WriteClosingParenthesisAndSemicolon();
-            _writer.WriteLine();
             return;
         }
 
@@ -173,7 +172,9 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
 
         using (_writer.Indent())
         {
-            if (growInfo.Members.Any(static x => x.WriteType != WriteString))
+            var isUtf8 = growInfo.Members.Any(static x => x.WriteType != WriteString);
+
+            if (isUtf8)
             {
                 _writer.Write("+ ");
 
@@ -181,24 +182,27 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
                 WriteContextMemberLengths(in this, growInfo.Members, true, contextTypeName);
             }
 
-            // 対象のメンバーはUTF-16の文字列となるので、UTF-8での最大長を追加
-            if (growInfo.Members.Any(static x => x.WriteType == WriteString))
+            if (!growInfo.Members.Any(static x => x.WriteType == WriteString))
             {
-                _writer.WriteLine();
-                _writer.WriteLine("+ global::System.Text.Encoding.UTF8.GetMaxByteCount(");
-
-                using (_writer.Indent())
-                {
-                    WriteContextMemberLengths(in this, growInfo.Members, false, contextTypeName);
-
-                    _writer.Write(")");
-                    WriteClosingParenthesisAndSemicolon();
-                }
-
+                WriteClosingParenthesisAndSemicolon();
                 return;
             }
 
-            WriteClosingParenthesisAndSemicolon();
+            if (isUtf8)
+            {
+                _writer.WriteLine();
+            }
+
+            // 対象のメンバーはUTF-16の文字列となるので、UTF-8での最大長を追加
+            _writer.WriteLine("+ global::System.Text.Encoding.UTF8.GetMaxByteCount(");
+
+            using (_writer.Indent())
+            {
+                WriteContextMemberLengths(in this, growInfo.Members, false, contextTypeName);
+
+                _writer.Write(")");
+                WriteClosingParenthesisAndSemicolon();
+            }
         }
 
         static void WriteContextMemberLengths(in Emitter emitter, IReadOnlyList<ContextMember> members, bool isUtf8, string? contextTypeName)
@@ -217,11 +221,12 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
 
                 if (!first)
                 {
+                    writer.WriteLine();
                     writer.Write("+ ");
                 }
 
                 emitter.WriteContextMemberName(member, contextTypeName);
-                writer.WriteLine(".Length");
+                writer.Write(".Length");
                 first = false;
             }
         }
