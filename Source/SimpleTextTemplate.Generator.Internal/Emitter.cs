@@ -1,9 +1,9 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
+using FToolkit.AnalyzerUtilities.Buffers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using SimpleTextTemplate.Generator.Buffers;
 using SimpleTextTemplate.Generator.Extensions;
 using SimpleTextTemplate.Generator.Specs;
 using static SimpleTextTemplate.Generator.Specs.TemplateWriterWriteType;
@@ -165,53 +165,65 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
         if (growInfo.Members.Count == 0)
         {
             WriteClosingParenthesisAndSemicolon();
+            _writer.WriteLine();
             return;
         }
 
-        var members = growInfo.Members.ToLookup(static x => x.WriteType != WriteString);
-        var utf8Members = members[true].ToArray();
-        var utf16Members = members[false].ToArray().AsSpan();
+        _writer.WriteLine();
 
-        _writer.IncreaseIndent();
-
-        // 対象のメンバーはUTF-8のバイト列となるので、長さをそのまま追加
-        WriteContextMemberLengths(in this, utf8Members, contextTypeName);
-
-        // 対象のメンバーはUTF-16の文字列となるので、UTF-8での最大長を追加
-        if (utf16Members.Length > 0)
+        using (_writer.Indent())
         {
-            _writer.WriteLine();
-            _writer.WriteLine("+ global::System.Text.Encoding.UTF8.GetMaxByteCount(");
-            _writer.IncreaseIndent();
+            if (growInfo.Members.Any(static x => x.WriteType != WriteString))
+            {
+                _writer.Write("+ ");
 
-            WriteContextMemberLength(in this, utf16Members[0], contextTypeName);
-            WriteContextMemberLengths(in this, utf16Members[1..], contextTypeName);
+                // 対象のメンバーはUTF-8のバイト列となるので、長さをそのまま追加
+                WriteContextMemberLengths(in this, growInfo.Members, true, contextTypeName);
+            }
 
-            _writer.Write(")");
-            _writer.DecreaseIndent();
+            // 対象のメンバーはUTF-16の文字列となるので、UTF-8での最大長を追加
+            if (growInfo.Members.Any(static x => x.WriteType == WriteString))
+            {
+                _writer.WriteLine();
+                _writer.WriteLine("+ global::System.Text.Encoding.UTF8.GetMaxByteCount(");
+
+                using (_writer.Indent())
+                {
+                    WriteContextMemberLengths(in this, growInfo.Members, false, contextTypeName);
+
+                    _writer.Write(")");
+                    WriteClosingParenthesisAndSemicolon();
+                }
+
+                return;
+            }
+
+            WriteClosingParenthesisAndSemicolon();
         }
 
-        WriteClosingParenthesisAndSemicolon();
-        _writer.DecreaseIndent();
-
-        static void WriteContextMemberLengths(in Emitter emitter, ReadOnlySpan<ContextMember> members, string? contextTypeName)
+        static void WriteContextMemberLengths(in Emitter emitter, IReadOnlyList<ContextMember> members, bool isUtf8, string? contextTypeName)
         {
             var writer = emitter._writer;
+            var first = true;
 
             foreach (var member in members)
             {
-                writer.WriteLine();
-                writer.Write("+ ");
-                WriteContextMemberLength(in emitter, member, contextTypeName);
+                var isNotWriteString = member.WriteType != WriteString;
+
+                if (isNotWriteString != isUtf8)
+                {
+                    continue;
+                }
+
+                if (!first)
+                {
+                    writer.Write("+ ");
+                }
+
+                emitter.WriteContextMemberName(member, contextTypeName);
+                writer.WriteLine(".Length");
+                first = false;
             }
-        }
-
-        static void WriteContextMemberLength(in Emitter emitter, ContextMember member, string? contextTypeName)
-        {
-            var writer = emitter._writer;
-
-            emitter.WriteContextMemberName(member, contextTypeName);
-            writer.Write(".Length");
         }
     }
 
@@ -282,7 +294,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
 
         if (isStatic)
         {
-            _writer.Write($"{contextTypeName!}.@{member.Name}");
+            _writer.Write($"{contextTypeName}.@{member.Name}");
             return;
         }
 
