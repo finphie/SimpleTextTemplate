@@ -59,6 +59,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
         using (_writer.WriteBlock())
         {
             _writer.WriteLine($"""[global::System.CodeDom.Compiler.GeneratedCode("{FullName}", "{Version}")]""");
+            _writer.WriteLine("""[global::System.Diagnostics.Conditional("INTERCEPTS_LOCATION_KEEP_ATTRIBUTES")]""");
             _writer.WriteLine("[global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]");
             _writer.WriteLine("file sealed class InterceptsLocationAttribute(int version, string data) : global::System.Attribute;");
         }
