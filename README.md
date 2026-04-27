@@ -203,7 +203,6 @@ MIT
 - [DocumentationAnalyzers](https://github.com/DotNetAnalyzers/DocumentationAnalyzers)
 - [IDisposableAnalyzers](https://github.com/DotNetAnalyzers/IDisposableAnalyzers)
 - [Microsoft.CodeAnalysis.Analyzers](https://github.com/dotnet/roslyn)
-- [Microsoft.CodeAnalysis.NetAnalyzers](https://github.com/dotnet/sdk)
 - [Microsoft.VisualStudio.Threading.Analyzers](https://github.com/Microsoft/vs-threading)
 - [Roslynator.Analyzers](https://github.com/dotnet/roslynator)
 - [Roslynator.Formatting.Analyzers](https://github.com/dotnet/roslynator)
