@@ -3,6 +3,7 @@
     <File Path="version.json" />
   </Folder>
   <Folder Name="/Source/">
+    <File Path="Source/Directory.Packages.props" />
     <Project Path="Source/SimpleTextTemplate.Benchmarks/SimpleTextTemplate.Benchmarks.csproj" />
     <Project Path="Source/SimpleTextTemplate.Generator.Internal/SimpleTextTemplate.Generator.Internal.csproj" />
     <Project Path="Source/SimpleTextTemplate.Generator/SimpleTextTemplate.Generator.csproj">
@@ -13,6 +14,7 @@
     <Project Path="Source/SimpleTextTemplate/SimpleTextTemplate.csproj" />
   </Folder>
   <Folder Name="/Tests/">
+    <File Path="Tests/Directory.Packages.props" />
     <Project Path="Tests/SimpleTextTemplate.Generator.Execute.Tests/SimpleTextTemplate.Generator.Execute.Tests.csproj" />
     <Project Path="Tests/SimpleTextTemplate.Generator.Tests.Core/SimpleTextTemplate.Generator.Tests.Core.csproj" />
     <Project Path="Tests/SimpleTextTemplate.Generator.Tests/SimpleTextTemplate.Generator.Tests.csproj" />
