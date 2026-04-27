@@ -32,7 +32,7 @@ dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/fi
 
 ## 使い方
 
-次の例では、外部のライブラリである[CommunityToolkit.HighPerformance](https://www.nuget.org/packages/CommunityToolkit.HighPerformance/)を参照しています。
+次の例では、[CommunityToolkit.HighPerformance](https://www.nuget.org/packages/CommunityToolkit.HighPerformance/)を使用しています。
 
 ### SimpleTextTemplate.Generator
 
@@ -172,7 +172,8 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## サポートフレームワーク
 
-.NET 10
+- .NET 11
+- .NET 10
 
 ## 作者
 
@@ -212,7 +213,3 @@ MIT
 
 - [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
 - [Scriban](https://github.com/scriban/scriban)
-
-### その他
-
-- [PolySharp](https://github.com/Sergio0694/PolySharp)
