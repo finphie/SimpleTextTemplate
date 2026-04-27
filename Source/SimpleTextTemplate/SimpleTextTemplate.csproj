@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net11.0;net10.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>true</IsPackable>
+    <Description>シンプルなテキストテンプレートエンジンです。</Description>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>シンプルなテキストテンプレートエンジンです。</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>templating</PackageTags>
   </PropertyGroup>
