@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/Configuration/">
+    <File Path="version.json" />
+  </Folder>
+  <Folder Name="/Source/">
+    <Project Path="Source/SimpleTextTemplate.Benchmarks/SimpleTextTemplate.Benchmarks.csproj" />
+    <Project Path="Source/SimpleTextTemplate.Generator.Internal/SimpleTextTemplate.Generator.Internal.csproj" />
+    <Project Path="Source/SimpleTextTemplate.Generator/SimpleTextTemplate.Generator.csproj">
+      <BuildDependency Project="Source/SimpleTextTemplate.Generator.Internal/SimpleTextTemplate.Generator.Internal.csproj" />
+    </Project>
+    <Project Path="Source/SimpleTextTemplate.Sample/SimpleTextTemplate.Sample.csproj" />
+    <Project Path="Source/SimpleTextTemplate.Writer/SimpleTextTemplate.Writer.csproj" />
+    <Project Path="Source/SimpleTextTemplate/SimpleTextTemplate.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/SimpleTextTemplate.Generator.Execute.Tests/SimpleTextTemplate.Generator.Execute.Tests.csproj" />
+    <Project Path="Tests/SimpleTextTemplate.Generator.Tests.Core/SimpleTextTemplate.Generator.Tests.Core.csproj" />
+    <Project Path="Tests/SimpleTextTemplate.Generator.Tests/SimpleTextTemplate.Generator.Tests.csproj" />
+    <Project Path="Tests/SimpleTextTemplate.Tests/SimpleTextTemplate.Tests.csproj" />
+    <Project Path="Tests/SimpleTextTemplate.Writer.Tests/SimpleTextTemplate.Writer.Tests.csproj" />
+  </Folder>
+</Solution>
