@@ -1,15 +1,12 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using Xunit;
+using SimpleTextTemplate.Generator.Tests.TestData;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderEmptyTest
 {
-    [Fact]
-    public void 定数()
+    [Test]
+    public async Task 定数()
     {
         var context = new EmptyContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -18,12 +15,12 @@ public sealed class TemplateRendererRenderEmptyTest
         TemplateRenderer.Render(ref writer, "{{ EmptyStringConstantField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public async Task 静的フィールド()
     {
         var context = new EmptyContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -32,12 +29,12 @@ public sealed class TemplateRendererRenderEmptyTest
         TemplateRenderer.Render(ref writer, "{{ EmptyStringStaticField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public async Task フィールド()
     {
         var context = new EmptyContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -46,12 +43,12 @@ public sealed class TemplateRendererRenderEmptyTest
         TemplateRenderer.Render(ref writer, "{{ EmptyStringField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public async Task 静的プロパティ()
     {
         var context = new EmptyContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -60,12 +57,12 @@ public sealed class TemplateRendererRenderEmptyTest
         TemplateRenderer.Render(ref writer, "{{ EmptyStringStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public async Task プロパティ()
     {
         var context = new EmptyContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -74,7 +71,7 @@ public sealed class TemplateRendererRenderEmptyTest
         TemplateRenderer.Render(ref writer, "{{ EmptyStringProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 }

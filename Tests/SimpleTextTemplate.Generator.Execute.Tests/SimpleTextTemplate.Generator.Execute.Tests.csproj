@@ -10,6 +10,7 @@
     <ProjectReference Include="..\..\Source\SimpleTextTemplate.Generator.Internal\SimpleTextTemplate.Generator.Internal.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\Source\SimpleTextTemplate.Generator\SimpleTextTemplate.Generator.csproj" />
     <ProjectReference Include="..\SimpleTextTemplate.Generator.Tests.Core\SimpleTextTemplate.Generator.Tests.Core.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate.Tests.Core\SimpleTextTemplate.Tests.Core.csproj" />
   </ItemGroup>
 
 </Project>

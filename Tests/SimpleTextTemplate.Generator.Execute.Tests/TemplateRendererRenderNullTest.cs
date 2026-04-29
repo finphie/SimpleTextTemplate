@@ -1,15 +1,12 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using Xunit;
+using SimpleTextTemplate.Generator.Tests.TestData;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderNullTest
 {
-    [Fact]
-    public void 定数()
+    [Test]
+    public async Task 定数()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -19,37 +16,40 @@ public sealed class TemplateRendererRenderNullTest
         TemplateRenderer.Render(ref writer, "{{ NullObjectConstantField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 
-    [Fact]
-    public void 静的フィールド_NullReferenceException()
+    [Test]
+    public async Task 静的フィールド_NullReferenceException()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action1 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullBytesStaticField }}", in context);
-        });
+        };
+        await Assert.That(action1).Throws<NullReferenceException>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action2 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullCharsStaticField }}", in context);
-        });
+        };
+        await Assert.That(action2).Throws<NullReferenceException>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action3 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullStringStaticField }}", in context);
-        });
+        };
+        await Assert.That(action3).Throws<NullReferenceException>();
     }
 
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public async Task 静的フィールド()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -58,37 +58,40 @@ public sealed class TemplateRendererRenderNullTest
         TemplateRenderer.Render(ref writer, "{{ NullObjectStaticField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 
-    [Fact]
-    public void フィールド_NullReferenceException()
+    [Test]
+    public async Task フィールド_NullReferenceException()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action1 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullBytesField }}", in context);
-        });
+        };
+        await Assert.That(action1).Throws<NullReferenceException>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action2 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullCharsField }}", in context);
-        });
+        };
+        await Assert.That(action2).Throws<NullReferenceException>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action3 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullStringField }}", in context);
-        });
+        };
+        await Assert.That(action3).Throws<NullReferenceException>();
     }
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public async Task フィールド()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -97,37 +100,40 @@ public sealed class TemplateRendererRenderNullTest
         TemplateRenderer.Render(ref writer, "{{ NullObjectField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 
-    [Fact]
-    public void 静的プロパティ_NullReferenceException()
+    [Test]
+    public async Task 静的プロパティ_NullReferenceException()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action1 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullBytesStaticProperty }}", in context);
-        });
+        };
+        await Assert.That(action1).Throws<NullReferenceException>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action2 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullCharsStaticProperty }}", in context);
-        });
+        };
+        await Assert.That(action2).Throws<NullReferenceException>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action3 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullStringStaticProperty }}", in context);
-        });
+        };
+        await Assert.That(action3).Throws<NullReferenceException>();
     }
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public async Task 静的プロパティ()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -136,37 +142,40 @@ public sealed class TemplateRendererRenderNullTest
         TemplateRenderer.Render(ref writer, "{{ NullObjectStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 
-    [Fact]
-    public void プロパティ_NullReferenceException()
+    [Test]
+    public async Task プロパティ_NullReferenceException()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action1 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullBytesProperty }}", in context);
-        });
+        };
+        await Assert.That(action1).Throws<NullReferenceException>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action2 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullCharsProperty }}", in context);
-        });
+        };
+        await Assert.That(action2).Throws<NullReferenceException>();
 
-        Should.Throw<NullReferenceException>(() =>
+        var action3 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullStringProperty }}", in context);
-        });
+        };
+        await Assert.That(action3).Throws<NullReferenceException>();
     }
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public async Task プロパティ()
     {
         var context = new NullContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -175,7 +184,7 @@ public sealed class TemplateRendererRenderNullTest
         TemplateRenderer.Render(ref writer, "{{ NullObjectProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBeEmpty();
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsEmpty();
     }
 }

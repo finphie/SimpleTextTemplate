@@ -1,15 +1,13 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using Xunit;
+using SimpleTextTemplate.Generator.Tests.TestData;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderCharArrayTest
 {
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public async Task 静的フィールド()
     {
         var context = new CharArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -18,12 +16,12 @@ public sealed class TemplateRendererRenderCharArrayTest
         TemplateRenderer.Render(ref writer, "{{ CharsStaticField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_CharsStaticField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_CharsStaticField");
     }
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public async Task フィールド()
     {
         var context = new CharArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -32,12 +30,12 @@ public sealed class TemplateRendererRenderCharArrayTest
         TemplateRenderer.Render(ref writer, "{{ CharsField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_CharsField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_CharsField");
     }
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public async Task 静的プロパティ()
     {
         var context = new CharArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -46,12 +44,12 @@ public sealed class TemplateRendererRenderCharArrayTest
         TemplateRenderer.Render(ref writer, "{{ CharsStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_CharsStaticProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_CharsStaticProperty");
     }
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public async Task プロパティ()
     {
         var context = new CharArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -60,12 +58,12 @@ public sealed class TemplateRendererRenderCharArrayTest
         TemplateRenderer.Render(ref writer, "{{ CharsProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_CharsProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_CharsProperty");
     }
 
-    [Fact]
-    public void 静的ReadOnlySpanプロパティ()
+    [Test]
+    public async Task 静的ReadOnlySpanプロパティ()
     {
         var context = new CharArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -74,12 +72,12 @@ public sealed class TemplateRendererRenderCharArrayTest
         TemplateRenderer.Render(ref writer, "{{ CharsSpanStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_CharsSpanStaticProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_CharsSpanStaticProperty");
     }
 
-    [Fact]
-    public void ReadOnlySpanプロパティ()
+    [Test]
+    public async Task ReadOnlySpanプロパティ()
     {
         var context = new CharArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -88,7 +86,7 @@ public sealed class TemplateRendererRenderCharArrayTest
         TemplateRenderer.Render(ref writer, "{{ CharsSpanProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_CharsSpanProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_CharsSpanProperty");
     }
 }

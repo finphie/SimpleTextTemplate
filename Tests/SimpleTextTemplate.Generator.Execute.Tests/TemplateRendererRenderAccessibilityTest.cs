@@ -1,14 +1,12 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderAccessibilityTest
 {
-    [Fact]
-    public void 静的Internalフィールド()
+    [Test]
+    public async Task 静的Internalフィールド()
     {
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -17,12 +15,12 @@ public sealed class TemplateRendererRenderAccessibilityTest
         TemplateRenderer.Render(ref writer, "{{ _internalStaticField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("InternalStaticField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("InternalStaticField");
     }
 
-    [Fact]
-    public void Internalフィールド()
+    [Test]
+    public async Task Internalフィールド()
     {
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -31,12 +29,12 @@ public sealed class TemplateRendererRenderAccessibilityTest
         TemplateRenderer.Render(ref writer, "{{ _internalField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("InternalField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("InternalField");
     }
 
-    [Fact]
-    public void 静的ProtectedInternalフィールド()
+    [Test]
+    public async Task 静的ProtectedInternalフィールド()
     {
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -45,12 +43,12 @@ public sealed class TemplateRendererRenderAccessibilityTest
         TemplateRenderer.Render(ref writer, "{{ ProtectedInternalStaticField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_ProtectedInternalStaticField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_ProtectedInternalStaticField");
     }
 
-    [Fact]
-    public void ProtectedInternalフィールド()
+    [Test]
+    public async Task ProtectedInternalフィールド()
     {
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -59,12 +57,12 @@ public sealed class TemplateRendererRenderAccessibilityTest
         TemplateRenderer.Render(ref writer, "{{ ProtectedInternalField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_ProtectedInternalField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_ProtectedInternalField");
     }
 
-    [Fact]
-    public void 静的Internalプロパティ()
+    [Test]
+    public async Task 静的Internalプロパティ()
     {
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -73,12 +71,12 @@ public sealed class TemplateRendererRenderAccessibilityTest
         TemplateRenderer.Render(ref writer, "{{ InternalStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_InternalStaticProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_InternalStaticProperty");
     }
 
-    [Fact]
-    public void Internalプロパティ()
+    [Test]
+    public async Task Internalプロパティ()
     {
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -87,12 +85,12 @@ public sealed class TemplateRendererRenderAccessibilityTest
         TemplateRenderer.Render(ref writer, "{{ InternalProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_InternalProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_InternalProperty");
     }
 
-    [Fact]
-    public void 静的ProtectedInternalプロパティ()
+    [Test]
+    public async Task 静的ProtectedInternalプロパティ()
     {
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -101,12 +99,12 @@ public sealed class TemplateRendererRenderAccessibilityTest
         TemplateRenderer.Render(ref writer, "{{ ProtectedInternalStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_ProtectedInternalStaticProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_ProtectedInternalStaticProperty");
     }
 
-    [Fact]
-    public void ProtectedInternalプロパティ()
+    [Test]
+    public async Task ProtectedInternalプロパティ()
     {
         var context = new AccessibilityTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -115,7 +113,7 @@ public sealed class TemplateRendererRenderAccessibilityTest
         TemplateRenderer.Render(ref writer, "{{ ProtectedInternalProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_ProtectedInternalProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_ProtectedInternalProperty");
     }
 }

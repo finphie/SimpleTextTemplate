@@ -1,16 +1,14 @@
 ﻿using System.Buffers;
 using System.Globalization;
-using System.Text;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using Xunit;
+using SimpleTextTemplate.Generator.Tests.TestData;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderDoubleTest
 {
-    [Fact]
-    public void 定数()
+    [Test]
+    public async Task 定数()
     {
         const string Text = """
             {{ DoubleConstantField }}
@@ -25,8 +23,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 1234.567
                 1,234.567
                 1234,567
@@ -34,8 +32,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void 定数_InvariantCulture指定()
+    [Test]
+    public async Task 定数_InvariantCulture指定()
     {
         const string Text = """
             {{ DoubleConstantField }}
@@ -50,8 +48,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 1234.567
                 1,234.567
                 1234,567
@@ -59,8 +57,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void 定数_特定カルチャー指定()
+    [Test]
+    public async Task 定数_特定カルチャー指定()
     {
         const string Text = """
             {{ DoubleConstantField }}
@@ -75,8 +73,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 1234,567
                 1.234,567
                 1234.567
@@ -84,8 +82,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public async Task 静的フィールド()
     {
         const string Text = """
             {{ DoubleStaticField }}
@@ -100,8 +98,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 2345.678
                 2,345.678
                 2345,678
@@ -109,8 +107,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void 静的フィールド_InvariantCulture指定()
+    [Test]
+    public async Task 静的フィールド_InvariantCulture指定()
     {
         const string Text = """
             {{ DoubleStaticField }}
@@ -125,8 +123,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 2345.678
                 2,345.678
                 2345,678
@@ -134,8 +132,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void 静的フィールド_特定カルチャー指定()
+    [Test]
+    public async Task 静的フィールド_特定カルチャー指定()
     {
         const string Text = """
             {{ DoubleStaticField }}
@@ -150,8 +148,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 2345,678
                 2.345,678
                 2345.678
@@ -159,8 +157,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public async Task フィールド()
     {
         const string Text = """
             {{ DoubleField }}
@@ -175,8 +173,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 3456.789
                 3,456.789
                 3456,789
@@ -184,8 +182,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void フィールド_InvariantCulture指定()
+    [Test]
+    public async Task フィールド_InvariantCulture指定()
     {
         const string Text = """
             {{ DoubleField }}
@@ -200,8 +198,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 3456.789
                 3,456.789
                 3456,789
@@ -209,8 +207,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void フィールド_特定カルチャー指定()
+    [Test]
+    public async Task フィールド_特定カルチャー指定()
     {
         const string Text = """
             {{ DoubleField }}
@@ -225,8 +223,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 3456,789
                 3.456,789
                 3456.789
@@ -234,8 +232,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public async Task 静的プロパティ()
     {
         const string Text = """
             {{ DoubleStaticProperty }}
@@ -250,8 +248,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 4567.891
                 4,567.891
                 4567,891
@@ -259,8 +257,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void 静的プロパティ_InvariantCulture指定()
+    [Test]
+    public async Task 静的プロパティ_InvariantCulture指定()
     {
         const string Text = """
             {{ DoubleStaticProperty }}
@@ -275,8 +273,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 4567.891
                 4,567.891
                 4567,891
@@ -284,8 +282,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void 静的プロパティ_特定カルチャー指定()
+    [Test]
+    public async Task 静的プロパティ_特定カルチャー指定()
     {
         const string Text = """
             {{ DoubleStaticProperty }}
@@ -300,8 +298,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 4567,891
                 4.567,891
                 4567.891
@@ -309,8 +307,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public async Task プロパティ()
     {
         const string Text = """
             {{ DoubleProperty }}
@@ -325,8 +323,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 5678.912
                 5,678.912
                 5678,912
@@ -334,8 +332,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void プロパティ_InvariantCulture指定()
+    [Test]
+    public async Task プロパティ_InvariantCulture指定()
     {
         const string Text = """
             {{ DoubleProperty }}
@@ -350,8 +348,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.InvariantCulture);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 5678.912
                 5,678.912
                 5678,912
@@ -359,8 +357,8 @@ public sealed class TemplateRendererRenderDoubleTest
                 """);
     }
 
-    [Fact]
-    public void プロパティ_特定カルチャー指定()
+    [Test]
+    public async Task プロパティ_特定カルチャー指定()
     {
         const string Text = """
             {{ DoubleProperty }}
@@ -375,8 +373,8 @@ public sealed class TemplateRendererRenderDoubleTest
         TemplateRenderer.Render(ref writer, Text, in context, CultureInfo.GetCultureInfo("es-ES", true));
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
                 5678,912
                 5.678,912
                 5678.912

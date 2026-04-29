@@ -1,15 +1,13 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using Xunit;
+using SimpleTextTemplate.Generator.Tests.TestData;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderStringTest
 {
-    [Fact]
-    public void 定数()
+    [Test]
+    public async Task 定数()
     {
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -18,12 +16,12 @@ public sealed class TemplateRendererRenderStringTest
         TemplateRenderer.Render(ref writer, "{{ StringConstantField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_StringConstantField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_StringConstantField");
     }
 
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public async Task 静的フィールド()
     {
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -32,12 +30,12 @@ public sealed class TemplateRendererRenderStringTest
         TemplateRenderer.Render(ref writer, "{{ StringStaticField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_StringStaticField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_StringStaticField");
     }
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public async Task フィールド()
     {
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -46,12 +44,12 @@ public sealed class TemplateRendererRenderStringTest
         TemplateRenderer.Render(ref writer, "{{ StringField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_StringField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_StringField");
     }
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public async Task 静的プロパティ()
     {
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -60,12 +58,12 @@ public sealed class TemplateRendererRenderStringTest
         TemplateRenderer.Render(ref writer, "{{ StringStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_StringStaticProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_StringStaticProperty");
     }
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public async Task プロパティ()
     {
         var context = new StringContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -74,7 +72,7 @@ public sealed class TemplateRendererRenderStringTest
         TemplateRenderer.Render(ref writer, "{{ StringProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_StringProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_StringProperty");
     }
 }
