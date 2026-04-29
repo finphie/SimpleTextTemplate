@@ -31,21 +31,21 @@ public sealed class TemplateRendererRenderNullTest
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullBytesStaticField }}", in context);
         };
-        await Assert.That(action1).Throws<NullReferenceException>();
+        await Assert.That(action1).ThrowsExactly<NullReferenceException>();
 
         var action2 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullCharsStaticField }}", in context);
         };
-        await Assert.That(action2).Throws<NullReferenceException>();
+        await Assert.That(action2).ThrowsExactly<NullReferenceException>();
 
         var action3 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullStringStaticField }}", in context);
         };
-        await Assert.That(action3).Throws<NullReferenceException>();
+        await Assert.That(action3).ThrowsExactly<NullReferenceException>();
     }
 
     [Test]
@@ -73,21 +73,21 @@ public sealed class TemplateRendererRenderNullTest
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullBytesField }}", in context);
         };
-        await Assert.That(action1).Throws<NullReferenceException>();
+        await Assert.That(action1).ThrowsExactly<NullReferenceException>();
 
         var action2 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullCharsField }}", in context);
         };
-        await Assert.That(action2).Throws<NullReferenceException>();
+        await Assert.That(action2).ThrowsExactly<NullReferenceException>();
 
         var action3 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullStringField }}", in context);
         };
-        await Assert.That(action3).Throws<NullReferenceException>();
+        await Assert.That(action3).ThrowsExactly<NullReferenceException>();
     }
 
     [Test]
@@ -115,21 +115,21 @@ public sealed class TemplateRendererRenderNullTest
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullBytesStaticProperty }}", in context);
         };
-        await Assert.That(action1).Throws<NullReferenceException>();
+        await Assert.That(action1).ThrowsExactly<NullReferenceException>();
 
         var action2 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullCharsStaticProperty }}", in context);
         };
-        await Assert.That(action2).Throws<NullReferenceException>();
+        await Assert.That(action2).ThrowsExactly<NullReferenceException>();
 
         var action3 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullStringStaticProperty }}", in context);
         };
-        await Assert.That(action3).Throws<NullReferenceException>();
+        await Assert.That(action3).ThrowsExactly<NullReferenceException>();
     }
 
     [Test]
@@ -157,21 +157,21 @@ public sealed class TemplateRendererRenderNullTest
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullBytesProperty }}", in context);
         };
-        await Assert.That(action1).Throws<NullReferenceException>();
+        await Assert.That(action1).ThrowsExactly<NullReferenceException>();
 
         var action2 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullCharsProperty }}", in context);
         };
-        await Assert.That(action2).Throws<NullReferenceException>();
+        await Assert.That(action2).ThrowsExactly<NullReferenceException>();
 
         var action3 = () =>
         {
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ NullStringProperty }}", in context);
         };
-        await Assert.That(action3).Throws<NullReferenceException>();
+        await Assert.That(action3).ThrowsExactly<NullReferenceException>();
     }
 
     [Test]
