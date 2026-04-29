@@ -1,4 +1,4 @@
-﻿namespace SimpleTextTemplate.Generator.Tests.Core;
+﻿namespace SimpleTextTemplate.Generator.Tests.TestData;
 
 public sealed record StringContextTestData
 {
