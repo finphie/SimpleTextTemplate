@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source\SimpleTextTemplate.Writer\SimpleTextTemplate.Writer.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate.Tests.Core\SimpleTextTemplate.Tests.Core.csproj" />
   </ItemGroup>
 
 </Project>

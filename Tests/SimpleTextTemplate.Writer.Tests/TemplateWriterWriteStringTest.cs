@@ -1,18 +1,16 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Writer.Tests;
 
 public sealed class TemplateWriterWriteStringTest
 {
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("a")]
-    [InlineData("abc01234567890")]
-    public void 文字列_バッファーライターに書き込み(string? value)
+    [Test]
+    [Arguments(null)]
+    [Arguments("")]
+    [Arguments("a")]
+    [Arguments("abc01234567890")]
+    public async Task 文字列_バッファーライターに書き込み(string? value)
     {
         var bufferWriter = new ArrayBufferWriter<byte>();
 
@@ -20,12 +18,12 @@ public sealed class TemplateWriterWriteStringTest
         writer.WriteString(value);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe(value ?? string.Empty);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo(value);
     }
 
-    [Fact]
-    public void 長い文字列_バッファーライターに書き込み()
+    [Test]
+    public async Task 長い文字列_バッファーライターに書き込み()
     {
         var value = new string('a', 1024);
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -34,12 +32,12 @@ public sealed class TemplateWriterWriteStringTest
         writer.WriteString(value);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe(value);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo(value);
     }
 
-    [Fact]
-    public void 文字列を複数回追加_バッファーライターに書き込み()
+    [Test]
+    public async Task 文字列を複数回追加_バッファーライターに書き込み()
     {
         var value = new string('a', 30);
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -54,8 +52,10 @@ public sealed class TemplateWriterWriteStringTest
 
         writer.Flush();
 
-        var array = bufferWriter.WrittenSpan.ToArray();
-        array.ShouldAllBe(static x => x == (byte)'a');
-        array.Length.ShouldBe(value.Length * count);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .Count()
+            .IsEqualTo(value.Length * count)
+            .And
+            .All(static x => x == 'a');
     }
 }

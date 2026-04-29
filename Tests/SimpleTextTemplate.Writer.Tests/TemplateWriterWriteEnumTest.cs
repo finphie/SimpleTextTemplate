@@ -1,7 +1,5 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Writer.Tests;
 
@@ -17,8 +15,8 @@ public sealed class TemplateWriterWriteEnumTest
         AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     }
 
-    [Fact]
-    public void 書式指定なし_バッファーライターに書き込み()
+    [Test]
+    public async Task 書式指定なし_バッファーライターに書き込み()
     {
         const Test1 Value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -27,12 +25,12 @@ public sealed class TemplateWriterWriteEnumTest
         writer.WriteEnum(Value);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("A");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("A");
     }
 
-    [Fact]
-    public void 書式指定_バッファーライターに書き込み()
+    [Test]
+    public async Task 書式指定_バッファーライターに書き込み()
     {
         const Test1 Value = Test1.A;
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -41,12 +39,12 @@ public sealed class TemplateWriterWriteEnumTest
         writer.WriteEnum(Value, "D");
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("0");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("0");
     }
 
-    [Fact]
-    public void Enumを複数回追加_バッファーライターに書き込み()
+    [Test]
+    public async Task Enumを複数回追加_バッファーライターに書き込み()
     {
         const Test2 Value = Test2.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA;
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -61,8 +59,10 @@ public sealed class TemplateWriterWriteEnumTest
 
         writer.Flush();
 
-        var array = Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
-        array.ShouldAllBe(static x => x == (byte)'A');
-        array.Length.ShouldBe(30 * count);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .Count()
+            .IsEqualTo(nameof(Test2.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA).Length * count)
+            .And
+            .All(static x => x == 'A');
     }
 }

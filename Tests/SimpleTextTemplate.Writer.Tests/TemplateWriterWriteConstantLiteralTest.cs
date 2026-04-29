@@ -1,24 +1,23 @@
 ﻿using System.Buffers;
 using System.Text;
-using Shouldly;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Writer.Tests;
 
 public sealed class TemplateWriterWriteConstantLiteralTest
 {
-    [Theory]
-    [InlineData("0")]
-    [InlineData("01")]
-    [InlineData("012")]
-    [InlineData("0123")]
-    [InlineData("01234")]
-    [InlineData("012345")]
-    [InlineData("0123456")]
-    [InlineData("01234567")]
-    [InlineData("012345678")]
-    [InlineData("0123456789")]
-    public void 文字列_バッファーライターに書き込み(string value)
+    [Test]
+    [Arguments("0")]
+    [Arguments("01")]
+    [Arguments("012")]
+    [Arguments("0123")]
+    [Arguments("01234")]
+    [Arguments("012345")]
+    [Arguments("0123456")]
+    [Arguments("01234567")]
+    [Arguments("012345678")]
+    [Arguments("0123456789")]
+    public async Task 文字列_バッファーライターに書き込み(string value)
     {
         var utf8Value = Encoding.UTF8.GetBytes(value);
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -27,22 +26,22 @@ public sealed class TemplateWriterWriteConstantLiteralTest
         writer.WriteConstantLiteral(utf8Value);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe(value);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo(value);
     }
 
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    [InlineData(4)]
-    [InlineData(5)]
-    [InlineData(6)]
-    [InlineData(7)]
-    [InlineData(8)]
-    [InlineData(9)]
-    [InlineData(10)]
-    public void 指定された長さの文字列を複数回追加_バッファーライターに書き込み(int length)
+    [Test]
+    [Arguments(1)]
+    [Arguments(2)]
+    [Arguments(3)]
+    [Arguments(4)]
+    [Arguments(5)]
+    [Arguments(6)]
+    [Arguments(7)]
+    [Arguments(8)]
+    [Arguments(9)]
+    [Arguments(10)]
+    public async Task 指定された長さの文字列を複数回追加_バッファーライターに書き込み(int length)
     {
         var value = new string('a', length);
         var utf8Value = Encoding.UTF8.GetBytes(value);
@@ -58,8 +57,10 @@ public sealed class TemplateWriterWriteConstantLiteralTest
 
         writer.Flush();
 
-        var array = bufferWriter.WrittenSpan.ToArray();
-        array.ShouldAllBe(static x => x == (byte)'a');
-        array.Length.ShouldBe(value.Length * count);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .Count()
+            .IsEqualTo(value.Length * count)
+            .And
+            .All(static x => x == 'a');
     }
 }
