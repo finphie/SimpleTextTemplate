@@ -111,7 +111,6 @@ public sealed class TemplateWriterWriteLiteralTest
 
         writer.Flush();
 
-        var array = bufferWriter.WrittenMemory;
         await Assert.That(bufferWriter.WrittenMemory)
             .Count()
             .IsEqualTo(value.Length * count)
