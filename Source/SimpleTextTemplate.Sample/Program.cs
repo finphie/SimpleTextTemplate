@@ -1,7 +1,6 @@
 ﻿using System.Buffers;
 using System.Globalization;
 using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
 var bufferWriter = new ArrayBufferWriter<byte>();

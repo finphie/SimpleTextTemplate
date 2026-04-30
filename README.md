@@ -71,7 +71,7 @@ readonly record struct SampleContext(
 file static class Intercept
 {
     [global::System.Runtime.CompilerServices.InterceptsLocation(1, "...")]
-    public static void Render0(ref global::SimpleTextTemplate.TemplateWriter<global::CommunityToolkit.HighPerformance.Buffers.ArrayPoolBufferWriter<byte>> writer, string text, in global::SampleContext context, global::System.IFormatProvider provider = null)
+    public static void Render0(ref global::SimpleTextTemplate.TemplateWriter<global::System.Buffers.ArrayBufferWriter<byte>> writer, string text, in global::SampleContext context, global::System.IFormatProvider provider = null)
     {
         writer.WriteValue(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", global::System.Globalization.CultureInfo.InvariantCulture);
         writer.Grow(2
@@ -83,7 +83,7 @@ file static class Intercept
     }
 
     [global::System.Runtime.CompilerServices.InterceptsLocation(1, "...")]
-    public static void Render1(ref global::SimpleTextTemplate.TemplateWriter<global::CommunityToolkit.HighPerformance.Buffers.ArrayPoolBufferWriter<byte>> writer, string text, in global::SampleContext context, global::System.IFormatProvider provider = null)
+    public static void Render1(ref global::SimpleTextTemplate.TemplateWriter<global::System.Buffers.ArrayBufferWriter<byte>> writer, string text, in global::SampleContext context, global::System.IFormatProvider provider = null)
     {
         writer.Grow(15);
         writer.DangerousWriteConstantLiteral("_Hello_999.000_"u8);
