@@ -32,6 +32,8 @@ dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/fi
 
 ## 使い方
 
+[サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
+
 ### SimpleTextTemplate.Generator
 
 ```csharp
@@ -62,12 +64,9 @@ readonly record struct SampleContext(
 }
 ```
 
-[サンプルプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Sample)
-
 #### 生成コード
 
 ```csharp
-[global::System.CodeDom.Compiler.GeneratedCode("SimpleTextTemplate.Generator.TemplateGenerator", "3.1.0.0")]
 file static class Intercept
 {
     [global::System.Runtime.CompilerServices.InterceptsLocation(1, "...")]
@@ -92,10 +91,7 @@ file static class Intercept
 }
 ```
 
-<details>
-<summary>SimpleTextTemplate（非推奨）</summary>
-
-### SimpleTextTemplate.Renderer
+### SimpleTextTemplate
 
 ```csharp
 using System;
@@ -106,7 +102,7 @@ using SimpleTextTemplate;
 var symbols = Context.Create();
 symbols.Add("Identifier"u8.ToArray(), "Hello, World!"u8.ToArray());
 
-using var bufferWriter = new ArrayBufferWriter<byte>();
+var bufferWriter = new ArrayBufferWriter<byte>();
 var source = "{{ Identifier }}"u8.ToArray();
 var template = Template.Parse(source);
 template.Render(bufferWriter, symbols);
@@ -114,8 +110,6 @@ template.Render(bufferWriter, symbols);
 // Hello, World!
 Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 ```
-
-</details>
 
 ## ベンチマーク
 
