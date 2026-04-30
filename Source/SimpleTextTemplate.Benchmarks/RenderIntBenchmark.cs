@@ -11,13 +11,13 @@ namespace SimpleTextTemplate.Benchmarks;
 
 public class RenderIntBenchmark
 {
-    const string IntTemplate = "abcdef{{ IntValue }}abcdef";
+    const string IntTemplate = "{{ IntValue }}{{ IntValue }}{{ IntValue }}{{ IntValue }}{{ IntValue }}";
 
     readonly ArrayBufferWriter<byte> _bufferWriter = new();
 
-    Template _intTemplate;
-    ScribanTemplate _intScribanTemplate;
-    ScribanTemplate _intScribanLiquidTemplate;
+    Template _template;
+    ScribanTemplate _scribanTemplate;
+    ScribanTemplate _scribanLiquidTemplate;
     CompositeFormat _compositeFormat;
 
     SampleContext _generatorContext;
@@ -27,9 +27,9 @@ public class RenderIntBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        _intTemplate = Template.Parse(Encoding.UTF8.GetBytes(IntTemplate));
-        _intScribanTemplate = ScribanTemplate.Parse(IntTemplate);
-        _intScribanLiquidTemplate = ScribanTemplate.ParseLiquid(IntTemplate);
+        _template = Template.Parse(Encoding.UTF8.GetBytes(IntTemplate));
+        _scribanTemplate = ScribanTemplate.Parse(IntTemplate);
+        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(IntTemplate);
         _compositeFormat = CompositeFormat.Parse(Format);
 
         _generatorContext = new();
@@ -42,55 +42,70 @@ public class RenderIntBenchmark
     }
 
     [Benchmark(Baseline = true, Description = DescriptionSimpleTextTemplateGenerator)]
-    public byte[] SimpleTextTemplate_Generator_Int()
+    public byte[] SimpleTextTemplate_Generator()
     {
+        _bufferWriter.ResetWrittenCount();
+
         var writer = TemplateWriter.Create(_bufferWriter);
         TemplateRenderer.Render(ref writer, IntTemplate, in _generatorContext);
         writer.Flush();
 
-        var result = _bufferWriter.WrittenSpan.ToArray();
-        _bufferWriter.ResetWrittenCount();
-
-        return result;
+        return _bufferWriter.WrittenSpan.ToArray();
     }
 
     [Benchmark(Description = DescriptionSimpleTextTemplate)]
-    public byte[] SimpleTextTemplate_Int()
+    public byte[] SimpleTextTemplate()
     {
-        _intTemplate.Render(_bufferWriter, _context);
-
-        var result = _bufferWriter.WrittenSpan.ToArray();
         _bufferWriter.ResetWrittenCount();
 
-        return result;
+        _template.Render(_bufferWriter, _context);
+        return _bufferWriter.WrittenSpan.ToArray();
     }
 
-    [Benchmark(Description = DescriptionScriban)]
-    public string Scriban_Int() => _intScribanTemplate.Render(_scribanContext);
-
-    [Benchmark(Description = DescriptionScribanLiquid)]
-    public string ScribanLiquid_Int() => _intScribanLiquidTemplate.Render(_scribanContext);
-
     [Benchmark(Description = DescriptionUtf8TryWrite)]
-    public byte[] Utf8TryWrite_Int()
+    public byte[] Utf8_TryWrite()
     {
-        Utf8.TryWrite(_bufferWriter.GetSpan(), $"abcdef{_generatorContext.IntValue}abcdef", out var bytesWritten);
-        _bufferWriter.Advance(bytesWritten);
-
-        var result = _bufferWriter.WrittenSpan.ToArray();
         _bufferWriter.ResetWrittenCount();
 
-        return result;
+        Utf8.TryWrite(
+            _bufferWriter.GetSpan(),
+            $"{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}",
+            out var bytesWritten);
+        _bufferWriter.Advance(bytesWritten);
+
+        return _bufferWriter.WrittenSpan.ToArray();
     }
 
     [Benchmark(Description = DescriptionInterpolatedStringHandler)]
-    public string InterpolatedStringHandler_Int()
+    public string InterpolatedStringHandler()
     {
-        DefaultInterpolatedStringHandler handler = $"abcdef{_generatorContext.IntValue}abcdef";
+        _bufferWriter.ResetWrittenCount();
+
+        DefaultInterpolatedStringHandler handler = $"{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}";
         return handler.ToStringAndClear();
     }
 
     [Benchmark(Description = DescriptionCompositeFormat)]
-    public string CompositeFormat_Int()
-        => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _generatorContext.IntValue);
+    public string System_Text_CompositeFormat()
+    {
+        _bufferWriter.ResetWrittenCount();
+
+        return string.Format(CultureInfo.InvariantCulture, _compositeFormat, _generatorContext.IntValue);
+    }
+
+    [Benchmark(Description = DescriptionScriban)]
+    public string Scriban()
+    {
+        _bufferWriter.ResetWrittenCount();
+
+        return _scribanTemplate.Render(_scribanContext);
+    }
+
+    [Benchmark(Description = DescriptionScribanLiquid)]
+    public string Scriban_Liquid()
+    {
+        _bufferWriter.ResetWrittenCount();
+
+        return _scribanLiquidTemplate.Render(_scribanContext);
+    }
 }
