@@ -1,7 +1,5 @@
-﻿using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using SimpleTextTemplate.Generator.Tests.Extensions;
-using Xunit;
+﻿using SimpleTextTemplate.Generator.Tests.Extensions;
+using SimpleTextTemplate.Tests.TestData;
 using static Microsoft.CodeAnalysis.DiagnosticSeverity;
 using static SimpleTextTemplate.Generator.Tests.GeneratorRunner;
 using static SimpleTextTemplate.Generator.Tests.SourceCode;
@@ -10,8 +8,8 @@ namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class TemplateWriterWriteDiagnosticsTest
 {
-    [Fact]
-    public void テンプレート文字列が定数ではない_STT1000()
+    [Test]
+    public async Task テンプレート文字列が定数ではない_STT1000()
     {
         const string SourceCode = """
             using System.Buffers;
@@ -22,30 +20,30 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             var x = "a";
             TemplateRenderer.Render(ref writer, x);
             """;
-        var (_, diagnostics) = Run(SourceCode);
+        var (_, diagnostics) = await RunAsync(SourceCode);
 
-        diagnostics.Count.ShouldBe(1);
+        await Assert.That(diagnostics.Count).IsEqualTo(1);
 
-        diagnostics[0].Id.ShouldBe("STT1000");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("x");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1000");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("x");
     }
 
-    [Fact]
-    public void テンプレート文字列がnull_STT1000()
+    [Test]
+    public async Task テンプレート文字列がnull_STT1000()
     {
         var sourceCode = Get(templateText: null);
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(1);
+        await Assert.That(diagnostics.Count).IsEqualTo(1);
 
-        diagnostics[0].Id.ShouldBe("STT1000");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("null");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1000");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("null");
     }
 
-    [Fact]
-    public void テンプレート文字列に識別子がありコンテキストの指定がない_STT1001()
+    [Test]
+    public async Task テンプレート文字列に識別子がありコンテキストの指定がない_STT1001()
     {
         const string SourceCode = """
             using System.Buffers;
@@ -55,86 +53,86 @@ public sealed class TemplateWriterWriteDiagnosticsTest
             var writer = TemplateWriter.Create(bufferWriter);
             TemplateRenderer.Render(ref writer, "{{ x }}");
             """;
-        var (_, diagnostics) = Run(SourceCode);
+        var (_, diagnostics) = await RunAsync(SourceCode);
 
-        diagnostics.Count.ShouldBe(1);
+        await Assert.That(diagnostics.Count).IsEqualTo(1);
 
-        diagnostics[0].Id.ShouldBe("STT1001");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("TemplateRenderer.Render(ref writer, \"{{ x }}\")");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1001");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("TemplateRenderer.Render(ref writer, \"{{ x }}\")");
     }
 
-    [Fact]
-    public void コンテキストに識別子が存在しない_STT1002()
+    [Test]
+    public async Task コンテキストに識別子が存在しない_STT1002()
     {
         var sourceCode = Get("{{ A }}", nameof(ByteArrayContextTestData));
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(1);
+        await Assert.That(diagnostics.Count).IsEqualTo(1);
 
-        diagnostics[0].Id.ShouldBe("STT1002");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("context");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1002");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("context");
     }
 
-    [Fact]
-    public void コンテキストに複数の識別子が存在しない_STT1002()
+    [Test]
+    public async Task コンテキストに複数の識別子が存在しない_STT1002()
     {
         var sourceCode = Get("{{ A }}{{ B }}", nameof(ByteArrayContextTestData));
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(2);
+        await Assert.That(diagnostics.Count).IsEqualTo(2);
 
-        diagnostics[0].Id.ShouldBe("STT1002");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("context");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1002");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("context");
 
-        diagnostics[1].Id.ShouldBe("STT1002");
-        diagnostics[1].Severity.ShouldBe(Error);
-        diagnostics[1].GetText().ShouldBe("context");
+        await Assert.That(diagnostics[1].Id).IsEqualTo("STT1002");
+        await Assert.That(diagnostics[1].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[1].GetText()).IsEqualTo("context");
     }
 
-    [Fact]
-    public void テンプレート文字列が不正な形式_STT1003()
+    [Test]
+    public async Task テンプレート文字列が不正な形式_STT1003()
     {
         var sourceCode = Get("{{");
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(1);
+        await Assert.That(diagnostics.Count).IsEqualTo(1);
 
-        diagnostics[0].Id.ShouldBe("STT1003");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("\"{{\"");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1003");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("\"{{\"");
     }
 
-    [Fact]
-    public void テンプレート文字列に識別子名の宣言が存在しない_STT1003()
+    [Test]
+    public async Task テンプレート文字列に識別子名の宣言が存在しない_STT1003()
     {
         var sourceCode = Get("{{}}");
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(1);
+        await Assert.That(diagnostics.Count).IsEqualTo(1);
 
-        diagnostics[0].Id.ShouldBe("STT1003");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("\"{{}}\"");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1003");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("\"{{}}\"");
     }
 
-    [Fact]
-    public void テンプレート文字列の識別子名宣言が空白_STT1003()
+    [Test]
+    public async Task テンプレート文字列の識別子名宣言が空白_STT1003()
     {
         var sourceCode = Get("{{ }}");
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(1);
+        await Assert.That(diagnostics.Count).IsEqualTo(1);
 
-        diagnostics[0].Id.ShouldBe("STT1003");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("\"{{ }}\"");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1003");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("\"{{ }}\"");
     }
 
-    [Fact]
-    public void 文字列定数識別子に対して書式指定_STT1004()
+    [Test]
+    public async Task 文字列定数識別子に対して書式指定_STT1004()
     {
         var sourceCode = Get(
             [
@@ -143,25 +141,25 @@ public sealed class TemplateWriterWriteDiagnosticsTest
                 "{{ StringConstantField:A:ja-JP }}"
             ],
             nameof(StringContextTestData));
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(3);
+        await Assert.That(diagnostics.Count).IsEqualTo(3);
 
-        diagnostics[0].Id.ShouldBe("STT1004");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("\"{{ StringConstantField:A }}\"");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1004");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("\"{{ StringConstantField:A }}\"");
 
-        diagnostics[1].Id.ShouldBe("STT1004");
-        diagnostics[1].Severity.ShouldBe(Error);
-        diagnostics[1].GetText().ShouldBe("\"{{ StringConstantField::ja-JP }}\"");
+        await Assert.That(diagnostics[1].Id).IsEqualTo("STT1004");
+        await Assert.That(diagnostics[1].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[1].GetText()).IsEqualTo("\"{{ StringConstantField::ja-JP }}\"");
 
-        diagnostics[2].Id.ShouldBe("STT1004");
-        diagnostics[2].Severity.ShouldBe(Error);
-        diagnostics[2].GetText().ShouldBe("\"{{ StringConstantField:A:ja-JP }}\"");
+        await Assert.That(diagnostics[2].Id).IsEqualTo("STT1004");
+        await Assert.That(diagnostics[2].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[2].GetText()).IsEqualTo("\"{{ StringConstantField:A:ja-JP }}\"");
     }
 
-    [Fact]
-    public void 列挙型識別子に対して書式指定_STT1005()
+    [Test]
+    public async Task 列挙型識別子に対して書式指定_STT1005()
     {
         var sourceCode = Get(
             [
@@ -169,21 +167,21 @@ public sealed class TemplateWriterWriteDiagnosticsTest
                 "{{ EnumStaticField:A:ja-JP }}"
             ],
             nameof(EnumContextTestData));
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(2);
+        await Assert.That(diagnostics.Count).IsEqualTo(2);
 
-        diagnostics[0].Id.ShouldBe("STT1005");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("\"{{ EnumStaticField::ja-JP }}\"");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1005");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("\"{{ EnumStaticField::ja-JP }}\"");
 
-        diagnostics[1].Id.ShouldBe("STT1005");
-        diagnostics[1].Severity.ShouldBe(Error);
-        diagnostics[1].GetText().ShouldBe("\"{{ EnumStaticField:A:ja-JP }}\"");
+        await Assert.That(diagnostics[1].Id).IsEqualTo("STT1005");
+        await Assert.That(diagnostics[1].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[1].GetText()).IsEqualTo("\"{{ EnumStaticField:A:ja-JP }}\"");
     }
 
-    [Fact]
-    public void IFormattable_ISpanFormattable_IUtf8Formattableを実装していない識別子に対して書式指定_STT1006()
+    [Test]
+    public async Task IFormattable_ISpanFormattable_IUtf8Formattableを実装していない識別子に対して書式指定_STT1006()
     {
         var sourceCode = Get(
             [
@@ -192,20 +190,20 @@ public sealed class TemplateWriterWriteDiagnosticsTest
                 "{{ BytesStaticField:A:ja-JP }}"
             ],
             nameof(ByteArrayContextTestData));
-        var (_, diagnostics) = Run(sourceCode);
+        var (_, diagnostics) = await RunAsync(sourceCode);
 
-        diagnostics.Count.ShouldBe(3);
+        await Assert.That(diagnostics.Count).IsEqualTo(3);
 
-        diagnostics[0].Id.ShouldBe("STT1006");
-        diagnostics[0].Severity.ShouldBe(Error);
-        diagnostics[0].GetText().ShouldBe("\"{{ BytesStaticField:A }}\"");
+        await Assert.That(diagnostics[0].Id).IsEqualTo("STT1006");
+        await Assert.That(diagnostics[0].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[0].GetText()).IsEqualTo("\"{{ BytesStaticField:A }}\"");
 
-        diagnostics[1].Id.ShouldBe("STT1006");
-        diagnostics[1].Severity.ShouldBe(Error);
-        diagnostics[1].GetText().ShouldBe("\"{{ BytesStaticField::ja-JP }}\"");
+        await Assert.That(diagnostics[1].Id).IsEqualTo("STT1006");
+        await Assert.That(diagnostics[1].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[1].GetText()).IsEqualTo("\"{{ BytesStaticField::ja-JP }}\"");
 
-        diagnostics[2].Id.ShouldBe("STT1006");
-        diagnostics[2].Severity.ShouldBe(Error);
-        diagnostics[2].GetText().ShouldBe("\"{{ BytesStaticField:A:ja-JP }}\"");
+        await Assert.That(diagnostics[2].Id).IsEqualTo("STT1006");
+        await Assert.That(diagnostics[2].Severity).IsEqualTo(Error);
+        await Assert.That(diagnostics[2].GetText()).IsEqualTo("\"{{ BytesStaticField:A:ja-JP }}\"");
     }
 }

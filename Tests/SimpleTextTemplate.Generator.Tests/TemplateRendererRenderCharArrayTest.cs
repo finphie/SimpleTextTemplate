@@ -1,7 +1,5 @@
-﻿using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using SimpleTextTemplate.Generator.Tests.Extensions;
-using Xunit;
+﻿using SimpleTextTemplate.Generator.Tests.Extensions;
+using SimpleTextTemplate.Tests.TestData;
 using static SimpleTextTemplate.Generator.Tests.Constants;
 using static SimpleTextTemplate.Generator.Tests.GeneratorRunner;
 using static SimpleTextTemplate.Generator.Tests.SourceCode;
@@ -10,61 +8,61 @@ namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class TemplateRendererRenderCharArrayTest
 {
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public Task 静的フィールド()
         => Test(nameof(CharArrayContextTestData.CharsStaticField), true);
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public Task フィールド()
         => Test(nameof(CharArrayContextTestData.CharsField), false);
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public Task 静的プロパティ()
         => Test(nameof(CharArrayContextTestData.CharsStaticProperty), true);
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public Task プロパティ()
         => Test(nameof(CharArrayContextTestData.CharsProperty), false);
 
-    [Fact]
-    public void 静的ReadOnlySpanプロパティ()
+    [Test]
+    public Task 静的ReadOnlySpanプロパティ()
         => Test(nameof(CharArrayContextTestData.CharsSpanStaticProperty), true);
 
-    [Fact]
-    public void ReadOnlySpanプロパティ()
+    [Test]
+    public Task ReadOnlySpanプロパティ()
         => Test(nameof(CharArrayContextTestData.CharsSpanProperty), false);
 
-    static void Test(string memberName, bool isStatic)
+    static async Task Test(string memberName, bool isStatic)
     {
         var templateText = $$$"""{{ {{{memberName}}} }}""";
         var contextArgument = GetContextArgumentString<CharArrayContextTestData>(memberName, isStatic);
 
         var sourceCode = Get(templateText, nameof(CharArrayContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(Grow);
-        method.Text.Count.ShouldBe(3);
-        method.Text[0].ShouldBe("0");
-        method.Text[1].ShouldBe(Utf8GetMaxByteCount);
-        method.Text[2].ShouldBe($"{contextArgument}.Length");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(Grow);
+        await Assert.That(method.Text.Count).IsEqualTo(3);
+        await Assert.That(method.Text[0]).IsEqualTo("0");
+        await Assert.That(method.Text[1]).IsEqualTo(Utf8GetMaxByteCount);
+        await Assert.That(method.Text[2]).IsEqualTo($"{contextArgument}.Length");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(DangerousWriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe(contextArgument);
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(DangerousWriteString);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo(contextArgument);
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 }
