@@ -1,4 +1,4 @@
-﻿namespace SimpleTextTemplate.Generator.Tests.TestData;
+﻿namespace SimpleTextTemplate.Tests.TestData;
 
 [Flags]
 public enum FlagEnumTestData

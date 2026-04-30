@@ -1,6 +1,6 @@
 ﻿using System.Buffers;
-using SimpleTextTemplate.Generator.Tests.TestData;
 using SimpleTextTemplate.Tests.Assertions;
+using SimpleTextTemplate.Tests.TestData;
 using Template = SimpleTextTemplate.TemplateRenderer;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;

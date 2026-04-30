@@ -1,13 +1,10 @@
-﻿namespace SimpleTextTemplate.Generator.Tests.TestData;
+﻿namespace SimpleTextTemplate.Tests.TestData;
 
-public sealed record ByteArrayContextTestData
+public readonly ref struct RefStructTestData()
 {
     public static readonly byte[] BytesStaticField = "_BytesStaticField"u8.ToArray();
     public readonly byte[] BytesField = "_BytesField"u8.ToArray();
-
-    public static ReadOnlySpan<byte> BytesSpanStaticProperty => "_BytesSpanStaticProperty"u8;
-
-    public ReadOnlySpan<byte> BytesSpanProperty => "_BytesSpanProperty"u8;
+    public readonly ReadOnlySpan<byte> BytesSpanField = "_BytesSpanField"u8;
 
     public static byte[] BytesStaticProperty => "_BytesStaticProperty"u8.ToArray();
 

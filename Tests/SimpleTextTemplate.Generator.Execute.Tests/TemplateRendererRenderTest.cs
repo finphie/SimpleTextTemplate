@@ -1,8 +1,8 @@
 ﻿using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
-using SimpleTextTemplate.Generator.Tests.TestData;
 using SimpleTextTemplate.Tests.Assertions;
 using SimpleTextTemplate.Tests.Buffers;
+using SimpleTextTemplate.Tests.TestData;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
