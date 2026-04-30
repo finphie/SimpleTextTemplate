@@ -16,8 +16,9 @@
   <Folder Name="/Tests/">
     <File Path="Tests/Directory.Packages.props" />
     <Project Path="Tests/SimpleTextTemplate.Generator.Execute.Tests/SimpleTextTemplate.Generator.Execute.Tests.csproj" />
-    <Project Path="Tests/SimpleTextTemplate.Generator.Tests.Core/SimpleTextTemplate.Generator.Tests.Core.csproj" />
     <Project Path="Tests/SimpleTextTemplate.Generator.Tests/SimpleTextTemplate.Generator.Tests.csproj" />
+    <Project Path="Tests/SimpleTextTemplate.Tests.Core/SimpleTextTemplate.Tests.Core.csproj" />
+    <Project Path="Tests/SimpleTextTemplate.Tests.TestData/SimpleTextTemplate.Tests.TestData.csproj" />
     <Project Path="Tests/SimpleTextTemplate.Tests/SimpleTextTemplate.Tests.csproj" />
     <Project Path="Tests/SimpleTextTemplate.Writer.Tests/SimpleTextTemplate.Writer.Tests.csproj" />
   </Folder>
