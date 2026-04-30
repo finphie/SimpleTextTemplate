@@ -6,7 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.HighPerformance" />
     <PackageReference Include="SimpleTextTemplate.Generator" />
   </ItemGroup>
 

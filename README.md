@@ -32,18 +32,16 @@ dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/fi
 
 ## 使い方
 
-次の例では、[CommunityToolkit.HighPerformance](https://www.nuget.org/packages/CommunityToolkit.HighPerformance/)を使用しています。
-
 ### SimpleTextTemplate.Generator
 
 ```csharp
 using System;
+using System.Buffers;
 using System.Globalization;
 using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+var bufferWriter = new ArrayBufferWriter<byte>();
 var context = new SampleContext("Hello, World", 1000, new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
 var writer = TemplateWriter.Create(bufferWriter);
@@ -99,18 +97,16 @@ file static class Intercept
 
 ### SimpleTextTemplate.Renderer
 
-[SimpleTextTemplate](https://www.nuget.org/packages/SimpleTextTemplate/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)への参照が必要です。
-
 ```csharp
 using System;
+using System.Buffers;
 using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
 var symbols = Context.Create();
 symbols.Add("Identifier"u8.ToArray(), "Hello, World!"u8.ToArray());
 
-using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+using var bufferWriter = new ArrayBufferWriter<byte>();
 var source = "{{ Identifier }}"u8.ToArray();
 var template = Template.Parse(source);
 template.Render(bufferWriter, symbols);
@@ -189,14 +185,11 @@ MIT
 
 ### ライブラリ
 
-- [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet)
 - [Microsoft.CodeAnalysis.CSharp](https://github.com/dotnet/roslyn)
 
 ### テスト
 
-- [Microsoft.Testing.Extensions.CodeCoverage](https://github.com/microsoft/codecoverage)
-- [Shouldly](https://github.com/shouldly/shouldly)
-- [xunit.v3](https://github.com/xunit/xunit)
+- [TUnit](https://github.com/thomhurst/TUnit)
 
 ### アナライザー
 

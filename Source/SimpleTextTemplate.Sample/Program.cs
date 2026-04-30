@@ -1,9 +1,10 @@
-﻿using System.Globalization;
+﻿using System.Buffers;
+using System.Globalization;
 using System.Text;
 using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+var bufferWriter = new ArrayBufferWriter<byte>();
 var context = new SampleContext("Hello, World", 1000, new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
 var writer = TemplateWriter.Create(bufferWriter);
