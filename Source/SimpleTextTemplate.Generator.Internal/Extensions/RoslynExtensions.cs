@@ -118,8 +118,8 @@ static class RoslynExtensions
         return symbol switch
         {
             { Name: nameof(IFormattable), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } => FormattableType.IFormattable,
-            { Name: "ISpanFormattable", ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } => FormattableType.ISpanFormattable,
-            { Name: "IUtf8Formattable", ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } => FormattableType.IUtf8Formattable,
+            { Name: nameof(ISpanFormattable), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } => FormattableType.ISpanFormattable,
+            { Name: nameof(IUtf8SpanFormattable), ContainingNamespace: { Name: nameof(System), ContainingNamespace.IsGlobalNamespace: true } } => FormattableType.IUtf8SpanFormattable,
             _ => FormattableType.None
         };
     }

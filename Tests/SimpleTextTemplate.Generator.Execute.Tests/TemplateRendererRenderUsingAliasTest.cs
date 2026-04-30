@@ -1,16 +1,14 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
+using SimpleTextTemplate.Tests.TestData;
 using Template = SimpleTextTemplate.TemplateRenderer;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderUsingAliasTest
 {
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public async Task 静的フィールド()
     {
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -19,12 +17,12 @@ public sealed class TemplateRendererRenderUsingAliasTest
         Template.Render(ref writer, "{{ BytesStaticField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_BytesStaticField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_BytesStaticField");
     }
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public async Task フィールド()
     {
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -33,12 +31,12 @@ public sealed class TemplateRendererRenderUsingAliasTest
         Template.Render(ref writer, "{{ BytesField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_BytesField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_BytesField");
     }
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public async Task 静的プロパティ()
     {
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -47,12 +45,12 @@ public sealed class TemplateRendererRenderUsingAliasTest
         Template.Render(ref writer, "{{ BytesStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_BytesStaticProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_BytesStaticProperty");
     }
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public async Task プロパティ()
     {
         var context = new ByteArrayContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -61,7 +59,7 @@ public sealed class TemplateRendererRenderUsingAliasTest
         Template.Render(ref writer, "{{ BytesProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_BytesProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_BytesProperty");
     }
 }

@@ -24,5 +24,5 @@ enum FormattableType
     /// <summary>
     /// IUtf8SpanFormattable実装
     /// </summary>
-    IUtf8Formattable = 1 << 2
+    IUtf8SpanFormattable = 1 << 2
 }

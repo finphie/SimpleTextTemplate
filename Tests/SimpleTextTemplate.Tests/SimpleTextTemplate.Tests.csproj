@@ -1,12 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net9.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net11.0;net10.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Source\SimpleTextTemplate\SimpleTextTemplate.csproj" />
+    <ProjectReference Include="..\SimpleTextTemplate.Tests.Core\SimpleTextTemplate.Tests.Core.csproj" />
   </ItemGroup>
 
 </Project>

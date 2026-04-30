@@ -1,4 +1,4 @@
-﻿namespace SimpleTextTemplate.Generator.Tests.Core;
+﻿namespace SimpleTextTemplate.Tests.TestData;
 
 public readonly ref struct RefStructTestData()
 {

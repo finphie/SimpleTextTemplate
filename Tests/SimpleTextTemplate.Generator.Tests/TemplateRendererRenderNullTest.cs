@@ -1,7 +1,5 @@
-﻿using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using SimpleTextTemplate.Generator.Tests.Extensions;
-using Xunit;
+﻿using SimpleTextTemplate.Generator.Tests.Extensions;
+using SimpleTextTemplate.Tests.TestData;
 using static SimpleTextTemplate.Generator.Tests.GeneratorRunner;
 using static SimpleTextTemplate.Generator.Tests.SourceCode;
 
@@ -9,30 +7,30 @@ namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class TemplateRendererRenderNullTest
 {
-    [Fact]
-    public void 定数()
+    [Test]
+    public async Task 定数()
     {
-        var sourceCode = Get(["{{ NullStringConstantField }}", "{{ NullObjectConstantField }}"], nameof(NullContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get<NullContextTestData>("{{ NullStringConstantField }}", "{{ NullObjectConstantField }}");
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(interceptInfoList.Dequeue().Methods).IsEmpty();
+        await Assert.That(interceptInfoList.Dequeue().Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 
-    [Fact]
-    public void 複数の定数()
+    [Test]
+    public async Task 複数の定数()
     {
-        var sourceCode = Get("{{ NullStringConstantField }}{{ NullStringConstantField }}", nameof(NullContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get<NullContextTestData>("{{ NullStringConstantField }}{{ NullStringConstantField }}");
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(interceptInfoList.Dequeue().Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 }

@@ -1,36 +1,27 @@
 ﻿using System.Buffers;
 
-namespace SimpleTextTemplate.Generator.Execute.Tests.Buffers;
+namespace SimpleTextTemplate.Tests.Buffers;
 
-/// <summary>
-/// 厳密なサイズのバッファーを確保して、データを書き込むことができるクラスです。
-/// </summary>
-sealed class ExactSizeBufferWriter : IBufferWriter<byte>
+public sealed class ExactSizeBufferWriter : IBufferWriter<byte>
 {
     byte[] _array = [];
     int _index;
 
-    /// <summary>
-    /// 書き込み済みのバッファを取得します。
-    /// </summary>
-    public ReadOnlySpan<byte> WrittenSpan
-        => _array.AsSpan(0, _index);
+    public ReadOnlyMemory<byte> WrittenMemory
+        => _array.AsMemory(0, _index);
 
-    /// <inheritdoc/>
     public void Advance(int count)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(count);
         _index += count;
     }
 
-    /// <inheritdoc/>
     public Span<byte> GetSpan(int sizeHint)
     {
         EnsureCapacity(sizeHint);
         return _array.AsSpan(_index);
     }
 
-    /// <inheritdoc/>
     Memory<byte> IBufferWriter<byte>.GetMemory(int sizeHint)
         => throw new NotSupportedException();
 

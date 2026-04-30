@@ -2,10 +2,11 @@
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
-[SuppressMessage("Design", "CA1051:参照可能なインスタンス フィールドを宣言しません", Justification = "テストのため")]
-[SuppressMessage("Performance", "CA1819:プロパティは配列を返すことはできません", Justification = "テストのため")]
-[SuppressMessage("Performance", "CA1822:メンバーを static に設定します", Justification = "テストのため")]
-public record AccessibilityTestData
+[SuppressMessage("Design", "CA1051:参照可能なインスタンス フィールドを宣言しません")]
+[SuppressMessage("Performance", "CA1819:プロパティは配列を返すことはできません")]
+[SuppressMessage("Performance", "CA1822:メンバーを static に設定します")]
+[SuppressMessage("Performance", "CA1852: 内部型をシールする")]
+record AccessibilityTestData
 {
     internal static byte[] _internalStaticField = "InternalStaticField"u8.ToArray();
     internal byte[] _internalField = "InternalField"u8.ToArray();

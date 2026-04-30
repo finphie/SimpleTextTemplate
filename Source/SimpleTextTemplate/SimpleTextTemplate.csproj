@@ -1,26 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net9.0;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net11.0;net10.0</TargetFrameworks>
     <IsPackable>true</IsPackable>
-    <Description>シンプルなテキストテンプレートエンジンです。</Description>
   </PropertyGroup>
 
   <PropertyGroup>
+    <Description>シンプルなテキストテンプレートエンジンです。</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>templating</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+  <ItemGroup>
     <PackageReference Include="System.IO.Hashing" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Memory" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+  <ItemGroup>
     <ProjectReference Include="..\SimpleTextTemplate.Writer\SimpleTextTemplate.Writer.csproj" />
   </ItemGroup>
 

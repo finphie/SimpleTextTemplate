@@ -1,4 +1,4 @@
-﻿namespace SimpleTextTemplate.Generator.Tests.Core;
+﻿namespace SimpleTextTemplate.Tests.TestData;
 
 /// <summary>
 /// <see cref="IFormattable"/>を実装していないクラスです。

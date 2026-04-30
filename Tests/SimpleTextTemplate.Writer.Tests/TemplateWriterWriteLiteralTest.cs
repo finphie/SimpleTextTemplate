@@ -1,17 +1,16 @@
 ﻿using System.Buffers;
 using System.Text;
-using Shouldly;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Writer.Tests;
 
 public sealed class TemplateWriterWriteLiteralTest
 {
-    [Theory]
-    [InlineData("")]
-    [InlineData("a")]
-    [InlineData("abc01234567890")]
-    public void 文字列_バッファーライターに書き込み(string value)
+    [Test]
+    [Arguments("")]
+    [Arguments("a")]
+    [Arguments("abc01234567890")]
+    public async Task 文字列_バッファーライターに書き込み(string value)
     {
         var utf8Value = Encoding.UTF8.GetBytes(value);
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -20,12 +19,12 @@ public sealed class TemplateWriterWriteLiteralTest
         writer.WriteLiteral(utf8Value);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe(value);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo(value);
     }
 
-    [Fact]
-    public void 長い文字列_バッファーライターに書き込み()
+    [Test]
+    public async Task 長い文字列_バッファーライターに書き込み()
     {
         var value = new string('a', 1024);
         var utf8Value = Encoding.UTF8.GetBytes(value);
@@ -35,12 +34,12 @@ public sealed class TemplateWriterWriteLiteralTest
         writer.WriteLiteral(utf8Value);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe(value);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo(value);
     }
 
-    [Fact]
-    public void 文字列を複数回追加_バッファーライターに書き込み()
+    [Test]
+    public async Task 文字列を複数回追加_バッファーライターに書き込み()
     {
         var value = new string('a', 30);
         var utf8Value = Encoding.UTF8.GetBytes(value);
@@ -56,16 +55,18 @@ public sealed class TemplateWriterWriteLiteralTest
 
         writer.Flush();
 
-        var array = Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
-        array.ShouldAllBe(static x => x == (byte)'a');
-        array.Length.ShouldBe(value.Length * count);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .Count()
+            .IsEqualTo(value.Length * count)
+            .And
+            .All(static x => x == 'a');
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("a")]
-    [InlineData("abc01234567890")]
-    public void ReadOnlySpan文字列_バッファーライターに書き込み(string value)
+    [Test]
+    [Arguments("")]
+    [Arguments("a")]
+    [Arguments("abc01234567890")]
+    public async Task ReadOnlySpan文字列_バッファーライターに書き込み(string value)
     {
         ReadOnlySpan<byte> utf8Value = Encoding.UTF8.GetBytes(value);
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -74,12 +75,12 @@ public sealed class TemplateWriterWriteLiteralTest
         writer.WriteLiteral(utf8Value);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe(value);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo(value);
     }
 
-    [Fact]
-    public void 長いReadOnlySpan文字列_バッファーライターに書き込み()
+    [Test]
+    public async Task 長いReadOnlySpan文字列_バッファーライターに書き込み()
     {
         var value = new string('a', 1024);
         ReadOnlySpan<byte> utf8Value = Encoding.UTF8.GetBytes(value);
@@ -89,12 +90,12 @@ public sealed class TemplateWriterWriteLiteralTest
         writer.WriteLiteral(utf8Value);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe(value);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo(value);
     }
 
-    [Fact]
-    public void ReadOnlySpan文字列を複数回追加_バッファーライターに書き込み()
+    [Test]
+    public async Task ReadOnlySpan文字列を複数回追加_バッファーライターに書き込み()
     {
         var value = new string('a', 30);
         ReadOnlySpan<byte> utf8Value = Encoding.UTF8.GetBytes(value);
@@ -110,8 +111,10 @@ public sealed class TemplateWriterWriteLiteralTest
 
         writer.Flush();
 
-        var array = Encoding.UTF8.GetString(bufferWriter.WrittenSpan);
-        array.ShouldAllBe(static x => x == (byte)'a');
-        array.Length.ShouldBe(value.Length * count);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .Count()
+            .IsEqualTo(value.Length * count)
+            .And
+            .All(static x => x == 'a');
     }
 }

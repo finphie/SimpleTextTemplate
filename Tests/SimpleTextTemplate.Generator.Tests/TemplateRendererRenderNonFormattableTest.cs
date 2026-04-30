@@ -1,7 +1,5 @@
-﻿using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using SimpleTextTemplate.Generator.Tests.Extensions;
-using Xunit;
+﻿using SimpleTextTemplate.Generator.Tests.Extensions;
+using SimpleTextTemplate.Tests.TestData;
 using static SimpleTextTemplate.Generator.Tests.Constants;
 using static SimpleTextTemplate.Generator.Tests.GeneratorRunner;
 using static SimpleTextTemplate.Generator.Tests.SourceCode;
@@ -10,43 +8,43 @@ namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class TemplateRendererRenderNonFormattableTest
 {
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public Task 静的フィールド()
         => Test(nameof(NonFormattableContextTestData.NonFormattableStaticField), true);
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public Task フィールド()
         => Test(nameof(NonFormattableContextTestData.NonFormattableField), false);
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public Task 静的プロパティ()
         => Test(nameof(NonFormattableContextTestData.NonFormattableStaticProperty), true);
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public Task プロパティ()
         => Test(nameof(NonFormattableContextTestData.NonFormattableProperty), false);
 
-    static void Test(string memberName, bool isStatic)
+    static async Task Test(string memberName, bool isStatic)
     {
         var templateText = $$$"""{{ {{{memberName}}} }}""";
         var contextArgument = GetContextArgumentString<NonFormattableContextTestData>(memberName, isStatic);
 
-        var sourceCode = Get(templateText, nameof(NonFormattableContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get<NonFormattableContextTestData>(templateText);
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe(contextArgument);
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
+        await Assert.That(method.Name).IsEqualTo(WriteValue);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo(contextArgument);
+        await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
+        await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 }

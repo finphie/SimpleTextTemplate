@@ -32,18 +32,16 @@ dotnet add package SimpleTextTemplate.Generator -s https://pkgs.dev.azure.com/fi
 
 ## 使い方
 
-次の例では、外部のライブラリである[CommunityToolkit.HighPerformance](https://www.nuget.org/packages/CommunityToolkit.HighPerformance/)を参照しています。
-
-### SimpleTextTemplate.Generator（推奨）
+### SimpleTextTemplate.Generator
 
 ```csharp
 using System;
+using System.Buffers;
 using System.Globalization;
 using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
-using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+var bufferWriter = new ArrayBufferWriter<byte>();
 var context = new SampleContext("Hello, World", 1000, new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero));
 
 var writer = TemplateWriter.Create(bufferWriter);
@@ -69,31 +67,27 @@ readonly record struct SampleContext(
 #### 生成コード
 
 ```csharp
-using System.Runtime.CompilerServices;
-using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
-using SimpleTextTemplate;
-
+[global::System.CodeDom.Compiler.GeneratedCode("SimpleTextTemplate.Generator.TemplateGenerator", "3.1.0.0")]
 file static class Intercept
 {
-    [InterceptsLocation(1, "...")]
-    public static void Render0(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
+    [global::System.Runtime.CompilerServices.InterceptsLocation(1, "...")]
+    public static void Render0(ref global::SimpleTextTemplate.TemplateWriter<global::System.Buffers.ArrayBufferWriter<byte>> writer, string text, in global::SampleContext context, global::System.IFormatProvider provider = null)
     {
-        writer.WriteValue(Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", CultureInfo.InvariantCulture);
+        writer.WriteValue(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@DateTimeOffsetValue, "o", global::System.Globalization.CultureInfo.InvariantCulture);
         writer.Grow(2
-            + Encoding.UTF8.GetMaxByteCount(
-                Unsafe.AsRef(in context).@StringValue.Length));
+            + global::System.Text.Encoding.UTF8.GetMaxByteCount(
+                global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringValue.Length));
         writer.DangerousWriteConstantLiteral("_"u8);
-        writer.DangerousWriteString(Unsafe.AsRef(in context).@StringValue);
+        writer.DangerousWriteString(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@StringValue);
         writer.DangerousWriteConstantLiteral("!"u8);
     }
 
-    [InterceptsLocation(1, "...")]
-    public static void Render1(ref TemplateWriter<ArrayPoolBufferWriter<byte>> writer, string text, in SampleContext context, IFormatProvider? provider = null)
+    [global::System.Runtime.CompilerServices.InterceptsLocation(1, "...")]
+    public static void Render1(ref global::SimpleTextTemplate.TemplateWriter<global::System.Buffers.ArrayBufferWriter<byte>> writer, string text, in global::SampleContext context, global::System.IFormatProvider provider = null)
     {
         writer.Grow(15);
-        writer.WriteConstantLiteral("_Hello_999.000_"u8);
-        writer.WriteValue(Unsafe.AsRef(in context).@IntValue, default, CultureInfo.InvariantCulture);
+        writer.DangerousWriteConstantLiteral("_Hello_999.000_"u8);
+        writer.WriteValue(global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@IntValue, default, global::System.Globalization.CultureInfo.InvariantCulture);
     }
 }
 ```
@@ -101,20 +95,18 @@ file static class Intercept
 <details>
 <summary>SimpleTextTemplate（非推奨）</summary>
 
-### SimpleTextTemplate.Renderer（非推奨）
-
-[SimpleTextTemplate](https://www.nuget.org/packages/SimpleTextTemplate/)と[SimpleTextTemplate.Contexts](https://www.nuget.org/packages/SimpleTextTemplate.Contexts/)への参照が必要です。
+### SimpleTextTemplate.Renderer
 
 ```csharp
 using System;
+using System.Buffers;
 using System.Text;
-using CommunityToolkit.HighPerformance.Buffers;
 using SimpleTextTemplate;
 
 var symbols = Context.Create();
 symbols.Add("Identifier"u8.ToArray(), "Hello, World!"u8.ToArray());
 
-using var bufferWriter = new ArrayPoolBufferWriter<byte>();
+using var bufferWriter = new ArrayBufferWriter<byte>();
 var source = "{{ Identifier }}"u8.ToArray();
 var template = Template.Parse(source);
 template.Render(bufferWriter, symbols);
@@ -176,7 +168,8 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ## サポートフレームワーク
 
-.NET 9
+- .NET 11
+- .NET 10
 
 ## 作者
 
@@ -188,25 +181,23 @@ MIT
 
 ## クレジット
 
-このプロジェクトでは、次のライブラリ等を使用しています。
+このプロジェクトでは、次のパッケージ等を使用しています。
 
 ### ライブラリ
 
-- [CommunityToolkit.HighPerformance](https://github.com/CommunityToolkit/dotnet)
 - [Microsoft.CodeAnalysis.CSharp](https://github.com/dotnet/roslyn)
+- [System.IO.Hashing](https://github.com/dotnet/dotnet)
 
 ### テスト
 
-- [Microsoft.Testing.Extensions.CodeCoverage](https://github.com/microsoft/codecoverage)
-- [Shouldly](https://github.com/shouldly/shouldly)
-- [xunit.v3](https://github.com/xunit/xunit)
+- [Microsoft.CodeAnalysis.CSharp.Workspaces](https://github.com/dotnet/roslyn)
+- [TUnit](https://github.com/thomhurst/TUnit)
 
 ### アナライザー
 
 - [DocumentationAnalyzers](https://github.com/DotNetAnalyzers/DocumentationAnalyzers)
 - [IDisposableAnalyzers](https://github.com/DotNetAnalyzers/IDisposableAnalyzers)
-- [Microsoft.CodeAnalysis.Analyzers](https://github.com/dotnet/roslyn-analyzers)
-- [Microsoft.CodeAnalysis.NetAnalyzers](https://github.com/dotnet/roslyn-analyzers)
+- [Microsoft.CodeAnalysis.Analyzers](https://github.com/dotnet/roslyn)
 - [Microsoft.VisualStudio.Threading.Analyzers](https://github.com/Microsoft/vs-threading)
 - [Roslynator.Analyzers](https://github.com/dotnet/roslynator)
 - [Roslynator.Formatting.Analyzers](https://github.com/dotnet/roslynator)
@@ -215,15 +206,4 @@ MIT
 ### ベンチマーク
 
 - [BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet)
-- [CommandLineParser](https://github.com/commandlineparser/commandline)
-- [Iced](https://github.com/icedland/iced)
-- [Microsoft.CodeAnalysis.CSharp](https://github.com/dotnet/roslyn)
-- [Microsoft.Diagnostics.NETCore.Client](https://github.com/dotnet/diagnostics)
-- [Microsoft.Diagnostics.Runtime](https://github.com/Microsoft/clrmd)
-- [Microsoft.Diagnostics.Tracing.TraceEvent](https://github.com/Microsoft/perfview)
-- [Perfolizer](https://github.com/AndreyAkinshin/perfolizer)
 - [Scriban](https://github.com/scriban/scriban)
-
-### その他
-
-- [PolySharp](https://github.com/Sergio0694/PolySharp)

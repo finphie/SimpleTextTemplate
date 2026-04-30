@@ -18,7 +18,7 @@ namespace SimpleTextTemplate.Generator;
 /// </summary>
 ref struct InterceptInfoCreator
 {
-    static readonly string FlagsAttributeFullName = typeof(FlagsAttribute).FullName;
+    static readonly string FlagsAttributeFullName = typeof(FlagsAttribute).FullName!;
 
     readonly GeneratorSyntaxContext _context;
     readonly SemanticModel _semanticModel;
@@ -32,7 +32,7 @@ ref struct InterceptInfoCreator
     readonly ExpressionSyntax? _providerArgument;
 
     readonly bool _isConstantTemplateString;
-    readonly Dictionary<ITypeSymbol, EnumInfo> _enumList = new(SymbolEqualityComparer.Default);
+    readonly Dictionary<ITypeSymbol, EnumInfo> _enumList = [with(SymbolEqualityComparer.Default)];
 
     readonly List<TemplateWriterWriteInfo> _writeInfoList = [];
     readonly Dictionary<int, TemplateWriterGrowInfo> _growInfoList = [];
@@ -43,9 +43,7 @@ ref struct InterceptInfoCreator
 
     readonly INamedTypeSymbol _flagsAttributeSymbol;
 
-#pragma warning disable RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
     InterceptableLocation? _interceptableLocation;
-#pragma warning restore RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
 
     bool _isInvariantCulture;
     bool _success;
@@ -105,10 +103,8 @@ ref struct InterceptInfoCreator
     /// <param name="cancellationToken">キャンセル要求を行うためのトークン</param>
     public void Parse(CancellationToken cancellationToken)
     {
-#pragma warning disable RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
         _interceptableLocation ??= _semanticModel.GetInterceptableLocation(_invocationExpression, cancellationToken)
             ?? throw new InvalidOperationException("インターセプト可能な場所を取得できませんでした。");
-#pragma warning restore RSEXPERIMENTAL002 // 種類は、評価の目的でのみ提供されています。将来の更新で変更または削除されることがあります。続行するには、この診断を非表示にします。
 
         if (_semanticModel.GetConstantValue(_templateArgument, cancellationToken).Value is not string templateString)
         {
@@ -446,7 +442,14 @@ ref struct InterceptInfoCreator
             return true;
         }
 
-        AddConstantString(value.ToString());
+        var constantString = value.ToString();
+
+        if (string.IsNullOrEmpty(constantString))
+        {
+            return true;
+        }
+
+        AddConstantString(constantString);
         return true;
     }
 

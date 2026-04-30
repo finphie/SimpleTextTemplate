@@ -1,6 +1,4 @@
-﻿#if NET9_0_OR_GREATER
-using System.IO.Hashing;
-using System.Runtime.InteropServices;
+﻿using System.IO.Hashing;
 
 namespace SimpleTextTemplate;
 
@@ -16,15 +14,7 @@ sealed class Utf8StringEqualityComparer : IEqualityComparer<byte[]>, IAlternateE
 
     /// <inheritdoc/>
     public bool Equals(byte[]? x, byte[]? y)
-    {
-        return (x, y) switch
-        {
-            (null, null) => true,
-            (null, _) or (_, null) => false,
-            _ => MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(x), x.Length)
-                .SequenceEqual(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(y), y.Length))
-        };
-    }
+        => x.AsSpan().SequenceEqual(y);
 
     /// <inheritdoc/>
     public bool Equals(ReadOnlySpan<byte> alternate, byte[] other)
@@ -42,4 +32,3 @@ sealed class Utf8StringEqualityComparer : IEqualityComparer<byte[]>, IAlternateE
     public byte[] Create(ReadOnlySpan<byte> alternate)
         => alternate.ToArray();
 }
-#endif

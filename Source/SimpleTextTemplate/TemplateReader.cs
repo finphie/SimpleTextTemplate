@@ -3,10 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using SimpleTextTemplate.Helpers;
 
-#if NET8_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
-
 namespace SimpleTextTemplate;
 
 /// <summary>
@@ -14,16 +10,10 @@ namespace SimpleTextTemplate;
 /// </summary>
 public ref struct TemplateReader
 {
-#if NET8_0_OR_GREATER
     readonly ref readonly byte _start;
     ref byte _buffer;
 
-    [SuppressMessage("Style", "IDE0032:自動プロパティを使用する", Justification = "誤検知")]
     int _length;
-#else
-    readonly ReadOnlySpan<byte> _start;
-    ReadOnlySpan<byte> _buffer;
-#endif
 
     /// <summary>
     /// <see cref="TemplateReader"/>構造体の新しいインスタンスを初期化します。
@@ -31,25 +21,16 @@ public ref struct TemplateReader
     /// <param name="input">処理対象にするUTF-8のテンプレート文字列</param>
     public TemplateReader(ReadOnlySpan<byte> input)
     {
-#if NET8_0_OR_GREATER
         _start = ref MemoryMarshal.GetReference(input);
         _buffer = ref MemoryMarshal.GetReference(input);
         _length = input.Length;
-#else
-        _start = input;
-        _buffer = input;
-#endif
     }
 
     /// <summary>
     /// 読み取ったバイト数
     /// </summary>
     public readonly nuint Consumed
-#if NET8_0_OR_GREATER
         => (nuint)Unsafe.ByteOffset(ref Unsafe.AsRef(in _start), ref _buffer);
-#else
-        => (uint)Unsafe.ByteOffset(ref MemoryMarshal.GetReference(_start), ref MemoryMarshal.GetReference(_buffer));
-#endif
 
     /// <summary>
     /// {{
@@ -61,23 +42,6 @@ public ref struct TemplateReader
     /// </summary>
     static ReadOnlySpan<byte> EndIdentifier => "}}"u8;
 
-    readonly ref byte Buffer =>
-#if NET8_0_OR_GREATER
-        ref _buffer;
-#else
-        ref MemoryMarshal.GetReference(_buffer);
-#endif
-
-#if NET8_0_OR_GREATER
-    [SuppressMessage("Style", "IDE0032:自動プロパティを使用する", Justification = "誤検知")]
-#endif
-    readonly int Length =>
-#if NET8_0_OR_GREATER
-        _length;
-#else
-        _buffer.Length;
-#endif
-
     /// <summary>
     /// 文字列または識別子を読み込みます。
     /// </summary>
@@ -86,7 +50,7 @@ public ref struct TemplateReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public BlockType TryRead(out ReadOnlySpan<byte> value)
     {
-        if (Length <= 0)
+        if (_length <= 0)
         {
             value = default;
             return BlockType.End;
@@ -136,14 +100,14 @@ public ref struct TemplateReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryReadString(out ReadOnlySpan<byte> value)
     {
-        if (Length == 0)
+        if (_length == 0)
         {
             value = default;
             return false;
         }
 
         // "{{"がある位置までは文字列となる。
-        var index = BinaryHelper.IndexOf(ref Buffer, Length, StartIdentifier);
+        var index = BinaryHelper.IndexOf(ref _buffer, _length, StartIdentifier);
 
         if (index == 0)
         {
@@ -153,10 +117,10 @@ public ref struct TemplateReader
 
         if (index == -1)
         {
-            index = Length;
+            index = _length;
         }
 
-        value = BinaryHelper.CreateReadOnlySpan(ref Buffer, index);
+        value = MemoryMarshal.CreateReadOnlySpan(ref _buffer, index);
         Advance(index);
 
         return true;
@@ -174,7 +138,7 @@ public ref struct TemplateReader
     public bool TryReadIdentifier(out ReadOnlySpan<byte> value)
     {
         // "{{"で始まらない場合
-        if (Length < StartIdentifier.Length || Unsafe.ReadUnaligned<ushort>(ref Buffer) != MemoryMarshal.Read<ushort>(StartIdentifier))
+        if (_length < StartIdentifier.Length || Unsafe.ReadUnaligned<ushort>(ref _buffer) != MemoryMarshal.Read<ushort>(StartIdentifier))
         {
             value = default;
             return false;
@@ -184,7 +148,7 @@ public ref struct TemplateReader
         SkipSpace();
 
         // "}}"がある位置までは識別子
-        var index = BinaryHelper.IndexOf(ref Buffer, Length, EndIdentifier);
+        var index = BinaryHelper.IndexOf(ref _buffer, _length, EndIdentifier);
 
         // "{{"と"}}"の間に1文字もないか、"}}"が見つからない場合
         if (index <= 0)
@@ -193,7 +157,7 @@ public ref struct TemplateReader
             return false;
         }
 
-        ref var buffer = ref Buffer;
+        ref var buffer = ref _buffer;
         Advance(index);
 
         // 識別子と"}}"の間にある連続する空白の位置を取得
@@ -205,7 +169,7 @@ public ref struct TemplateReader
             endIndex = index;
         }
 
-        value = BinaryHelper.CreateReadOnlySpan(ref Unsafe.SubtractByteOffset(ref Buffer, (nint)(uint)index), endIndex + 1);
+        value = MemoryMarshal.CreateReadOnlySpan(ref Unsafe.SubtractByteOffset(ref _buffer, (nint)(uint)index), endIndex + 1);
 
         Advance(EndIdentifier.Length);
         return true;
@@ -220,23 +184,19 @@ public ref struct TemplateReader
     {
         Debug.Assert(count > 0, "バイト数は0より大きい数値である必要があります。");
 
-#if NET8_0_OR_GREATER
         _buffer = ref Unsafe.AddByteOffset(ref _buffer, (nint)(uint)count);
         _length -= count;
-#else
-        _buffer = BinaryHelper.CreateReadOnlySpan(ref Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(_buffer), (nint)(uint)count), _buffer.Length - count);
-#endif
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void SkipSpace()
     {
-        var count = BinaryHelper.IndexOfAnyExcept(ref Buffer, Length, (byte)' ');
+        var count = BinaryHelper.IndexOfAnyExcept(ref _buffer, _length, (byte)' ');
 
         // 末尾まで空白の場合は、末尾までスキップ対象とする。
         if (count == -1)
         {
-            count = Length;
+            count = _length;
         }
 
         // 先頭が空白または既に末尾まで読み取り済みの場合

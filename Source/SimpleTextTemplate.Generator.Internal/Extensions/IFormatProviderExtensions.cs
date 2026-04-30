@@ -17,7 +17,7 @@ static class IFormatProviderExtensions
     /// <see cref="CultureInfo.Name"/>または<see cref="object.ToString"/>を返します。
     /// </returns>
     public static string GetName(this IFormatProvider provider)
-        => provider is CultureInfo culture ? culture.Name : provider.ToString();
+        => provider is CultureInfo culture ? culture.Name : provider.ToString()!;
 
     /// <summary>
     /// カルチャー文字列を取得します。
@@ -46,7 +46,7 @@ static class IFormatProviderExtensions
             return "global::System.Globalization.CultureInfo.CurrentUICulture";
         }
 
-        var name = culture.GetName().Replace("-", string.Empty);
+        var name = culture.GetName().Replace("-", string.Empty, StringComparison.Ordinal);
 
         return string.IsNullOrEmpty(name)
             ? throw new InvalidOperationException("カルチャー名を取得できませんでした。")

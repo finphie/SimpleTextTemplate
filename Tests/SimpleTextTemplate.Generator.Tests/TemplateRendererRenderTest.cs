@@ -1,7 +1,5 @@
-﻿using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using SimpleTextTemplate.Generator.Tests.Extensions;
-using Xunit;
+﻿using SimpleTextTemplate.Generator.Tests.Extensions;
+using SimpleTextTemplate.Tests.TestData;
 using static SimpleTextTemplate.Generator.Tests.Constants;
 using static SimpleTextTemplate.Generator.Tests.GeneratorRunner;
 using static SimpleTextTemplate.Generator.Tests.SourceCode;
@@ -10,40 +8,40 @@ namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class TemplateRendererRenderTest
 {
-    [Fact]
-    public void 識別子なし()
+    [Test]
+    public async Task 識別子なし()
     {
-        var sourceCode = Get(["A", "B"]);
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get("A", "B");
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteConstantLiteral);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("\"A\"u8");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(WriteConstantLiteral);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("\"A\"u8");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
-        info.Methods.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
         info = interceptInfoList.Dequeue();
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteConstantLiteral);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("\"B\"u8");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(WriteConstantLiteral);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("\"B\"u8");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 
-    [Fact]
-    public void StringEmpty()
+    [Test]
+    public async Task StringEmpty()
     {
         const string SourceCode = """
             using System.Buffers;
@@ -59,192 +57,192 @@ public sealed class TemplateRendererRenderTest
             TemplateRenderer.Render(ref writer, S.Empty);
             TemplateRenderer.Render(ref writer, Empty);
             """;
-        var (compilation, diagnostics) = Run(SourceCode);
+        var (compilation, diagnostics) = await RunAsync(SourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
-        interceptInfoList.Dequeue().Methods.ShouldBeEmpty();
+        await Assert.That(interceptInfoList.Dequeue().Methods).IsEmpty();
+        await Assert.That(interceptInfoList.Dequeue().Methods).IsEmpty();
+        await Assert.That(interceptInfoList.Dequeue().Methods).IsEmpty();
+        await Assert.That(interceptInfoList.Dequeue().Methods).IsEmpty();
+        await Assert.That(interceptInfoList.Dequeue().Methods).IsEmpty();
 
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 
-    [Fact]
-    public void トップレベルステートメント()
+    [Test]
+    public async Task トップレベルステートメント()
     {
         var sourceCode = $$$"""
             using System.Buffers;
             using SimpleTextTemplate;
-            using SimpleTextTemplate.Generator.Tests.Core;
+            using SimpleTextTemplate.Tests.TestData;
 
             var bufferWriter = new ArrayBufferWriter<byte>();
             var writer = TemplateWriter.Create(bufferWriter);
             var context = new {{{nameof(ByteArrayContextTestData)}}}();
             TemplateRenderer.Render(ref writer, "{{ BytesStaticField }}", in context);
             """;
-        var (compilation, diagnostics) = Run(sourceCode);
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(Grow);
-        method.Text.Count.ShouldBe(2);
-        method.Text[0].ShouldBe("0");
-        method.Text[1].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticField.Length");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(Grow);
+        await Assert.That(method.Text.Count).IsEqualTo(2);
+        await Assert.That(method.Text[0]).IsEqualTo("0");
+        await Assert.That(method.Text[1]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ByteArrayContextTestData.@BytesStaticField.Length");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(DangerousWriteLiteral);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticField");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(DangerousWriteLiteral);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ByteArrayContextTestData.@BytesStaticField");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 
-    [Fact]
-    public void カルチャーにInvariantInfo指定()
+    [Test]
+    public async Task カルチャーにInvariantInfo指定()
     {
-        var sourceCode = Get(["{{ DoubleConstantField }}", "{{ DoubleStaticField }}"], nameof(DoubleContextTestData), InvariantInfo);
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(InvariantInfo, "{{ DoubleConstantField }}", "{{ DoubleStaticField }}");
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(Grow);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("8");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(Grow);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("8");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(DangerousWriteConstantLiteral);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("\"1234.567\"u8");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(DangerousWriteConstantLiteral);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("\"1234.567\"u8");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
-        info.Methods.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
         info = interceptInfoList.Dequeue();
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
+        await Assert.That(method.Name).IsEqualTo(WriteValue);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
+        await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 
-    [Fact]
-    public void Formatやカルチャー指定省略()
+    [Test]
+    public async Task Formatやカルチャー指定省略()
     {
-        var sourceCode = Get(["{{ DoubleStaticField:}}", "{{ DoubleStaticField: }}", "{{ DoubleStaticField::}}", "{{ DoubleStaticField:: }}", "{{ DoubleStaticField::  }}"], nameof(DoubleContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticField:}}", "{{ DoubleStaticField: }}", "{{ DoubleStaticField::}}", "{{ DoubleStaticField:: }}", "{{ DoubleStaticField::  }}");
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
+        await Assert.That(method.Name).IsEqualTo(WriteValue);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
+        await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
-        info.Methods.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
         info = interceptInfoList.Dequeue();
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
+        await Assert.That(method.Name).IsEqualTo(WriteValue);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
+        await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
-        info.Methods.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
         info = interceptInfoList.Dequeue();
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
+        await Assert.That(method.Name).IsEqualTo(WriteValue);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
+        await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
-        info.Methods.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
         info = interceptInfoList.Dequeue();
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
+        await Assert.That(method.Name).IsEqualTo(WriteValue);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
+        await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
-        info.Methods.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
         info = interceptInfoList.Dequeue();
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
+        await Assert.That(method.Name).IsEqualTo(WriteValue);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
+        await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 
-    [Fact]
-    public void 複雑なテンプレート文字列()
+    [Test]
+    public async Task 複雑なテンプレート文字列()
     {
         const string Text = """
             A{{ ConstantValue }}{{ ConstantValue }}B{{ ConstantValue }}{{ StringValue }}{{ ConstantValue }}{{ ConstantValue }}{{ Utf16Value }}{{ ConstantValue }}{{ Utf8Value }}{{ DoubleValue }}
             A{{ ConstantValue }}{{ ConstantValue }}B{{ ConstantValue }}{{ StringValue }}{{ ConstantValue }}{{ ConstantValue }}{{ Utf16Value }}{{ ConstantValue }}{{ Utf8Value }}
             """;
-        var sourceCode = Get(Text.Replace("\r\n", string.Empty), nameof(ContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get<ContextTestData>(Text.Replace("\r\n", string.Empty, StringComparison.Ordinal));
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
         var info = interceptInfoList.Dequeue();
 
-        Test(info);
+        await Test(info);
 
         // {{ DoubleValue }}
         var method = info.Methods.Dequeue();
-        method.Name.ShouldBe(WriteValue);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@DoubleValue");
-        method.Format.ShouldBe(DefaultKeyword);
-        method.Provider.ShouldBe(GlobalInvariantCulture);
+        await Assert.That(method.Name).IsEqualTo(WriteValue);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@DoubleValue");
+        await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
+        await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
-        Test(info);
+        await Test(info);
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
 
-        static void Test(InterceptInfo info)
+        static async Task Test(InterceptInfo info)
         {
             // Grow(
             //     (1 + 14 + 14 + 1 + 14)
@@ -254,63 +252,63 @@ public sealed class TemplateRendererRenderTest
             //     + 14
             //     + Utf8Value.Length)
             var method = info.Methods.Dequeue();
-            method.Name.ShouldBe(Grow);
-            method.Text.Count.ShouldBe(5);
-            method.Text[0].ShouldBe("86");
-            method.Text[1].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@Utf8Value.Length");
-            method.Text[2].ShouldBe(Utf8GetMaxByteCount);
-            method.Text[3].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@StringValue.Length");
-            method.Text[4].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@Utf16Value.Length");
-            method.Format.ShouldBeNull();
-            method.Provider.ShouldBeNull();
+            await Assert.That(method.Name).IsEqualTo(Grow);
+            await Assert.That(method.Text.Count).IsEqualTo(5);
+            await Assert.That(method.Text[0]).IsEqualTo("86");
+            await Assert.That(method.Text[1]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@Utf8Value.Length");
+            await Assert.That(method.Text[2]).IsEqualTo(Utf8GetMaxByteCount);
+            await Assert.That(method.Text[3]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@StringValue.Length");
+            await Assert.That(method.Text[4]).IsEqualTo("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@Utf16Value.Length");
+            await Assert.That(method.Format).IsNull();
+            await Assert.That(method.Provider).IsNull();
 
             // A{{ ConstantValue }}{{ ConstantValue }}B{{ ConstantValue }}
             method = info.Methods.Dequeue();
-            method.Name.ShouldBe(DangerousWriteConstantLiteral);
-            method.Text.Count.ShouldBe(1);
-            method.Text[0].ShouldBe("\"A_ConstantValue_ConstantValueB_ConstantValue\"u8");
-            method.Format.ShouldBeNull();
-            method.Provider.ShouldBeNull();
+            await Assert.That(method.Name).IsEqualTo(DangerousWriteConstantLiteral);
+            await Assert.That(method.Text.Count).IsEqualTo(1);
+            await Assert.That(method.Text[0]).IsEqualTo("\"A_ConstantValue_ConstantValueB_ConstantValue\"u8");
+            await Assert.That(method.Format).IsNull();
+            await Assert.That(method.Provider).IsNull();
 
             // {{ StringValue }}
             method = info.Methods.Dequeue();
-            method.Name.ShouldBe(DangerousWriteString);
-            method.Text.Count.ShouldBe(1);
-            method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@StringValue");
-            method.Format.ShouldBeNull();
-            method.Provider.ShouldBeNull();
+            await Assert.That(method.Name).IsEqualTo(DangerousWriteString);
+            await Assert.That(method.Text.Count).IsEqualTo(1);
+            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@StringValue");
+            await Assert.That(method.Format).IsNull();
+            await Assert.That(method.Provider).IsNull();
 
             // {{ ConstantValue }}{{ ConstantValue }}
             method = info.Methods.Dequeue();
-            method.Name.ShouldBe(DangerousWriteConstantLiteral);
-            method.Text.Count.ShouldBe(1);
-            method.Text[0].ShouldBe("\"_ConstantValue_ConstantValue\"u8");
-            method.Format.ShouldBeNull();
-            method.Provider.ShouldBeNull();
+            await Assert.That(method.Name).IsEqualTo(DangerousWriteConstantLiteral);
+            await Assert.That(method.Text.Count).IsEqualTo(1);
+            await Assert.That(method.Text[0]).IsEqualTo("\"_ConstantValue_ConstantValue\"u8");
+            await Assert.That(method.Format).IsNull();
+            await Assert.That(method.Provider).IsNull();
 
             // {{ Utf16Value }}
             method = info.Methods.Dequeue();
-            method.Name.ShouldBe(DangerousWriteString);
-            method.Text.Count.ShouldBe(1);
-            method.Text[0].ShouldBe("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@Utf16Value");
-            method.Format.ShouldBeNull();
-            method.Provider.ShouldBeNull();
+            await Assert.That(method.Name).IsEqualTo(DangerousWriteString);
+            await Assert.That(method.Text.Count).IsEqualTo(1);
+            await Assert.That(method.Text[0]).IsEqualTo("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@Utf16Value");
+            await Assert.That(method.Format).IsNull();
+            await Assert.That(method.Provider).IsNull();
 
             // {{ ConstantValue }}
             method = info.Methods.Dequeue();
-            method.Name.ShouldBe(DangerousWriteConstantLiteral);
-            method.Text.Count.ShouldBe(1);
-            method.Text[0].ShouldBe("\"_ConstantValue\"u8");
-            method.Format.ShouldBeNull();
-            method.Provider.ShouldBeNull();
+            await Assert.That(method.Name).IsEqualTo(DangerousWriteConstantLiteral);
+            await Assert.That(method.Text.Count).IsEqualTo(1);
+            await Assert.That(method.Text[0]).IsEqualTo("\"_ConstantValue\"u8");
+            await Assert.That(method.Format).IsNull();
+            await Assert.That(method.Provider).IsNull();
 
             // {{ Utf8Value }}
             method = info.Methods.Dequeue();
-            method.Name.ShouldBe(DangerousWriteLiteral);
-            method.Text.Count.ShouldBe(1);
-            method.Text[0].ShouldBe("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@Utf8Value");
-            method.Format.ShouldBeNull();
-            method.Provider.ShouldBeNull();
+            await Assert.That(method.Name).IsEqualTo(DangerousWriteLiteral);
+            await Assert.That(method.Text.Count).IsEqualTo(1);
+            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@Utf8Value");
+            await Assert.That(method.Format).IsNull();
+            await Assert.That(method.Provider).IsNull();
         }
     }
 }

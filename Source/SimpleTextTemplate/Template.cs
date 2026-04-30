@@ -1,13 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Buffers;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-
-#if NET8_0_OR_GREATER
-using System.Buffers;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using SimpleTextTemplate.Helpers;
-#endif
 
 using Block = (SimpleTextTemplate.BlockType Type, byte[] Value, string? Format, System.IFormatProvider? Culture);
 
@@ -30,11 +27,7 @@ public readonly struct Template
     /// ブロック単位のバッファ
     /// </value>
     public ReadOnlySpan<Block> Blocks
-#if NET8_0_OR_GREATER
         => MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetArrayDataReference(_blocks), _blocks.Length);
-#else
-        => _blocks.AsSpan();
-#endif
 
     /// <summary>
     /// テンプレート文字列を解析します。
@@ -78,11 +71,7 @@ public readonly struct Template
             {
                 if (culture is not null)
                 {
-#if NET8_0_OR_GREATER
                     cultureInfo = CultureInfo.GetCultureInfo(culture, true);
-#else
-                    cultureInfo = CultureInfo.GetCultureInfo(culture);
-#endif
                 }
             }
             catch (CultureNotFoundException)
@@ -130,11 +119,7 @@ public readonly struct Template
 
             var cultureInfo = culture is null
                 ? null
-#if NET8_0_OR_GREATER
                 : CultureInfo.GetCultureInfo(culture, true);
-#else
-                : CultureInfo.GetCultureInfo(culture);
-#endif
 
             list.Add((type, identifier.ToArray(), format, cultureInfo));
         }
@@ -142,7 +127,6 @@ public readonly struct Template
         return new([.. list]);
     }
 
-#if NET9_0_OR_GREATER
     /// <summary>
     /// テンプレートをレンダリングして、バッファーライターに書き込みます。
     /// </summary>
@@ -150,9 +134,12 @@ public readonly struct Template
     /// <param name="bufferWriter">バッファーライター</param>
     /// <param name="context">コンテキスト</param>
     /// <param name="provider">カルチャー指定</param>
+    /// <exception cref="ArgumentNullException"><paramref name="context"/>が<see langword="null"/>です。</exception>
     public readonly void Render<TWriter>(TWriter bufferWriter, Dictionary<byte[], object> context, IFormatProvider? provider = null)
         where TWriter : notnull, IBufferWriter<byte>, allows ref struct
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         if (context.Comparer is not IAlternateEqualityComparer<ReadOnlySpan<byte>, byte[]>)
         {
             ThrowHelper.ThrowInvalidCompareException();
@@ -199,5 +186,4 @@ public readonly struct Template
 
         writer.Flush();
     }
-#endif
 }

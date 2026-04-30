@@ -1,15 +1,13 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
+using SimpleTextTemplate.Tests.TestData;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderNonFormattableTest
 {
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public async Task 静的フィールド()
     {
         var context = new NonFormattableContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -18,12 +16,12 @@ public sealed class TemplateRendererRenderNonFormattableTest
         TemplateRenderer.Render(ref writer, "{{ NonFormattableStaticField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_NonFormattableStaticField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_NonFormattableStaticField");
     }
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public async Task フィールド()
     {
         var context = new NonFormattableContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -32,12 +30,12 @@ public sealed class TemplateRendererRenderNonFormattableTest
         TemplateRenderer.Render(ref writer, "{{ NonFormattableField }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_NonFormattableField");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_NonFormattableField");
     }
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public async Task 静的プロパティ()
     {
         var context = new NonFormattableContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -46,12 +44,12 @@ public sealed class TemplateRendererRenderNonFormattableTest
         TemplateRenderer.Render(ref writer, "{{ NonFormattableStaticProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_NonFormattableStaticProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_NonFormattableStaticProperty");
     }
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public async Task プロパティ()
     {
         var context = new NonFormattableContextTestData();
         var bufferWriter = new ArrayBufferWriter<byte>();
@@ -60,7 +58,7 @@ public sealed class TemplateRendererRenderNonFormattableTest
         TemplateRenderer.Render(ref writer, "{{ NonFormattableProperty }}", in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("_NonFormattableProperty");
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("_NonFormattableProperty");
     }
 }

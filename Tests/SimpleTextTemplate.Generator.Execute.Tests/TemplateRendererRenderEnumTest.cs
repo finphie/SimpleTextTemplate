@@ -1,15 +1,13 @@
 ﻿using System.Buffers;
-using System.Text;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
+using SimpleTextTemplate.Tests.TestData;
 
 namespace SimpleTextTemplate.Generator.Execute.Tests;
 
 public sealed class TemplateRendererRenderEnumTest
 {
-    [Fact]
-    public void 定数()
+    [Test]
+    public async Task 定数()
     {
         const string Text = """
             {{ EnumConstantField }}
@@ -23,16 +21,16 @@ public sealed class TemplateRendererRenderEnumTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            Test1
-            1
-            00000001
-            """);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
+                Test1
+                1
+                00000001
+                """);
     }
 
-    [Fact]
-    public void 定数が無効な値()
+    [Test]
+    public async Task 定数が無効な値()
     {
         const string Text = """
             {{ EnumConstantFieldInvalidNumber }}
@@ -45,15 +43,15 @@ public sealed class TemplateRendererRenderEnumTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            99
-            99
-            """);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
+                99
+                99
+                """);
     }
 
-    [Fact]
-    public void Flags属性を付与したEnumの定数()
+    [Test]
+    public async Task Flags属性を付与したEnumの定数()
     {
         const string Text = """
             {{ FlagEnumConstantField }}
@@ -66,15 +64,15 @@ public sealed class TemplateRendererRenderEnumTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            Test1, Test2
-            3
-            """);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
+                Test1, Test2
+                3
+                """);
     }
 
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public async Task 静的フィールド()
     {
         const string Text = """
             {{ EnumStaticField }}
@@ -87,15 +85,15 @@ public sealed class TemplateRendererRenderEnumTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            Test2
-            2
-            """);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
+                Test2
+                2
+                """);
     }
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public async Task フィールド()
     {
         const string Text = """
             {{ EnumField }}
@@ -108,15 +106,15 @@ public sealed class TemplateRendererRenderEnumTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            Test3
-            3
-            """);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
+                Test3
+                3
+                """);
     }
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public async Task 静的プロパティ()
     {
         const string Text = """
             {{ EnumStaticProperty }}
@@ -129,15 +127,15 @@ public sealed class TemplateRendererRenderEnumTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            Test4
-            4
-            """);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
+                Test4
+                4
+                """);
     }
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public async Task プロパティ()
     {
         const string Text = """
             {{ EnumProperty }}
@@ -150,10 +148,10 @@ public sealed class TemplateRendererRenderEnumTest
         TemplateRenderer.Render(ref writer, Text, in context);
         writer.Flush();
 
-        Encoding.UTF8.GetString(bufferWriter.WrittenSpan)
-            .ShouldBe("""
-            Test5
-            5
-            """);
+        await Assert.That(bufferWriter.WrittenMemory)
+            .IsUtf8SequenceEqualTo("""
+                Test5
+                5
+                """);
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System.Globalization;
-using Shouldly;
-using SimpleTextTemplate.Generator.Tests.Core;
 using SimpleTextTemplate.Generator.Tests.Extensions;
-using Xunit;
+using SimpleTextTemplate.Tests.TestData;
 using static SimpleTextTemplate.Generator.Tests.Constants;
 using static SimpleTextTemplate.Generator.Tests.GeneratorRunner;
 using static SimpleTextTemplate.Generator.Tests.SourceCode;
@@ -11,113 +9,113 @@ namespace SimpleTextTemplate.Generator.Tests;
 
 public sealed class TemplateRendererRenderStringTest
 {
-    [Fact]
-    public void 定数()
+    [Test]
+    public async Task 定数()
     {
-        var sourceCode = Get("{{ StringConstantField }}", nameof(StringContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get<StringContextTestData>("{{ StringConstantField }}");
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(Grow);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe(StringContextTestData.StringConstantField.Length.ToString(CultureInfo.InvariantCulture));
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(Grow);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo(StringContextTestData.StringConstantField.Length.ToString(CultureInfo.InvariantCulture));
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(DangerousWriteConstantLiteral);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("\"_StringConstantField\"u8");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(DangerousWriteConstantLiteral);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("\"_StringConstantField\"u8");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 
-    [Fact]
-    public void 複数の定数()
+    [Test]
+    public async Task 複数の定数()
     {
-        var sourceCode = Get("{{ StringConstantField }}{{ StringConstantField }}", nameof(StringContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get<StringContextTestData>("{{ StringConstantField }}{{ StringConstantField }}");
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(Grow);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe((StringContextTestData.StringConstantField.Length * 2).ToString(CultureInfo.InvariantCulture));
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(Grow);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo((StringContextTestData.StringConstantField.Length * 2).ToString(CultureInfo.InvariantCulture));
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(DangerousWriteConstantLiteral);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe("\"_StringConstantField_StringConstantField\"u8");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(DangerousWriteConstantLiteral);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo("\"_StringConstantField_StringConstantField\"u8");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 
-    [Fact]
-    public void 静的フィールド()
+    [Test]
+    public Task 静的フィールド()
         => Test(nameof(StringContextTestData.StringStaticField), true);
 
-    [Fact]
-    public void フィールド()
+    [Test]
+    public Task フィールド()
         => Test(nameof(StringContextTestData.StringField), false);
 
-    [Fact]
-    public void 静的プロパティ()
+    [Test]
+    public Task 静的プロパティ()
         => Test(nameof(StringContextTestData.StringStaticProperty), true);
 
-    [Fact]
-    public void プロパティ()
+    [Test]
+    public Task プロパティ()
         => Test(nameof(StringContextTestData.StringProperty), false);
 
-    static void Test(string memberName, bool isStatic)
+    static async Task Test(string memberName, bool isStatic)
     {
         var templateText = $$$"""{{ {{{memberName}}} }}""";
         var contextArgument = GetContextArgumentString<StringContextTestData>(memberName, isStatic);
 
-        var sourceCode = Get(templateText, nameof(StringContextTestData));
-        var (compilation, diagnostics) = Run(sourceCode);
+        var sourceCode = Get<StringContextTestData>(templateText);
+        var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
-        diagnostics.ShouldBeEmpty();
+        await Assert.That(diagnostics).IsEmpty();
 
         var info = interceptInfoList.Dequeue();
         var method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(Grow);
-        method.Text.Count.ShouldBe(3);
-        method.Text[0].ShouldBe("0");
-        method.Text[1].ShouldBe(Utf8GetMaxByteCount);
-        method.Text[2].ShouldBe($"{contextArgument}.Length");
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(Grow);
+        await Assert.That(method.Text.Count).IsEqualTo(3);
+        await Assert.That(method.Text[0]).IsEqualTo("0");
+        await Assert.That(method.Text[1]).IsEqualTo(Utf8GetMaxByteCount);
+        await Assert.That(method.Text[2]).IsEqualTo($"{contextArgument}.Length");
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
         method = info.Methods.Dequeue();
 
-        method.Name.ShouldBe(DangerousWriteString);
-        method.Text.Count.ShouldBe(1);
-        method.Text[0].ShouldBe(contextArgument);
-        method.Format.ShouldBeNull();
-        method.Provider.ShouldBeNull();
+        await Assert.That(method.Name).IsEqualTo(DangerousWriteString);
+        await Assert.That(method.Text.Count).IsEqualTo(1);
+        await Assert.That(method.Text[0]).IsEqualTo(contextArgument);
+        await Assert.That(method.Format).IsNull();
+        await Assert.That(method.Provider).IsNull();
 
-        info.Methods.ShouldBeEmpty();
-        interceptInfoList.ShouldBeEmpty();
+        await Assert.That(info.Methods).IsEmpty();
+        await Assert.That(interceptInfoList).IsEmpty();
     }
 }

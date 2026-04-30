@@ -1,42 +1,46 @@
 ﻿using System.Text;
-using Shouldly;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Tests;
 
 public sealed class TemplateReaderTryReadStringTest
 {
-    [Theory]
-    [InlineData("{", "{", 1)]
-    [InlineData("a", "a", 1)]
-    [InlineData("ab", "ab", 2)]
-    [InlineData("abc", "abc", 3)]
-    [InlineData("{ A }", "{ A }", 5)]
-    [InlineData("z{{ A }}z", "z", 1)]
-    [InlineData("z{{", "z", 1)]
-    public void 文字列_文字列の範囲とtrueを返す(string input, string template, int consumed)
+    [Test]
+    [Arguments("{", "{", 1)]
+    [Arguments("a", "a", 1)]
+    [Arguments("ab", "ab", 2)]
+    [Arguments("abc", "abc", 3)]
+    [Arguments("{ A }", "{ A }", 5)]
+    [Arguments("z{{ A }}z", "z", 1)]
+    [Arguments("z{{", "z", 1)]
+    public async Task 文字列_文字列の範囲とtrueを返す(string input, string template, int expectedConsumed)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryReadString(out var value).ShouldBeTrue();
-        reader.Consumed.ShouldBe((nuint)consumed);
+        var result = reader.TryReadString(out var value);
+        var consumed = reader.Consumed;
+        ReadOnlyMemory<byte> memory = value.ToArray();
 
-        Encoding.UTF8.GetString(value)
-            .ShouldBe(template);
+        await Assert.That(result).IsTrue();
+        await Assert.That(consumed).IsEqualTo((nuint)expectedConsumed);
+        await Assert.That(memory).IsUtf8SequenceEqualTo(template);
     }
 
-    [Theory]
-    [InlineData("")]
-    [InlineData("{{")]
-    public void 空または識別子開始タグ_falseを返す(string input)
+    [Test]
+    [Arguments("")]
+    [Arguments("{{")]
+    public async Task 空または識別子開始タグ_falseを返す(string input)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryReadString(out var value).ShouldBeFalse();
-        reader.Consumed.ShouldBe((nuint)0);
+        var result = reader.TryReadString(out var value);
+        var consumed = reader.Consumed;
+        var length = value.Length;
 
-        value.ToArray().ShouldBeEmpty();
+        await Assert.That(result).IsFalse();
+        await Assert.That(consumed).IsEqualTo((nuint)0);
+        await Assert.That(length).IsZero();
     }
 }

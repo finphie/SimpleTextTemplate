@@ -1,9 +1,9 @@
 ﻿using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Text;
+using FToolkit.AnalyzerUtilities.Buffers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using SimpleTextTemplate.Generator.Buffers;
 using SimpleTextTemplate.Generator.Extensions;
 using SimpleTextTemplate.Generator.Specs;
 using static SimpleTextTemplate.Generator.Specs.TemplateWriterWriteType;
@@ -17,8 +17,8 @@ namespace SimpleTextTemplate.Generator;
 /// <param name="infoList">インターセプター情報のリスト</param>
 readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<InterceptInfo> infoList) : IDisposable
 {
-    static readonly string FullName = typeof(TemplateGenerator).FullName;
-    static readonly string Version = typeof(TemplateGenerator).Assembly.GetName().Version.ToString();
+    static readonly string FullName = typeof(TemplateGenerator).FullName!;
+    static readonly string Version = typeof(TemplateGenerator).Assembly.GetName().Version!.ToString();
 
     readonly SourceCodeWriter _writer = new();
 
@@ -59,6 +59,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
         using (_writer.WriteBlock())
         {
             _writer.WriteLine($"""[global::System.CodeDom.Compiler.GeneratedCode("{FullName}", "{Version}")]""");
+            _writer.WriteLine("""[global::System.Diagnostics.Conditional("INTERCEPTS_LOCATION_KEEP_ATTRIBUTES")]""");
             _writer.WriteLine("[global::System.AttributeUsage(global::System.AttributeTargets.Method, AllowMultiple = true)]");
             _writer.WriteLine("file sealed class InterceptsLocationAttribute(int version, string data) : global::System.Attribute;");
         }
@@ -86,7 +87,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
         foreach (var culture in cultures)
         {
             _context.CancellationToken.ThrowIfCancellationRequested();
-            _writer.WriteLine($"static global::System.Globalization.CultureInfo {culture!.Replace("-", string.Empty)};");
+            _writer.WriteLine($"static global::System.Globalization.CultureInfo {culture!.Replace("-", string.Empty, StringComparison.Ordinal)};");
         }
 
         _writer.WriteLine();
@@ -98,7 +99,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
             foreach (var culture in cultures)
             {
                 _context.CancellationToken.ThrowIfCancellationRequested();
-                _writer.WriteLine($"""{culture!.Replace("-", string.Empty)} = global::System.Globalization.CultureInfo.GetCultureInfo("{culture}", true);""");
+                _writer.WriteLine($"""{culture!.Replace("-", string.Empty, StringComparison.Ordinal)} = global::System.Globalization.CultureInfo.GetCultureInfo("{culture}", true);""");
             }
         }
 
@@ -126,7 +127,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
 
     void WriteRenderMethod(int number)
     {
-        var (interceptsLocationInfo, writeInfo, grow, methodSymbol) = _infoList[number]!;
+        var (interceptsLocationInfo, writeInfo, grow, methodSymbol) = _infoList[number];
 
         var parameters = string.Join(", ", methodSymbol.Parameters.Select(static x => x.GetParameterText()));
         _writer.WriteLine($"""[global::System.Runtime.CompilerServices.InterceptsLocation({interceptsLocationInfo.Version}, "{interceptsLocationInfo.Data}")]""");
@@ -168,50 +169,67 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
             return;
         }
 
-        var members = growInfo.Members.ToLookup(static x => x.WriteType != WriteString);
-        var utf8Members = members[true].ToArray();
-        var utf16Members = members[false].ToArray().AsSpan();
+        _writer.WriteLine();
 
-        _writer.IncreaseIndent();
-
-        // 対象のメンバーはUTF-8のバイト列となるので、長さをそのまま追加
-        WriteContextMemberLengths(in this, utf8Members, contextTypeName);
-
-        // 対象のメンバーはUTF-16の文字列となるので、UTF-8での最大長を追加
-        if (utf16Members.Length > 0)
+        using (_writer.Indent())
         {
-            _writer.WriteLine();
-            _writer.WriteLine("+ global::System.Text.Encoding.UTF8.GetMaxByteCount(");
-            _writer.IncreaseIndent();
+            var isUtf8 = growInfo.Members.Any(static x => x.WriteType != WriteString);
 
-            WriteContextMemberLength(in this, utf16Members[0], contextTypeName);
-            WriteContextMemberLengths(in this, utf16Members[1..], contextTypeName);
-
-            _writer.Write(")");
-            _writer.DecreaseIndent();
-        }
-
-        WriteClosingParenthesisAndSemicolon();
-        _writer.DecreaseIndent();
-
-        static void WriteContextMemberLengths(in Emitter emitter, ReadOnlySpan<ContextMember> members, string? contextTypeName)
-        {
-            var writer = emitter._writer;
-
-            foreach (var member in members)
+            if (isUtf8)
             {
-                writer.WriteLine();
-                writer.Write("+ ");
-                WriteContextMemberLength(in emitter, member, contextTypeName);
+                _writer.Write("+ ");
+
+                // 対象のメンバーはUTF-8のバイト列となるので、長さをそのまま追加
+                WriteContextMemberLengths(in this, growInfo.Members, true, contextTypeName);
+            }
+
+            if (!growInfo.Members.Any(static x => x.WriteType == WriteString))
+            {
+                WriteClosingParenthesisAndSemicolon();
+                return;
+            }
+
+            if (isUtf8)
+            {
+                _writer.WriteLine();
+            }
+
+            // 対象のメンバーはUTF-16の文字列となるので、UTF-8での最大長を追加
+            _writer.WriteLine("+ global::System.Text.Encoding.UTF8.GetMaxByteCount(");
+
+            using (_writer.Indent())
+            {
+                WriteContextMemberLengths(in this, growInfo.Members, false, contextTypeName);
+
+                _writer.Write(")");
+                WriteClosingParenthesisAndSemicolon();
             }
         }
 
-        static void WriteContextMemberLength(in Emitter emitter, ContextMember member, string? contextTypeName)
+        static void WriteContextMemberLengths(in Emitter emitter, IReadOnlyList<ContextMember> members, bool isUtf8, string? contextTypeName)
         {
             var writer = emitter._writer;
+            var first = true;
 
-            emitter.WriteContextMemberName(member, contextTypeName);
-            writer.Write(".Length");
+            foreach (var member in members)
+            {
+                var isNotWriteString = member.WriteType != WriteString;
+
+                if (isNotWriteString != isUtf8)
+                {
+                    continue;
+                }
+
+                if (!first)
+                {
+                    writer.WriteLine();
+                    writer.Write("+ ");
+                }
+
+                emitter.WriteContextMemberName(member, contextTypeName);
+                writer.Write(".Length");
+                first = false;
+            }
         }
     }
 
@@ -282,7 +300,7 @@ readonly ref struct Emitter(SourceProductionContext context, ImmutableArray<Inte
 
         if (isStatic)
         {
-            _writer.Write($"{contextTypeName!}.@{member.Name}");
+            _writer.Write($"{contextTypeName}.@{member.Name}");
             return;
         }
 

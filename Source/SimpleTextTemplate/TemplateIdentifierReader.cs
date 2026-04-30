@@ -4,10 +4,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using SimpleTextTemplate.Helpers;
 
-#if NET8_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
-
 namespace SimpleTextTemplate;
 
 /// <summary>
@@ -15,14 +11,9 @@ namespace SimpleTextTemplate;
 /// </summary>
 public ref struct TemplateIdentifierReader
 {
-#if NET8_0_OR_GREATER
     ref byte _buffer;
 
-    [SuppressMessage("Style", "IDE0032:自動プロパティを使用する", Justification = "誤検知")]
     int _length;
-#else
-    ReadOnlySpan<byte> _buffer;
-#endif
 
     /// <summary>
     /// <see cref="TemplateIdentifierReader"/>構造体の新しいインスタンスを初期化します。
@@ -34,27 +25,9 @@ public ref struct TemplateIdentifierReader
         Debug.Assert(input[0] != ' ', "バイト列先頭には空白以外の文字が必要です。");
         Debug.Assert(input[^1] != ' ', "バイト列末尾には空白以外の文字が必要です。");
 
-#if NET8_0_OR_GREATER
         _buffer = ref MemoryMarshal.GetReference(input);
         _length = input.Length;
-#else
-        _buffer = input;
-#endif
     }
-
-    readonly ref byte Buffer =>
-#if NET8_0_OR_GREATER
-        ref _buffer;
-#else
-        ref MemoryMarshal.GetReference(_buffer);
-#endif
-
-    readonly int Length =>
-#if NET8_0_OR_GREATER
-        _length;
-#else
-        _buffer.Length;
-#endif
 
     /// <summary>
     /// 識別子を読み込みます。
@@ -87,9 +60,9 @@ public ref struct TemplateIdentifierReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public unsafe bool TryRead(out ReadOnlySpan<byte> value, out string? format, out string? culture)
     {
-        Debug.Assert(Length > 0, "バッファーの長さは0より大きい値である必要があります。");
+        Debug.Assert(_length > 0, "バッファーの長さは0より大きい値である必要があります。");
 
-        if (Buffer == (byte)':')
+        if (_buffer == (byte)':')
         {
             value = default;
             format = null;
@@ -97,35 +70,35 @@ public ref struct TemplateIdentifierReader
             return false;
         }
 
-        var formatIndex = BinaryHelper.IndexOf(ref Buffer, Length, (byte)':');
+        var formatIndex = BinaryHelper.IndexOf(ref _buffer, _length, (byte)':');
 
         if (formatIndex <= 0)
         {
-            value = BinaryHelper.CreateReadOnlySpan(ref Buffer, Length);
+            value = MemoryMarshal.CreateReadOnlySpan(ref _buffer, _length);
             format = null;
             culture = null;
             return true;
         }
 
-        value = BinaryHelper.CreateReadOnlySpan(ref Buffer, formatIndex);
+        value = MemoryMarshal.CreateReadOnlySpan(ref _buffer, formatIndex);
         Advance(formatIndex + 1);
 
-        var cultureIndex = BinaryHelper.IndexOf(ref Buffer, Length, (byte)':');
+        var cultureIndex = BinaryHelper.IndexOf(ref _buffer, _length, (byte)':');
 
         if (cultureIndex < 0)
         {
-            format = Length != 0
-                ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length)
+            format = _length != 0
+                ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref _buffer), _length)
                 : null;
             culture = null;
             return true;
         }
 
-        format = cultureIndex != 0 ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), cultureIndex) : null;
+        format = cultureIndex != 0 ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref _buffer), cultureIndex) : null;
         Advance(cultureIndex + 1);
 
-        culture = Length != 0
-            ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref Buffer), Length)
+        culture = _length != 0
+            ? Encoding.UTF8.GetString((byte*)Unsafe.AsPointer(ref _buffer), _length)
             : null;
 
         return true;
@@ -138,11 +111,7 @@ public ref struct TemplateIdentifierReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     void Advance(int count)
     {
-#if NET8_0_OR_GREATER
         _buffer = ref Unsafe.AddByteOffset(ref _buffer, (nint)(uint)count);
         _length -= count;
-#else
-        _buffer = BinaryHelper.CreateReadOnlySpan(ref Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(_buffer), (nint)(uint)count), _buffer.Length - count);
-#endif
     }
 }
