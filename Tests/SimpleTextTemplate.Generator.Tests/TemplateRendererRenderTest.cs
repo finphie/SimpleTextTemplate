@@ -11,7 +11,7 @@ public sealed class TemplateRendererRenderTest
     [Test]
     public async Task 識別子なし()
     {
-        var sourceCode = Get(["A", "B"]);
+        var sourceCode = Get("A", "B");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -77,7 +77,7 @@ public sealed class TemplateRendererRenderTest
         var sourceCode = $$$"""
             using System.Buffers;
             using SimpleTextTemplate;
-            using SimpleTextTemplate.Generator.Tests.Core;
+            using SimpleTextTemplate.Tests.TestData;
 
             var bufferWriter = new ArrayBufferWriter<byte>();
             var writer = TemplateWriter.Create(bufferWriter);
@@ -95,7 +95,7 @@ public sealed class TemplateRendererRenderTest
         await Assert.That(method.Name).IsEqualTo(Grow);
         await Assert.That(method.Text.Count).IsEqualTo(2);
         await Assert.That(method.Text[0]).IsEqualTo("0");
-        await Assert.That(method.Text[1]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticField.Length");
+        await Assert.That(method.Text[1]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ByteArrayContextTestData.@BytesStaticField.Length");
         await Assert.That(method.Format).IsNull();
         await Assert.That(method.Provider).IsNull();
 
@@ -103,7 +103,7 @@ public sealed class TemplateRendererRenderTest
 
         await Assert.That(method.Name).IsEqualTo(DangerousWriteLiteral);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.ByteArrayContextTestData.@BytesStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ByteArrayContextTestData.@BytesStaticField");
         await Assert.That(method.Format).IsNull();
         await Assert.That(method.Provider).IsNull();
 
@@ -114,7 +114,7 @@ public sealed class TemplateRendererRenderTest
     [Test]
     public async Task カルチャーにInvariantInfo指定()
     {
-        var sourceCode = Get(["{{ DoubleConstantField }}", "{{ DoubleStaticField }}"], nameof(DoubleContextTestData), InvariantInfo);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(InvariantInfo, "{{ DoubleConstantField }}", "{{ DoubleStaticField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -143,7 +143,7 @@ public sealed class TemplateRendererRenderTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -154,7 +154,7 @@ public sealed class TemplateRendererRenderTest
     [Test]
     public async Task Formatやカルチャー指定省略()
     {
-        var sourceCode = Get(["{{ DoubleStaticField:}}", "{{ DoubleStaticField: }}", "{{ DoubleStaticField::}}", "{{ DoubleStaticField:: }}", "{{ DoubleStaticField::  }}"], nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticField:}}", "{{ DoubleStaticField: }}", "{{ DoubleStaticField::}}", "{{ DoubleStaticField:: }}", "{{ DoubleStaticField::  }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -165,7 +165,7 @@ public sealed class TemplateRendererRenderTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -175,7 +175,7 @@ public sealed class TemplateRendererRenderTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -185,7 +185,7 @@ public sealed class TemplateRendererRenderTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -195,7 +195,7 @@ public sealed class TemplateRendererRenderTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -205,7 +205,7 @@ public sealed class TemplateRendererRenderTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -220,7 +220,7 @@ public sealed class TemplateRendererRenderTest
             A{{ ConstantValue }}{{ ConstantValue }}B{{ ConstantValue }}{{ StringValue }}{{ ConstantValue }}{{ ConstantValue }}{{ Utf16Value }}{{ ConstantValue }}{{ Utf8Value }}{{ DoubleValue }}
             A{{ ConstantValue }}{{ ConstantValue }}B{{ ConstantValue }}{{ StringValue }}{{ ConstantValue }}{{ ConstantValue }}{{ Utf16Value }}{{ ConstantValue }}{{ Utf8Value }}
             """;
-        var sourceCode = Get(Text.Replace("\r\n", string.Empty, StringComparison.Ordinal), nameof(ContextTestData));
+        var sourceCode = Get<ContextTestData>(Text.Replace("\r\n", string.Empty, StringComparison.Ordinal));
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -233,7 +233,7 @@ public sealed class TemplateRendererRenderTest
         var method = info.Methods.Dequeue();
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@DoubleValue");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@DoubleValue");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -255,9 +255,9 @@ public sealed class TemplateRendererRenderTest
             await Assert.That(method.Name).IsEqualTo(Grow);
             await Assert.That(method.Text.Count).IsEqualTo(5);
             await Assert.That(method.Text[0]).IsEqualTo("86");
-            await Assert.That(method.Text[1]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@Utf8Value.Length");
+            await Assert.That(method.Text[1]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@Utf8Value.Length");
             await Assert.That(method.Text[2]).IsEqualTo(Utf8GetMaxByteCount);
-            await Assert.That(method.Text[3]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@StringValue.Length");
+            await Assert.That(method.Text[3]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@StringValue.Length");
             await Assert.That(method.Text[4]).IsEqualTo("global::System.Runtime.CompilerServices.Unsafe.AsRef(in context).@Utf16Value.Length");
             await Assert.That(method.Format).IsNull();
             await Assert.That(method.Provider).IsNull();
@@ -274,7 +274,7 @@ public sealed class TemplateRendererRenderTest
             method = info.Methods.Dequeue();
             await Assert.That(method.Name).IsEqualTo(DangerousWriteString);
             await Assert.That(method.Text.Count).IsEqualTo(1);
-            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@StringValue");
+            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@StringValue");
             await Assert.That(method.Format).IsNull();
             await Assert.That(method.Provider).IsNull();
 
@@ -306,7 +306,7 @@ public sealed class TemplateRendererRenderTest
             method = info.Methods.Dequeue();
             await Assert.That(method.Name).IsEqualTo(DangerousWriteLiteral);
             await Assert.That(method.Text.Count).IsEqualTo(1);
-            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.ContextTestData.@Utf8Value");
+            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.ContextTestData.@Utf8Value");
             await Assert.That(method.Format).IsNull();
             await Assert.That(method.Provider).IsNull();
         }

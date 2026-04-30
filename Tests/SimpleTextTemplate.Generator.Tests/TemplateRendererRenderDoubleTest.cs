@@ -11,7 +11,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 定数()
     {
-        var sourceCode = Get("{{ DoubleConstantField }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleConstantField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -41,7 +41,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 定数_Format指定()
     {
-        var sourceCode = Get("{{ DoubleConstantField:N3 }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleConstantField:N3 }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -71,7 +71,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 定数_特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleConstantField::es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleConstantField::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -101,7 +101,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 定数_Formatと特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleConstantField:N3:es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleConstantField:N3:es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -133,7 +133,7 @@ public sealed class TemplateRendererRenderDoubleTest
     {
         foreach (var culture in InvariantCultureList)
         {
-            var sourceCode = Get("{{ DoubleConstantField }}", nameof(DoubleContextTestData), culture);
+            var sourceCode = GetWithCulture<DoubleContextTestData>(culture, "{{ DoubleConstantField }}");
             var (compilation, diagnostics) = await RunAsync(sourceCode);
             var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -164,7 +164,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 定数_メソッド引数で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleConstantField }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleConstantField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -175,7 +175,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleConstantField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleConstantField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(ProviderArgument);
 
@@ -186,7 +186,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 定数_メソッド引数とテンプレート文字列で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleConstantField::es-ES }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleConstantField::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -216,7 +216,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 複数の定数()
     {
-        var sourceCode = Get("{{ DoubleConstantField }}{{ DoubleConstantField }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleConstantField }}{{ DoubleConstantField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -246,7 +246,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的フィールド()
     {
-        var sourceCode = Get("{{ DoubleStaticField }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -257,7 +257,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -268,7 +268,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的フィールド_Format指定()
     {
-        var sourceCode = Get("{{ DoubleStaticField:N3 }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticField:N3 }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -279,7 +279,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo("\"N3\"");
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -290,7 +290,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的フィールド_特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleStaticField::es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticField::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -301,7 +301,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo("esES");
 
@@ -312,7 +312,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的フィールド_Formatと特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleStaticField:N3:es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticField:N3:es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -323,7 +323,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo("\"N3\"");
         await Assert.That(method.Provider).IsEqualTo("esES");
 
@@ -336,7 +336,7 @@ public sealed class TemplateRendererRenderDoubleTest
     {
         foreach (var culture in InvariantCultureList)
         {
-            var sourceCode = Get("{{ DoubleStaticField }}", nameof(DoubleContextTestData), culture);
+            var sourceCode = GetWithCulture<DoubleContextTestData>(culture, "{{ DoubleStaticField }}");
             var (compilation, diagnostics) = await RunAsync(sourceCode);
             var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -347,7 +347,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
             await Assert.That(method.Name).IsEqualTo(WriteValue);
             await Assert.That(method.Text.Count).IsEqualTo(1);
-            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
             await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
             await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -359,7 +359,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的フィールド_メソッド引数で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleStaticField }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleStaticField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -370,7 +370,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(ProviderArgument);
 
@@ -381,7 +381,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的フィールド_メソッド引数とテンプレート文字列で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleStaticField::es-ES }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleStaticField::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -392,7 +392,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticField");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticField");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo("esES");
 
@@ -403,7 +403,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task フィールド()
     {
-        var sourceCode = Get("{{ DoubleField }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -425,7 +425,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task フィールド_Format指定()
     {
-        var sourceCode = Get("{{ DoubleField:N3 }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleField:N3 }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -447,7 +447,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task フィールド_特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleField::es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleField::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -469,7 +469,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task フィールド_Formatと特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleField:N3:es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleField:N3:es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -493,7 +493,7 @@ public sealed class TemplateRendererRenderDoubleTest
     {
         foreach (var culture in InvariantCultureList)
         {
-            var sourceCode = Get("{{ DoubleField }}", nameof(DoubleContextTestData), culture);
+            var sourceCode = GetWithCulture<DoubleContextTestData>(culture, "{{ DoubleField }}");
             var (compilation, diagnostics) = await RunAsync(sourceCode);
             var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -516,7 +516,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task フィールド_メソッド引数で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleField }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -538,7 +538,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task フィールド_メソッド引数とテンプレート文字列で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleField::es-ES }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleField::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -560,7 +560,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的プロパティ()
     {
-        var sourceCode = Get("{{ DoubleStaticProperty }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticProperty }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -571,7 +571,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticProperty");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticProperty");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -582,7 +582,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的プロパティ_Format指定()
     {
-        var sourceCode = Get("{{ DoubleStaticProperty:N3 }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticProperty:N3 }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -593,7 +593,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticProperty");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticProperty");
         await Assert.That(method.Format).IsEqualTo("\"N3\"");
         await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -604,7 +604,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的プロパティ_特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleStaticProperty::es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticProperty::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -615,7 +615,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticProperty");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticProperty");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo("esES");
 
@@ -626,7 +626,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的プロパティ_Formatと特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleStaticProperty:N3:es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleStaticProperty:N3:es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -637,7 +637,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticProperty");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticProperty");
         await Assert.That(method.Format).IsEqualTo("\"N3\"");
         await Assert.That(method.Provider).IsEqualTo("esES");
 
@@ -650,7 +650,7 @@ public sealed class TemplateRendererRenderDoubleTest
     {
         foreach (var culture in InvariantCultureList)
         {
-            var sourceCode = Get("{{ DoubleStaticProperty }}", nameof(DoubleContextTestData), InvariantCulture);
+            var sourceCode = GetWithCulture<DoubleContextTestData>(culture, "{{ DoubleStaticProperty }}");
             var (compilation, diagnostics) = await RunAsync(sourceCode);
             var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -661,7 +661,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
             await Assert.That(method.Name).IsEqualTo(WriteValue);
             await Assert.That(method.Text.Count).IsEqualTo(1);
-            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticProperty");
+            await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticProperty");
             await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
             await Assert.That(method.Provider).IsEqualTo(GlobalInvariantCulture);
 
@@ -673,7 +673,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的プロパティ_メソッド引数で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleStaticProperty }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleStaticProperty }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -684,7 +684,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticProperty");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticProperty");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo(ProviderArgument);
 
@@ -695,7 +695,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task 静的プロパティ_メソッド引数とテンプレート文字列で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleStaticProperty::es-ES }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleStaticProperty::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -706,7 +706,7 @@ public sealed class TemplateRendererRenderDoubleTest
 
         await Assert.That(method.Name).IsEqualTo(WriteValue);
         await Assert.That(method.Text.Count).IsEqualTo(1);
-        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Generator.Tests.Core.DoubleContextTestData.@DoubleStaticProperty");
+        await Assert.That(method.Text[0]).IsEqualTo("global::SimpleTextTemplate.Tests.TestData.DoubleContextTestData.@DoubleStaticProperty");
         await Assert.That(method.Format).IsEqualTo(DefaultKeyword);
         await Assert.That(method.Provider).IsEqualTo("esES");
 
@@ -717,7 +717,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task プロパティ()
     {
-        var sourceCode = Get("{{ DoubleProperty }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleProperty }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -739,7 +739,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task プロパティ_Format指定()
     {
-        var sourceCode = Get("{{ DoubleProperty:N3 }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleProperty:N3 }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -761,7 +761,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task プロパティ_特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleProperty::es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleProperty::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -783,7 +783,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task プロパティ_Formatと特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleProperty:N3:es-ES }}", nameof(DoubleContextTestData));
+        var sourceCode = Get<DoubleContextTestData>("{{ DoubleProperty:N3:es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -807,7 +807,7 @@ public sealed class TemplateRendererRenderDoubleTest
     {
         foreach (var culture in InvariantCultureList)
         {
-            var sourceCode = Get("{{ DoubleProperty }}", nameof(DoubleContextTestData), InvariantCulture);
+            var sourceCode = GetWithCulture<DoubleContextTestData>(culture, "{{ DoubleProperty }}");
             var (compilation, diagnostics) = await RunAsync(sourceCode);
             var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -830,7 +830,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task プロパティ_メソッド引数で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleProperty }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleProperty }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -852,7 +852,7 @@ public sealed class TemplateRendererRenderDoubleTest
     [Test]
     public async Task プロパティ_メソッド引数とテンプレート文字列で特定カルチャー指定()
     {
-        var sourceCode = Get("{{ DoubleProperty::es-ES }}", nameof(DoubleContextTestData), JaJpCulture);
+        var sourceCode = GetWithCulture<DoubleContextTestData>(JaJpCulture, "{{ DoubleProperty::es-ES }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 

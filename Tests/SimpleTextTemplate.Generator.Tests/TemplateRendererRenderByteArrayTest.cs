@@ -37,7 +37,7 @@ public sealed class TemplateRendererRenderByteArrayTest
         var templateText = $$$"""{{ {{{memberName}}} }}""";
         var contextArgument = GetContextArgumentString<ByteArrayContextTestData>(memberName, isStatic);
 
-        var sourceCode = Get(templateText, nameof(ByteArrayContextTestData));
+        var sourceCode = Get<ByteArrayContextTestData>(templateText);
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 

@@ -29,7 +29,7 @@ public sealed class TemplateRendererRenderNonFormattableTest
         var templateText = $$$"""{{ {{{memberName}}} }}""";
         var contextArgument = GetContextArgumentString<NonFormattableContextTestData>(memberName, isStatic);
 
-        var sourceCode = Get(templateText, nameof(NonFormattableContextTestData));
+        var sourceCode = Get<NonFormattableContextTestData>(templateText);
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 

@@ -32,7 +32,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     [Test]
     public async Task テンプレート文字列がnull_STT1000()
     {
-        var sourceCode = Get(templateText: null);
+        var sourceCode = Get((string?)null);
         var (_, diagnostics) = await RunAsync(sourceCode);
 
         await Assert.That(diagnostics.Count).IsEqualTo(1);
@@ -65,7 +65,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     [Test]
     public async Task コンテキストに識別子が存在しない_STT1002()
     {
-        var sourceCode = Get("{{ A }}", nameof(ByteArrayContextTestData));
+        var sourceCode = Get<ByteArrayContextTestData>("{{ A }}");
         var (_, diagnostics) = await RunAsync(sourceCode);
 
         await Assert.That(diagnostics.Count).IsEqualTo(1);
@@ -78,7 +78,7 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     [Test]
     public async Task コンテキストに複数の識別子が存在しない_STT1002()
     {
-        var sourceCode = Get("{{ A }}{{ B }}", nameof(ByteArrayContextTestData));
+        var sourceCode = Get<ByteArrayContextTestData>("{{ A }}{{ B }}");
         var (_, diagnostics) = await RunAsync(sourceCode);
 
         await Assert.That(diagnostics.Count).IsEqualTo(2);
@@ -134,13 +134,10 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     [Test]
     public async Task 文字列定数識別子に対して書式指定_STT1004()
     {
-        var sourceCode = Get(
-            [
-                "{{ StringConstantField:A }}",
-                "{{ StringConstantField::ja-JP }}",
-                "{{ StringConstantField:A:ja-JP }}"
-            ],
-            nameof(StringContextTestData));
+        var sourceCode = Get<StringContextTestData>(
+            "{{ StringConstantField:A }}",
+            "{{ StringConstantField::ja-JP }}",
+            "{{ StringConstantField:A:ja-JP }}");
         var (_, diagnostics) = await RunAsync(sourceCode);
 
         await Assert.That(diagnostics.Count).IsEqualTo(3);
@@ -161,12 +158,9 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     [Test]
     public async Task 列挙型識別子に対して書式指定_STT1005()
     {
-        var sourceCode = Get(
-            [
-                "{{ EnumStaticField::ja-JP }}",
-                "{{ EnumStaticField:A:ja-JP }}"
-            ],
-            nameof(EnumContextTestData));
+        var sourceCode = Get<EnumContextTestData>(
+            "{{ EnumStaticField::ja-JP }}",
+            "{{ EnumStaticField:A:ja-JP }}");
         var (_, diagnostics) = await RunAsync(sourceCode);
 
         await Assert.That(diagnostics.Count).IsEqualTo(2);
@@ -183,13 +177,10 @@ public sealed class TemplateWriterWriteDiagnosticsTest
     [Test]
     public async Task IFormattable_ISpanFormattable_IUtf8Formattableを実装していない識別子に対して書式指定_STT1006()
     {
-        var sourceCode = Get(
-            [
-                "{{ BytesStaticField:A }}",
-                "{{ BytesStaticField::ja-JP }}",
-                "{{ BytesStaticField:A:ja-JP }}"
-            ],
-            nameof(ByteArrayContextTestData));
+        var sourceCode = Get<ByteArrayContextTestData>(
+            "{{ BytesStaticField:A }}",
+            "{{ BytesStaticField::ja-JP }}",
+            "{{ BytesStaticField:A:ja-JP }}");
         var (_, diagnostics) = await RunAsync(sourceCode);
 
         await Assert.That(diagnostics.Count).IsEqualTo(3);

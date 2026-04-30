@@ -37,7 +37,7 @@ public sealed class TemplateRendererRenderCharArrayTest
         var templateText = $$$"""{{ {{{memberName}}} }}""";
         var contextArgument = GetContextArgumentString<CharArrayContextTestData>(memberName, isStatic);
 
-        var sourceCode = Get(templateText, nameof(CharArrayContextTestData));
+        var sourceCode = Get<CharArrayContextTestData>(templateText);
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 

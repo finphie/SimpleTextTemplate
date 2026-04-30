@@ -12,7 +12,7 @@ public sealed class TemplateRendererRenderStringTest
     [Test]
     public async Task 定数()
     {
-        var sourceCode = Get("{{ StringConstantField }}", nameof(StringContextTestData));
+        var sourceCode = Get<StringContextTestData>("{{ StringConstantField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -42,7 +42,7 @@ public sealed class TemplateRendererRenderStringTest
     [Test]
     public async Task 複数の定数()
     {
-        var sourceCode = Get("{{ StringConstantField }}{{ StringConstantField }}", nameof(StringContextTestData));
+        var sourceCode = Get<StringContextTestData>("{{ StringConstantField }}{{ StringConstantField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -90,7 +90,7 @@ public sealed class TemplateRendererRenderStringTest
         var templateText = $$$"""{{ {{{memberName}}} }}""";
         var contextArgument = GetContextArgumentString<StringContextTestData>(memberName, isStatic);
 
-        var sourceCode = Get(templateText, nameof(StringContextTestData));
+        var sourceCode = Get<StringContextTestData>(templateText);
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 

@@ -8,24 +8,16 @@ namespace SimpleTextTemplate.Generator.Tests;
 /// </summary>
 static class SourceCode
 {
-    /// <summary>
-    /// ソースコードを取得します。
-    /// </summary>
-    /// <param name="templateText">テンプレート文字列</param>
-    /// <param name="context">コンテキスト名</param>
-    /// <param name="provider">カルチャー指定</param>
-    /// <returns>ソースコードを返します。</returns>
-    public static string Get(string? templateText, string? context = null, string? provider = null)
-        => Get([templateText], context, provider);
+    public static string Get(params ReadOnlySpan<string?> templateTextList)
+        => GetInternal(templateTextList, null, null);
 
-    /// <summary>
-    /// ソースコードを取得します。
-    /// </summary>
-    /// <param name="templateTextList">テンプレート文字列のリスト</param>
-    /// <param name="context">コンテキスト名</param>
-    /// <param name="provider">カルチャー指定</param>
-    /// <returns>ソースコードを返します。</returns>
-    public static string Get(string?[] templateTextList, string? context = null, string? provider = null)
+    public static string Get<T>(params ReadOnlySpan<string?> templateTextList)
+        => GetInternal(templateTextList, typeof(T).Name, null);
+
+    public static string GetWithCulture<T>(string? provider, params ReadOnlySpan<string?> templateTextList)
+        => GetInternal(templateTextList, typeof(T).Name, provider);
+
+    static string GetInternal(ReadOnlySpan<string?> templateTextList, string? context = null, string? provider = null)
     {
         var builder = new StringBuilder();
         builder.AppendLine(value: """
@@ -44,7 +36,7 @@ static class SourceCode
 
         if (context is not null)
         {
-            builder.AppendLine(value: $"        var context = new SimpleTextTemplate.Generator.Tests.Core.{context}();");
+            builder.AppendLine(value: $"        var context = new SimpleTextTemplate.Tests.TestData.{context}();");
         }
 
         foreach (var templateText in templateTextList)

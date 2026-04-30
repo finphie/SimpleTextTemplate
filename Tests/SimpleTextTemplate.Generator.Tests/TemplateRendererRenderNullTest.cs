@@ -10,7 +10,7 @@ public sealed class TemplateRendererRenderNullTest
     [Test]
     public async Task 定数()
     {
-        var sourceCode = Get(["{{ NullStringConstantField }}", "{{ NullObjectConstantField }}"], nameof(NullContextTestData));
+        var sourceCode = Get<NullContextTestData>("{{ NullStringConstantField }}", "{{ NullObjectConstantField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
@@ -24,7 +24,7 @@ public sealed class TemplateRendererRenderNullTest
     [Test]
     public async Task 複数の定数()
     {
-        var sourceCode = Get("{{ NullStringConstantField }}{{ NullStringConstantField }}", nameof(NullContextTestData));
+        var sourceCode = Get<NullContextTestData>("{{ NullStringConstantField }}{{ NullStringConstantField }}");
         var (compilation, diagnostics) = await RunAsync(sourceCode);
         var interceptInfoList = compilation.GetInterceptInfo();
 
