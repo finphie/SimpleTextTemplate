@@ -186,9 +186,11 @@ MIT
 ### ライブラリ
 
 - [Microsoft.CodeAnalysis.CSharp](https://github.com/dotnet/roslyn)
+- [System.IO.Hashing](https://github.com/dotnet/dotnet)
 
 ### テスト
 
+- [Microsoft.CodeAnalysis.CSharp.Workspaces](https://github.com/dotnet/roslyn)
 - [TUnit](https://github.com/thomhurst/TUnit)
 
 ### アナライザー
