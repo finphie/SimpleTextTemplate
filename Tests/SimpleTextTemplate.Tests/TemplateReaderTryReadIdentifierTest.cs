@@ -1,57 +1,61 @@
 ﻿using System.Text;
-using Shouldly;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Tests;
 
 public sealed class TemplateReaderTryReadIdentifierTest
 {
-    [Theory]
-    [InlineData("{{A}}", "A", 5)]
-    [InlineData("{{AB}}", "AB", 6)]
-    [InlineData("{{ A }}", "A", 7)]
-    [InlineData("{{   A   }}", "A", 11)]
-    [InlineData("{{ ABC }}", "ABC", 9)]
-    [InlineData("{{ A B }}", "A B", 9)]
-    [InlineData("{{{A}}", "{A", 6)]
-    [InlineData("{{{ A}}", "{ A", 7)]
-    [InlineData("{{A}}}", "A", 5)]
-    [InlineData("{{A }}}", "A", 6)]
-    public void 識別子_識別子の範囲とtrueを返す(string input, string identifier, int consumed)
+    [Test]
+    [Arguments("{{A}}", "A", 5)]
+    [Arguments("{{AB}}", "AB", 6)]
+    [Arguments("{{ A }}", "A", 7)]
+    [Arguments("{{   A   }}", "A", 11)]
+    [Arguments("{{ ABC }}", "ABC", 9)]
+    [Arguments("{{ A B }}", "A B", 9)]
+    [Arguments("{{{A}}", "{A", 6)]
+    [Arguments("{{{ A}}", "{ A", 7)]
+    [Arguments("{{A}}}", "A", 5)]
+    [Arguments("{{A }}}", "A", 6)]
+    public async Task 識別子_識別子の範囲とtrueを返す(string input, string expectedIdentifier, int expectedConsumed)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryReadIdentifier(out var value).ShouldBeTrue();
-        reader.Consumed.ShouldBe((nuint)consumed);
+        var result = reader.TryReadIdentifier(out var value);
+        var consumed = reader.Consumed;
+        ReadOnlyMemory<byte> memory = value.ToArray();
 
-        Encoding.UTF8.GetString(value)
-            .ShouldBe(identifier);
+        await Assert.That(result).IsTrue();
+        await Assert.That(consumed).IsEqualTo((nuint)expectedConsumed);
+        await Assert.That(memory).IsUtf8SequenceEqualTo(expectedIdentifier);
     }
 
-    [Theory]
-    [InlineData("{{}}", 2)]
-    [InlineData("", 0)]
-    [InlineData("{", 0)]
-    [InlineData("a", 0)]
-    [InlineData("ab", 0)]
-    [InlineData("abc", 0)]
-    [InlineData("z{{A}}z", 0)]
-    [InlineData("{A}", 0)]
-    [InlineData("}}", 0)]
-    [InlineData("{ A }", 0)]
-    [InlineData("{{", 2)]
-    [InlineData("{{ ", 3)]
-    [InlineData("{{ A", 3)]
-    [InlineData("{{{", 2)]
-    public void 識別子以外_falseを返す(string input, int consumed)
+    [Test]
+    [Arguments("{{}}", 2)]
+    [Arguments("", 0)]
+    [Arguments("{", 0)]
+    [Arguments("a", 0)]
+    [Arguments("ab", 0)]
+    [Arguments("abc", 0)]
+    [Arguments("z{{A}}z", 0)]
+    [Arguments("{A}", 0)]
+    [Arguments("}}", 0)]
+    [Arguments("{ A }", 0)]
+    [Arguments("{{", 2)]
+    [Arguments("{{ ", 3)]
+    [Arguments("{{ A", 3)]
+    [Arguments("{{{", 2)]
+    public async Task 識別子以外_falseを返す(string input, int expectedConsumed)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateReader(utf8Input);
 
-        reader.TryReadIdentifier(out var value).ShouldBeFalse();
-        reader.Consumed.ShouldBe((nuint)consumed);
+        var result = reader.TryReadIdentifier(out var value);
+        var consumed = reader.Consumed;
+        var length = value.Length;
 
-        value.ToArray().ShouldBeEmpty();
+        await Assert.That(result).IsFalse();
+        await Assert.That(consumed).IsEqualTo((nuint)expectedConsumed);
+        await Assert.That(length).IsZero();
     }
 }

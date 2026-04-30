@@ -1,90 +1,94 @@
 ﻿using System.Text;
-using Shouldly;
-using Xunit;
+using SimpleTextTemplate.Tests.Assertions;
 
 namespace SimpleTextTemplate.Tests;
 
 public sealed class TemplateIdentifierReaderReadTest
 {
-    [Theory]
-    [InlineData("A", "A")]
-    [InlineData("A B", "A B")]
-    [InlineData("A:", "A")]
-    [InlineData("A::", "A")]
-    public void 書式指定及びカルチャー指定なし_識別子名のみ返す(string input, string expectedIdentifier)
+    [Test]
+    [Arguments("A", "A")]
+    [Arguments("A B", "A B")]
+    [Arguments("A:", "A")]
+    [Arguments("A::", "A")]
+    public async Task 書式指定及びカルチャー指定なし_識別子名のみ返す(string input, string expectedIdentifier)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateIdentifierReader(utf8Input);
 
         reader.Read(out var value, out var format, out var culture);
+        ReadOnlyMemory<byte> memory = value.ToArray();
 
-        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
-        format.ShouldBeNull();
-        culture.ShouldBeNull();
+        await Assert.That(memory).IsUtf8SequenceEqualTo(expectedIdentifier);
+        await Assert.That(format).IsNull();
+        await Assert.That(culture).IsNull();
     }
 
-    [Theory]
-    [InlineData("A:B", "A", "B")]
-    [InlineData("A:BC", "A", "BC")]
-    [InlineData("A:B C", "A", "B C")]
-    [InlineData("A: B", "A", " B")]
-    [InlineData("A B:C", "A B", "C")]
-    public void 書式指定あり_識別子名と書式指定を返す(string input, string expectedIdentifier, string expectedFormat)
+    [Test]
+    [Arguments("A:B", "A", "B")]
+    [Arguments("A:BC", "A", "BC")]
+    [Arguments("A:B C", "A", "B C")]
+    [Arguments("A: B", "A", " B")]
+    [Arguments("A B:C", "A B", "C")]
+    public async Task 書式指定あり_識別子名と書式指定を返す(string input, string expectedIdentifier, string expectedFormat)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateIdentifierReader(utf8Input);
 
         reader.Read(out var value, out var format, out var culture);
+        ReadOnlyMemory<byte> memory = value.ToArray();
 
-        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
-        format.ShouldBe(expectedFormat);
-        culture.ShouldBeNull();
+        await Assert.That(memory).IsUtf8SequenceEqualTo(expectedIdentifier);
+        await Assert.That(format).IsEqualTo(expectedFormat);
+        await Assert.That(culture).IsNull();
     }
 
-    [Theory]
-    [InlineData("A::B", "A", "B")]
-    [InlineData("A::BC", "A", "BC")]
-    [InlineData("A::B C", "A", "B C")]
-    [InlineData("A:: B", "A", " B")]
-    [InlineData("A:::", "A", ":")]
-    [InlineData("A B::C", "A B", "C")]
-    public void カルチャー指定あり_識別子名とカルチャー指定を返す(string input, string expectedIdentifier, string expectedCulture)
+    [Test]
+    [Arguments("A::B", "A", "B")]
+    [Arguments("A::BC", "A", "BC")]
+    [Arguments("A::B C", "A", "B C")]
+    [Arguments("A:: B", "A", " B")]
+    [Arguments("A:::", "A", ":")]
+    [Arguments("A B::C", "A B", "C")]
+    public async Task カルチャー指定あり_識別子名とカルチャー指定を返す(string input, string expectedIdentifier, string expectedCulture)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateIdentifierReader(utf8Input);
 
         reader.Read(out var value, out var format, out var culture);
+        ReadOnlyMemory<byte> memory = value.ToArray();
 
-        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
-        format.ShouldBeNull();
-        culture.ShouldBe(expectedCulture);
+        await Assert.That(memory).IsUtf8SequenceEqualTo(expectedIdentifier);
+        await Assert.That(format).IsNull();
+        await Assert.That(culture).IsEqualTo(expectedCulture);
     }
 
-    [Theory]
-    [InlineData("A:B:C", "A", "B", "C")]
-    [InlineData("A:B :C", "A", "B ", "C")]
-    [InlineData("A: B:C", "A", " B", "C")]
-    [InlineData("A:B: C", "A", "B", " C")]
-    [InlineData("A : B : C", "A ", " B ", " C")]
-    public void 書式指定及びカルチャー指定あり_識別子名と書式指定とカルチャー指定を返す(string input, string expectedIdentifier, string expectedFormat, string expectedCulture)
+    [Test]
+    [Arguments("A:B:C", "A", "B", "C")]
+    [Arguments("A:B :C", "A", "B ", "C")]
+    [Arguments("A: B:C", "A", " B", "C")]
+    [Arguments("A:B: C", "A", "B", " C")]
+    [Arguments("A : B : C", "A ", " B ", " C")]
+    public async Task 書式指定及びカルチャー指定あり_識別子名と書式指定とカルチャー指定を返す(string input, string expectedIdentifier, string expectedFormat, string expectedCulture)
     {
         var utf8Input = Encoding.UTF8.GetBytes(input);
         var reader = new TemplateIdentifierReader(utf8Input);
 
         reader.Read(out var value, out var format, out var culture);
+        ReadOnlyMemory<byte> memory = value.ToArray();
 
-        Encoding.UTF8.GetString(value).ShouldBe(expectedIdentifier);
-        format.ShouldBe(expectedFormat);
-        culture.ShouldBe(expectedCulture);
+        await Assert.That(memory).IsUtf8SequenceEqualTo(expectedIdentifier);
+        await Assert.That(format).IsEqualTo(expectedFormat);
+        await Assert.That(culture).IsEqualTo(expectedCulture);
     }
 
-    [Fact]
-    public void バイト列先頭がコロン_TemplateException()
+    [Test]
+    public async Task バイト列先頭がコロン_TemplateException()
     {
-        Should.Throw<TemplateException>(static () =>
+        var action = () =>
         {
             var reader = new TemplateIdentifierReader(":A"u8);
             reader.Read(out _, out _, out _);
-        });
+        };
+        await Assert.That(action).ThrowsExactly<TemplateException>();
     }
 }
