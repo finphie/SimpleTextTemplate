@@ -3,8 +3,7 @@
 
   <ItemGroup>
     <PackageVersion Include="Scriban" Version="7.1.0" />
-    <PackageVersion Condition="!$(MSBuildProjectName.EndsWith('.Sample'))" Include="SimpleTextTemplate.Generator" Version="3.1.0.148" />
-    <PackageVersion Condition="$(MSBuildProjectName.EndsWith('.Sample'))" Include="SimpleTextTemplate.Generator" Version="3.1.0" />
+    <PackageVersion Include="SimpleTextTemplate.Generator" Version="3.1.0" />
     <PackageVersion Include="System.IO.Hashing" Version="10.0.7" />
   </ItemGroup>
 
