@@ -12,7 +12,7 @@ namespace SimpleTextTemplate.Benchmarks;
 
 public partial class RenderConstantIntBenchmark
 {
-    const string Template = "{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}";
+    const string TemplateText = "{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}";
 
     readonly ArrayBufferWriter<byte> _bufferWriter = new(BufferSize);
 
@@ -31,9 +31,9 @@ public partial class RenderConstantIntBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        _template = global::SimpleTextTemplate.Template.Parse(Encoding.UTF8.GetBytes(Template));
-        _scribanTemplate = ScribanTemplate.Parse(Template);
-        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(Template);
+        _template = Template.Parse(Encoding.UTF8.GetBytes(TemplateText));
+        _scribanTemplate = ScribanTemplate.Parse(TemplateText);
+        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(TemplateText);
         _compositeFormat = CompositeFormat.Parse(Format);
 
         _generatorContext = new();
@@ -51,7 +51,7 @@ public partial class RenderConstantIntBenchmark
         _bufferWriter.ResetWrittenCount();
 
         var writer = TemplateWriter.Create(_bufferWriter);
-        TemplateRenderer.Render(ref writer, Template, in _generatorContext);
+        TemplateRenderer.Render(ref writer, TemplateText, in _generatorContext);
         writer.Flush();
 
         return _bufferWriter.WrittenMemory;
@@ -94,7 +94,7 @@ public partial class RenderConstantIntBenchmark
 
     [Benchmark(Description = DescriptionRegex)]
     public string System_Text_RegularExpressions_Regex()
-        => Regex.Replace(Template, SampleContext.ConstantIntValue.ToString(CultureInfo.InvariantCulture));
+        => Regex.Replace(TemplateText, SampleContext.ConstantIntValue.ToString(CultureInfo.InvariantCulture));
 
     [Benchmark(Description = DescriptionScriban)]
     public string Scriban()
