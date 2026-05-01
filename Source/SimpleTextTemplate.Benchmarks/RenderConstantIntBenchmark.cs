@@ -13,7 +13,7 @@ public class RenderConstantIntBenchmark
 {
     const string ConstantIntTemplate = "{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}{{ ConstantIntValue }}";
 
-    readonly ArrayBufferWriter<byte> _bufferWriter = new();
+    readonly ArrayBufferWriter<byte> _bufferWriter = new(BufferSize);
 
     Template _template;
     ScribanTemplate _scribanTemplate;

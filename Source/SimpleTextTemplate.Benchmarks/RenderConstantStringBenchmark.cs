@@ -13,7 +13,7 @@ public class RenderConstantStringBenchmark
 {
     const string ConstantStringTemplate = "{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}";
 
-    readonly ArrayBufferWriter<byte> _bufferWriter = new();
+    readonly ArrayBufferWriter<byte> _bufferWriter = new(BufferSize);
 
     Template _template;
     ScribanTemplate _scribanTemplate;

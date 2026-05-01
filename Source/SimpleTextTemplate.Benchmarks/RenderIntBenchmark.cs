@@ -13,7 +13,7 @@ public class RenderIntBenchmark
 {
     const string IntTemplate = "{{ IntValue }}{{ IntValue }}{{ IntValue }}{{ IntValue }}{{ IntValue }}";
 
-    readonly ArrayBufferWriter<byte> _bufferWriter = new();
+    readonly ArrayBufferWriter<byte> _bufferWriter = new(BufferSize);
 
     Template _template;
     ScribanTemplate _scribanTemplate;

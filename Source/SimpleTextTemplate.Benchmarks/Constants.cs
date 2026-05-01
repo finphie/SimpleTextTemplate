@@ -2,6 +2,8 @@
 
 static class Constants
 {
+    public const int BufferSize = 256;
+
     public const string DescriptionSimpleTextTemplate = "SimpleTextTemplate";
     public const string DescriptionSimpleTextTemplateGenerator = "SimpleTextTemplate.Generator";
     public const string DescriptionScriban = "Scriban";

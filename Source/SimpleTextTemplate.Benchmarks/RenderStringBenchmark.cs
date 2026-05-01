@@ -13,7 +13,7 @@ public class RenderStringBenchmark
 {
     const string StringTemplate = "{{ StringValue }}{{ StringValue }}{{ StringValue }}{{ StringValue }}{{ StringValue }}";
 
-    readonly ArrayBufferWriter<byte> _bufferWriter = new();
+    readonly ArrayBufferWriter<byte> _bufferWriter = new(BufferSize);
 
     Template _stringTemplate;
     ScribanTemplate _scribanTemplate;
