@@ -115,48 +115,55 @@ Console.WriteLine(Encoding.UTF8.GetString(bufferWriter.WrittenSpan));
 
 ### 定数（string）
 
-| Method                       | Mean     | Error    | Ratio | Gen0   | Allocated |
-|----------------------------- |---------:|---------:|------:|-------:|----------:|
-| SimpleTextTemplate.Generator | 13.53 ns | 0.110 ns |  1.00 | 0.0067 |      56 B |
-| (Utf8.TryWrite)              | 25.12 ns | 0.164 ns |  1.86 | 0.0067 |      56 B |
-| (InterpolatedStringHandler)  | 30.96 ns | 0.357 ns |  2.29 | 0.0105 |      88 B |
-| (CompositeFormat)            | 29.98 ns | 0.468 ns |  2.22 | 0.0105 |      88 B |
+| Method                       | Mean          | Error       | Ratio    | Gen0   | Gen1   | Allocated |
+|----------------------------- |--------------:|------------:|---------:|-------:|-------:|----------:|
+| SimpleTextTemplate.Generator |      4.664 ns |   0.0067 ns |     1.00 |      - |      - |         - |
+| SimpleTextTemplate           |    100.016 ns |   0.1215 ns |    21.45 |      - |      - |         - |
+| Utf8.TryWrite                |     26.145 ns |   0.0387 ns |     5.61 |      - |      - |         - |
+| InterpolatedStringHandler    |     17.810 ns |   0.3476 ns |     3.82 | 0.0043 |      - |      72 B |
+| CompositeFormat              |     40.057 ns |   0.2720 ns |     8.59 | 0.0043 |      - |      72 B |
+| Regex                        |    152.400 ns |   0.2889 ns |    32.68 | 0.0043 |      - |      72 B |
+| Scriban                      | 10,953.132 ns | 157.4480 ns | 2,348.54 | 3.6621 | 0.3662 |   62090 B |
+| Scriban_Liquid               |  9,733.122 ns |  90.6237 ns | 2,086.95 | 3.8452 | 0.3662 |   64374 B |
 
 ### 定数（int）
 
-| Method                       | Mean     | Error    | Ratio | Gen0   | Allocated |
-|----------------------------- |---------:|---------:|------:|-------:|----------:|
-| SimpleTextTemplate.Generator | 12.18 ns | 0.051 ns |  1.00 | 0.0048 |      40 B |
-| (Utf8.TryWrite)              | 13.54 ns | 0.234 ns |  1.11 | 0.0048 |      40 B |
-| (InterpolatedStringHandler)  | 32.67 ns | 0.487 ns |  2.68 | 0.0067 |      56 B |
-| (CompositeFormat)            | 28.76 ns | 0.412 ns |  2.36 | 0.0067 |      56 B |
+| Method                       | Mean          | Error       | Ratio    | Gen0   | Gen1   | Allocated |
+|----------------------------- |--------------:|------------:|---------:|-------:|-------:|----------:|
+| SimpleTextTemplate.Generator |      4.627 ns |   0.0193 ns |     1.00 |      - |      - |         - |
+| SimpleTextTemplate           |     71.926 ns |   0.0699 ns |    15.54 |      - |      - |         - |
+| Utf8.TryWrite                |     14.638 ns |   0.0376 ns |     3.16 |      - |      - |         - |
+| InterpolatedStringHandler    |     34.755 ns |   0.1168 ns |     7.51 | 0.0043 |      - |      72 B |
+| CompositeFormat              |     49.985 ns |   0.7447 ns |    10.80 | 0.0043 |      - |      72 B |
+| Regex                        |    158.656 ns |   0.4039 ns |    34.29 | 0.0062 |      - |     104 B |
+| Scriban                      | 11,049.313 ns | 131.1204 ns | 2,387.86 | 3.6926 | 0.3662 |   62247 B |
+| Scriban_Liquid               | 10,085.002 ns | 102.6479 ns | 2,179.46 | 3.8452 | 0.3662 |   64534 B |
 
 ### string
 
-| Method                       | Mean        | Error     | Ratio  | Gen0   | Gen1   | Allocated |
-|----------------------------- |------------:|----------:|-------:|-------:|-------:|----------:|
-| SimpleTextTemplate.Generator |    25.32 ns |  0.062 ns |   1.00 | 0.0057 |      - |      48 B |
-| SimpleTextTemplate           |    61.39 ns |  0.530 ns |   2.42 | 0.0057 |      - |      48 B |
-| Scriban                      | 8,339.53 ns | 46.900 ns | 329.31 | 3.7842 | 0.3662 |   32071 B |
-| Scriban_Liquid               | 6,670.99 ns | 66.825 ns | 263.43 | 4.0131 | 0.3815 |   33602 B |
-| (Utf8.TryWrite)              |    22.73 ns |  0.346 ns |   0.90 | 0.0057 |      - |      48 B |
-| (InterpolatedStringHandler)  |    30.22 ns |  0.393 ns |   1.19 | 0.0086 |      - |      72 B |
-| (CompositeFormat)            |    27.75 ns |  0.348 ns |   1.10 | 0.0086 |      - |      72 B |
+| Method                       | Mean         | Error      | Ratio  | Gen0   | Gen1   | Allocated |
+|----------------------------- |-------------:|-----------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate.Generator |     29.73 ns |   0.069 ns |   1.00 |      - |      - |         - |
+| SimpleTextTemplate           |     88.72 ns |   0.461 ns |   2.98 |      - |      - |         - |
+| Utf8.TryWrite                |     27.01 ns |   0.021 ns |   0.91 |      - |      - |         - |
+| InterpolatedStringHandler    |     26.65 ns |   0.132 ns |   0.90 | 0.0043 |      - |      72 B |
+| CompositeFormat              |     41.19 ns |   0.120 ns |   1.39 | 0.0043 |      - |      72 B |
+| Regex                        |    154.58 ns |   0.560 ns |   5.20 | 0.0043 |      - |      72 B |
+| Scriban                      | 10,953.11 ns | 176.259 ns | 368.47 | 3.6621 | 0.3662 |   62103 B |
+| Scriban_Liquid               |  9,955.17 ns | 135.368 ns | 334.90 | 3.8452 | 0.3662 |   64374 B |
 
 ### int
 
-| Method                       | Mean        | Error     | Ratio  | Gen0   | Gen1   | Allocated |
-|----------------------------- |------------:|----------:|-------:|-------:|-------:|----------:|
-| SimpleTextTemplate.Generator |    19.00 ns |  0.067 ns |   1.00 | 0.0057 |      - |      48 B |
-| SimpleTextTemplate           |    60.97 ns |  0.690 ns |   3.21 | 0.0057 |      - |      48 B |
-| Scriban                      | 8,600.22 ns | 78.630 ns | 452.65 | 3.7842 | 0.3662 |   32095 B |
-| Scriban_Liquid               | 6,794.65 ns | 98.124 ns | 357.62 | 4.0131 | 0.3967 |   33626 B |
-| (Utf8.TryWrite)              |    17.98 ns |  0.313 ns |   0.95 | 0.0057 |      - |      48 B |
-| (InterpolatedStringHandler)  |    34.09 ns |  0.439 ns |   1.79 | 0.0076 |      - |      64 B |
-| (CompositeFormat)            |    29.13 ns |  0.352 ns |   1.53 | 0.0076 |      - |      64 B |
-
-> [!Note]
-> ()で囲まれているメソッドは参考として記載。
+| Method                       | Mean         | Error      | Ratio  | Gen0   | Gen1   | Allocated |
+|----------------------------- |-------------:|-----------:|-------:|-------:|-------:|----------:|
+| SimpleTextTemplate.Generator |     24.41 ns |   0.053 ns |   1.00 |      - |      - |         - |
+| SimpleTextTemplate           |     76.66 ns |   0.090 ns |   3.14 |      - |      - |         - |
+| Utf8.TryWrite                |     20.20 ns |   0.052 ns |   0.83 |      - |      - |         - |
+| InterpolatedStringHandler    |     35.54 ns |   0.162 ns |   1.46 | 0.0043 |      - |      72 B |
+| CompositeFormat              |     49.87 ns |   0.135 ns |   2.04 | 0.0043 |      - |      72 B |
+| Regex                        |    148.38 ns |   1.536 ns |   6.08 | 0.0062 |      - |     104 B |
+| Scriban                      | 11,223.34 ns | 111.485 ns | 459.73 | 3.6621 | 0.2441 |   62255 B |
+| Scriban_Liquid               |  9,870.61 ns | 127.730 ns | 404.32 | 3.8452 | 0.3662 |   64534 B |
 
 [ベンチマークプロジェクト](https://github.com/finphie/SimpleTextTemplate/tree/main/Source/SimpleTextTemplate.Benchmarks)
 

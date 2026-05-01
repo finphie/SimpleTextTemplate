@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using BenchmarkDotNet.Attributes;
+using static SimpleTextTemplate.Benchmarks.Constants;
 using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;
@@ -30,8 +31,8 @@ public class ParseBenchmark
     public ScribanTemplate Scriban() => ScribanTemplate.Parse(_utf16Source);
 
     [Benchmark]
-    public ScribanTemplate ScribanLiquid() => ScribanTemplate.ParseLiquid(_utf16Source);
+    public ScribanTemplate Scriban_Liquid() => ScribanTemplate.ParseLiquid(_utf16Source);
 
-    [Benchmark(Description = "(CompositeFormat)")]
-    public CompositeFormat CompositeFormatParse() => CompositeFormat.Parse(_format);
+    [Benchmark(Description = DescriptionCompositeFormat)]
+    public CompositeFormat System_Text_CompositeFormat() => CompositeFormat.Parse(_format);
 }
