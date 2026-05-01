@@ -73,6 +73,7 @@ public partial class RenderIntBenchmark
 
         Utf8.TryWrite(
             _bufferWriter.GetSpan(),
+            CultureInfo.InvariantCulture,
             $"{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}{_generatorContext.IntValue}",
             out var bytesWritten);
         _bufferWriter.Advance(bytesWritten);

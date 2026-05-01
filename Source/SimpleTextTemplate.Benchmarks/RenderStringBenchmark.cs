@@ -74,6 +74,7 @@ public partial class RenderStringBenchmark
         var length = Encoding.UTF8.GetMaxByteCount(_generatorContext.StringValue.Length * 5);
         Utf8.TryWrite(
             _bufferWriter.GetSpan(length),
+            CultureInfo.InvariantCulture,
             $"{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}",
             out var bytesWritten);
         _bufferWriter.Advance(bytesWritten);

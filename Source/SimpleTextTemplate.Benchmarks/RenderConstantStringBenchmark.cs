@@ -74,6 +74,7 @@ public partial class RenderConstantStringBenchmark
         var length = Encoding.UTF8.GetMaxByteCount(SampleContext.ConstantStringValue.Length * 5);
         Utf8.TryWrite(
             _bufferWriter.GetSpan(length),
+            CultureInfo.InvariantCulture,
             $"{SampleContext.ConstantStringValue}{SampleContext.ConstantStringValue}{SampleContext.ConstantStringValue}{SampleContext.ConstantStringValue}{SampleContext.ConstantStringValue}",
             out var bytesWritten);
         _bufferWriter.Advance(bytesWritten);
