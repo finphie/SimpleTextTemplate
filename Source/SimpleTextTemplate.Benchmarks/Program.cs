@@ -3,10 +3,9 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using SimpleTextTemplate.Benchmarks;
 
 #if DEBUG
-var x = new RenderConstantStringBenchmark();
+var x = new SimpleTextTemplate.Benchmarks.RenderConstantStringBenchmark();
 x.Setup();
 
 Console.WriteLine("1: " + System.Text.Encoding.UTF8.GetString(x.SimpleTextTemplate_Generator().Span));
