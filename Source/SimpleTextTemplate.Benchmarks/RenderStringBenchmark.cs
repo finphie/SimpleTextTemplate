@@ -85,7 +85,7 @@ public class RenderStringBenchmark
     }
 
     [Benchmark(Description = DescriptionCompositeFormat)]
-    public string System_Text_CompositeFormat() 
+    public string System_Text_CompositeFormat()
         => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _generatorContext.StringValue);
 
     [Benchmark(Description = DescriptionScriban)]
@@ -93,6 +93,6 @@ public class RenderStringBenchmark
         => _scribanTemplate.Render(_scribanContext);
 
     [Benchmark(Description = DescriptionScribanLiquid)]
-    public string Scriban_Liquid() 
+    public string Scriban_Liquid()
         => _scribanLiquidTemplate.Render(_scribanContext);
 }

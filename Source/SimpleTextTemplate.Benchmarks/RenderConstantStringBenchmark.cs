@@ -85,7 +85,7 @@ public class RenderConstantStringBenchmark
     }
 
     [Benchmark(Description = DescriptionCompositeFormat)]
-    public string System_Text_CompositeFormat() 
+    public string System_Text_CompositeFormat()
         => string.Format(CultureInfo.InvariantCulture, _compositeFormat, SampleContext.ConstantStringValue);
 
     [Benchmark(Description = DescriptionScriban)]

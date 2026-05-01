@@ -85,14 +85,14 @@ public class RenderConstantIntBenchmark
     }
 
     [Benchmark(Description = DescriptionCompositeFormat)]
-    public string System_Text_CompositeFormat() 
+    public string System_Text_CompositeFormat()
         => string.Format(CultureInfo.InvariantCulture, _compositeFormat, SampleContext.ConstantIntValue);
 
     [Benchmark(Description = DescriptionScriban)]
-    public string Scriban() 
+    public string Scriban()
         => _scribanTemplate.Render(_scribanContext);
 
     [Benchmark(Description = DescriptionScribanLiquid)]
-    public string Scriban_Liquid() 
+    public string Scriban_Liquid()
         => _scribanLiquidTemplate.Render(_scribanContext);
 }
