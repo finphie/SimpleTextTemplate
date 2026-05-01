@@ -42,7 +42,7 @@ public class RenderStringBenchmark
     }
 
     [Benchmark(Baseline = true, Description = DescriptionSimpleTextTemplateGenerator)]
-    public byte[] SimpleTextTemplate_Generator()
+    public ReadOnlyMemory<byte> SimpleTextTemplate_Generator()
     {
         _bufferWriter.ResetWrittenCount();
 
@@ -50,63 +50,49 @@ public class RenderStringBenchmark
         TemplateRenderer.Render(ref writer, StringTemplate, in _generatorContext);
         writer.Flush();
 
-        return _bufferWriter.WrittenSpan.ToArray();
+        return _bufferWriter.WrittenMemory;
     }
 
     [Benchmark(Description = DescriptionSimpleTextTemplate)]
-    public byte[] SimpleTextTemplate()
+    public ReadOnlyMemory<byte> SimpleTextTemplate()
     {
         _bufferWriter.ResetWrittenCount();
 
         _stringTemplate.Render(_bufferWriter, _context);
-
-        return _bufferWriter.WrittenSpan.ToArray();
+        return _bufferWriter.WrittenMemory;
     }
 
     [Benchmark(Description = DescriptionUtf8TryWrite)]
-    public byte[] Utf8_TryWrite()
+    public ReadOnlyMemory<byte> Utf8_TryWrite()
     {
         _bufferWriter.ResetWrittenCount();
 
+        var length = Encoding.UTF8.GetMaxByteCount(_generatorContext.StringValue.Length * 5);
         Utf8.TryWrite(
-            _bufferWriter.GetSpan(),
+            _bufferWriter.GetSpan(length),
             $"{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}",
             out var bytesWritten);
         _bufferWriter.Advance(bytesWritten);
 
-        return _bufferWriter.WrittenSpan.ToArray();
+        return _bufferWriter.WrittenMemory;
     }
 
     [Benchmark(Description = DescriptionInterpolatedStringHandler)]
     public string InterpolatedStringHandler()
     {
-        _bufferWriter.ResetWrittenCount();
-
         DefaultInterpolatedStringHandler handler = $"{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}{_generatorContext.StringValue}";
         return handler.ToStringAndClear();
     }
 
     [Benchmark(Description = DescriptionCompositeFormat)]
-    public string System_Text_CompositeFormat()
-    {
-        _bufferWriter.ResetWrittenCount();
-
-        return string.Format(CultureInfo.InvariantCulture, _compositeFormat, _generatorContext.StringValue);
-    }
+    public string System_Text_CompositeFormat() 
+        => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _generatorContext.StringValue);
 
     [Benchmark(Description = DescriptionScriban)]
     public string Scriban()
-    {
-        _bufferWriter.ResetWrittenCount();
-
-        return _scribanTemplate.Render(_scribanContext);
-    }
+        => _scribanTemplate.Render(_scribanContext);
 
     [Benchmark(Description = DescriptionScribanLiquid)]
-    public string Scriban_Liquid()
-    {
-        _bufferWriter.ResetWrittenCount();
-
-        return _scribanLiquidTemplate.Render(_scribanContext);
-    }
+    public string Scriban_Liquid() 
+        => _scribanLiquidTemplate.Render(_scribanContext);
 }
