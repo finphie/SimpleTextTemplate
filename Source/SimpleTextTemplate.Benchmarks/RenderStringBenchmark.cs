@@ -12,7 +12,7 @@ namespace SimpleTextTemplate.Benchmarks;
 
 public partial class RenderStringBenchmark
 {
-    const string StringTemplate = "{{ StringValue }}{{ StringValue }}{{ StringValue }}{{ StringValue }}{{ StringValue }}";
+    const string Template = "{{ StringValue }}{{ StringValue }}{{ StringValue }}{{ StringValue }}{{ StringValue }}";
 
     readonly ArrayBufferWriter<byte> _bufferWriter = new(BufferSize);
 
@@ -31,9 +31,9 @@ public partial class RenderStringBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        _stringTemplate = Template.Parse(Encoding.UTF8.GetBytes(StringTemplate));
-        _scribanTemplate = ScribanTemplate.Parse(StringTemplate);
-        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(StringTemplate);
+        _stringTemplate = global::SimpleTextTemplate.Template.Parse(Encoding.UTF8.GetBytes(Template));
+        _scribanTemplate = ScribanTemplate.Parse(Template);
+        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(Template);
         _compositeFormat = CompositeFormat.Parse(Format);
 
         _generatorContext = new();
@@ -51,7 +51,7 @@ public partial class RenderStringBenchmark
         _bufferWriter.ResetWrittenCount();
 
         var writer = TemplateWriter.Create(_bufferWriter);
-        TemplateRenderer.Render(ref writer, StringTemplate, in _generatorContext);
+        TemplateRenderer.Render(ref writer, Template, in _generatorContext);
         writer.Flush();
 
         return _bufferWriter.WrittenMemory;
@@ -94,7 +94,7 @@ public partial class RenderStringBenchmark
 
     [Benchmark(Description = DescriptionRegex)]
     public string System_Text_RegularExpressions_Regex()
-        => Regex.Replace(StringTemplate, _generatorContext.StringValue);
+        => Regex.Replace(Template, _generatorContext.StringValue);
 
     [Benchmark(Description = DescriptionScriban)]
     public string Scriban()

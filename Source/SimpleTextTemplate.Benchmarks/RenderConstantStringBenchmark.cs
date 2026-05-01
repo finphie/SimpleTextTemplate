@@ -12,7 +12,7 @@ namespace SimpleTextTemplate.Benchmarks;
 
 public partial class RenderConstantStringBenchmark
 {
-    const string ConstantStringTemplate = "{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}";
+    const string Template = "{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}{{ ConstantStringValue }}";
 
     readonly ArrayBufferWriter<byte> _bufferWriter = new(BufferSize);
 
@@ -31,9 +31,9 @@ public partial class RenderConstantStringBenchmark
     [GlobalSetup]
     public void Setup()
     {
-        _template = Template.Parse(Encoding.UTF8.GetBytes(ConstantStringTemplate));
-        _scribanTemplate = ScribanTemplate.Parse(ConstantStringTemplate);
-        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(ConstantStringTemplate);
+        _template = global::SimpleTextTemplate.Template.Parse(Encoding.UTF8.GetBytes(Template));
+        _scribanTemplate = ScribanTemplate.Parse(Template);
+        _scribanLiquidTemplate = ScribanTemplate.ParseLiquid(Template);
         _compositeFormat = CompositeFormat.Parse(Format);
 
         _generatorContext = new();
@@ -51,7 +51,7 @@ public partial class RenderConstantStringBenchmark
         _bufferWriter.ResetWrittenCount();
 
         var writer = TemplateWriter.Create(_bufferWriter);
-        TemplateRenderer.Render(ref writer, ConstantStringTemplate, in _generatorContext);
+        TemplateRenderer.Render(ref writer, Template, in _generatorContext);
         writer.Flush();
 
         return _bufferWriter.WrittenMemory;
@@ -94,7 +94,7 @@ public partial class RenderConstantStringBenchmark
 
     [Benchmark(Description = DescriptionRegex)]
     public string System_Text_RegularExpressions_Regex()
-        => Regex.Replace(ConstantStringTemplate, SampleContext.ConstantStringValue);
+        => Regex.Replace(Template, SampleContext.ConstantStringValue);
 
     [Benchmark(Description = DescriptionScriban)]
     public string Scriban()
