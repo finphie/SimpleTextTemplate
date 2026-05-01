@@ -11,5 +11,7 @@ static class Constants
     public const string DescriptionUtf8TryWrite = "Utf8.TryWrite";
     public const string DescriptionInterpolatedStringHandler = "InterpolatedStringHandler";
     public const string DescriptionCompositeFormat = "CompositeFormat";
+    public const string DescriptionRegex = "Regex";
+
     public const string Format = "{0}{0}{0}{0}{0}";
 }

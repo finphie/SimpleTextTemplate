@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Text.Unicode;
 using BenchmarkDotNet.Attributes;
 using static SimpleTextTemplate.Benchmarks.Constants;
@@ -9,7 +10,7 @@ using ScribanTemplate = Scriban.Template;
 
 namespace SimpleTextTemplate.Benchmarks;
 
-public class RenderStringBenchmark
+public partial class RenderStringBenchmark
 {
     const string StringTemplate = "{{ StringValue }}{{ StringValue }}{{ StringValue }}{{ StringValue }}{{ StringValue }}";
 
@@ -23,6 +24,9 @@ public class RenderStringBenchmark
     SampleContext _generatorContext;
     Dictionary<byte[], object> _context;
     Dictionary<string, object> _scribanContext;
+
+    [GeneratedRegex("{{ StringValue }}")]
+    static partial Regex Regex { get; }
 
     [GlobalSetup]
     public void Setup()
@@ -87,6 +91,10 @@ public class RenderStringBenchmark
     [Benchmark(Description = DescriptionCompositeFormat)]
     public string System_Text_CompositeFormat()
         => string.Format(CultureInfo.InvariantCulture, _compositeFormat, _generatorContext.StringValue);
+
+    [Benchmark(Description = DescriptionRegex)]
+    public string System_Text_RegularExpressions_Regex()
+        => Regex.Replace(StringTemplate, _generatorContext.StringValue);
 
     [Benchmark(Description = DescriptionScriban)]
     public string Scriban()
