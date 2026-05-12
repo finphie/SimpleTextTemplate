@@ -39,7 +39,7 @@
   <!-- テスト -->
   <ItemGroup>
     <PackageVersion Include="TUnit" Version="1.40.10" />
-    <PackageVersion Include="TUnit.Assertions" Version="1.40.10" />
+    <PackageVersion Include="TUnit.Assertions" Version="1.43.11" />
   </ItemGroup>
 
 </Project>
