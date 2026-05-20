@@ -4,7 +4,7 @@
   <ItemGroup>
     <PackageVersion Include="Scriban" Version="7.1.0" />
     <PackageVersion Include="SimpleTextTemplate.Generator" Version="3.1.0" />
-    <PackageVersion Include="System.IO.Hashing" Version="10.0.7" />
+    <PackageVersion Include="System.IO.Hashing" Version="10.0.8" />
   </ItemGroup>
 
 </Project>
